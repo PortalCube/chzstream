@@ -1,0 +1,136 @@
+import classNames from "classnames";
+import React, { useEffect, useRef, useState } from "react";
+import { requestChzzkChannelInfo } from "src/scripts/message.ts";
+import styled from "styled-components";
+import DragImage from "src/components/drag/DragImage.tsx";
+import { useAtom } from "jotai";
+import { favoriteChannelsAtom } from "src/librarys/app";
+import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
+
+const Container = styled.div<{ $index: number; $gap: number }>`
+  width: 42px;
+  height: 42px;
+
+  margin-right: ${({ $gap }) => $gap}px;
+  border-radius: 50%;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  transition:
+    transform 100ms,
+    margin 100ms;
+
+  background-color: rgba(32, 32, 32, 1);
+
+  z-index: ${({ $index }) => $index};
+
+  cursor: grab;
+
+  &:hover {
+    transform: scale(1.3);
+    z-index: 1000;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.active {
+    outline: 3px solid #1ed070;
+  }
+
+  &:not(.active) {
+    filter: grayscale(50%) brightness(0.33);
+  }
+`;
+
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
+`;
+
+function Channel({ uuid, index, gap }: ChannelProps) {
+  const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
+
+  const [name, setName] = useState("");
+  const [iconUrl, setIconUrl] = useState("");
+  const [active, setActive] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const loadChannelInfo = async () => {
+      const data = await requestChzzkChannelInfo(uuid);
+
+      if (data === null) {
+        return;
+      }
+
+      setName(data.channelName);
+      setIconUrl(getProfileImageUrl(data.channelImageUrl));
+      setActive(data.openLive);
+    };
+
+    const intervalTimer = setInterval(() => {
+      loadChannelInfo();
+    }, 120000);
+
+    loadChannelInfo();
+
+    return () => {
+      clearInterval(intervalTimer);
+    };
+  }, [uuid]);
+
+  const onDragStart: React.DragEventHandler = (event) => {
+    if (event.dataTransfer === null) return;
+
+    if (ref?.current) {
+      event.dataTransfer.setDragImage(ref.current, 0, 0);
+    }
+
+    event.dataTransfer.effectAllowed = "all";
+    event.dataTransfer.dropEffect = "copy";
+
+    const data = JSON.stringify({
+      _isChannel: true,
+      uuid,
+      name,
+      iconUrl,
+    });
+
+    event.dataTransfer.setData("application/json", data);
+  };
+
+  const onPointerDown: React.PointerEventHandler = (event) => {
+    if (event.button === 2) {
+      const isDelete = confirm(`${name} 채널을 즐겨찾기에서 삭제할까요?`);
+      if (isDelete) {
+        setFavoriteChannels(favoriteChannels.filter((item) => item !== uuid));
+      }
+    }
+  };
+
+  return (
+    <Container
+      $index={index}
+      $gap={gap}
+      className={classNames({ active })}
+      draggable={true}
+      onDragStart={onDragStart}
+      onPointerDown={onPointerDown}
+    >
+      <DragImage _ref={ref} src={iconUrl} name={name} />
+      <Image src={iconUrl} />
+    </Container>
+  );
+}
+
+type ChannelProps = {
+  uuid: string;
+  index: number;
+  gap: number;
+};
+
+export default Channel;

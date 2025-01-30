@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.app.json",
+  "compilerOptions": {
+    "rootDir": "../",
+    "baseUrl": ".",
+    "paths": {
+      "@chzstream/url": ["../packages/url/src/index.ts"],
+      "@chzstream/message": ["../packages/message/src/index.ts"]
+    }
+  },
+  "include": [
+    "src",
+    "../packages/**/src",
+    "../packages/url/dist/index.d.ts",
+    "../packages/message/dist/index.d.ts"
+  ]
+}

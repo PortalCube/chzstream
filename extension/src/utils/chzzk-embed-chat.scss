@@ -1,0 +1,39 @@
+.chzzk-embed-chat {
+  &.minified.no-pinned {
+    // 고정된 메세지 제거
+    & div[class^="live_chatting_list_fixed"] {
+      display: none;
+    }
+
+    // 후원 랭킹 제거
+    & div[class^="live_chatting_ranking_container"] {
+      display: none;
+    }
+  }
+
+  &.minified.height {
+    // 헤더 제거
+    & div[class^="live_chatting_header_container"],
+
+      // 채팅 영역 제거
+      & div[class^="live_chatting_area"] {
+      display: none;
+    }
+
+    // 하단 스크롤 채팅 위치 조정
+    & button[class^="live_chatting_scroll_button_chatting"] {
+      bottom: 8px;
+    }
+
+    // 하단 맨 위로 버튼 위치 조정
+    & button[class^="live_chatting_scroll_button_arrow"] {
+      bottom: 11px;
+    }
+
+    // 컨테이너 크기 재조정
+    & div[class^="live_chatting_list_container"] {
+      margin: 0;
+      padding: 0;
+    }
+  }
+}

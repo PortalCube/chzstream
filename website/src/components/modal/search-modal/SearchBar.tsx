@@ -1,0 +1,149 @@
+import classNames from "classnames";
+import { useRef, useState } from "react";
+import { MdClose, MdSearch } from "react-icons/md";
+import { useSearchModal } from "src/librarys/search-modal.ts";
+import styled from "styled-components";
+
+const Container = styled.div`
+  width: 100%;
+  height: 48px;
+
+  padding: 6px 12px;
+  border-radius: 8px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 63, 63, 1);
+  background-color: rgba(31, 31, 31, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+
+  transition: outline 100ms;
+
+  outline: 2px solid rgba(128, 128, 128, 0);
+
+  cursor: text;
+
+  &.focus {
+    outline: 2px solid rgba(128, 128, 128, 1);
+  }
+`;
+
+const Input = styled.input`
+  flex-grow: 1;
+  border: none;
+  background: none;
+
+  font-weight: 600;
+  font-size: 16px;
+
+  color: rgba(220, 220, 220, 1);
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: rgba(128, 128, 128, 1);
+  }
+`;
+
+const Button = styled.button`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: none;
+
+  cursor: pointer;
+
+  color: rgba(128, 128, 128, 1);
+
+  transition: background-color 100ms;
+
+  &:hover {
+    background-color: rgba(63, 63, 63, 1);
+  }
+
+  &.hidden {
+    visibility: hidden;
+  }
+`;
+
+function SearchBar({}: SearchBarProps) {
+  const ref = useRef<HTMLInputElement>(null);
+  const { query, setQuery, search, showRecommend } = useSearchModal();
+  const [isFocus, setFocus] = useState(false);
+
+  const className = classNames({
+    focus: isFocus,
+  });
+
+  const clearClassName = classNames({
+    hidden: query === "",
+  });
+
+  const onClick: React.MouseEventHandler = (event) => {
+    if (event.target === event.currentTarget && ref.current !== null) {
+      ref.current.focus();
+    }
+  };
+
+  const onInput: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    setQuery(event.target.value);
+  };
+
+  const onFocusChange = (value: boolean) => {
+    return () => {
+      setFocus(value);
+    };
+  };
+
+  const onKeyDown: React.KeyboardEventHandler = (event) => {
+    if (event.key === "Enter") {
+      search();
+    }
+  };
+
+  const onClearClick: React.MouseEventHandler = () => {
+    showRecommend();
+  };
+
+  const onSearchClick: React.MouseEventHandler = () => {
+    search();
+  };
+
+  return (
+    <Container className={className} onClick={onClick}>
+      <Input
+        type="text"
+        placeholder="채널 이름, 라이브 제목, UUID로 검색해보세요"
+        value={query}
+        ref={ref}
+        onInput={onInput}
+        onKeyDown={onKeyDown}
+        onFocus={onFocusChange(true)}
+        onBlur={onFocusChange(false)}
+      />
+      <Button onClick={onClearClick} className={clearClassName}>
+        <MdClose size={24} />
+      </Button>
+      <Button onClick={onSearchClick}>
+        <MdSearch size={24} />
+      </Button>
+    </Container>
+  );
+}
+
+type SearchBarProps = {};
+
+export default SearchBar;

@@ -1,0 +1,37 @@
+{
+  "name": "@chzstream/extension",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "dev:edge": "wxt -b edge",
+    "dev:whale": "wxt -b whale",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "build:edge": "wxt build -b edge",
+    "build:whale": "wxt build -b whale",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "zip:edge": "wxt zip -b edge",
+    "zip:whale": "wxt zip -b whale",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@chzstream/message": "workspace:^",
+    "axios": "^1.7.9",
+    "keyv": "^5.2.3",
+    "nanoevents": "^9.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.280",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "@wxt-dev/module-react": "^1.1.2",
+    "typescript": "^5.6.3",
+    "wxt": "^0.19.13"
+  }
+}

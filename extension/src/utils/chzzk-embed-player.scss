@@ -1,0 +1,37 @@
+.chzzk-embed-player {
+  // 비활성화된 클립 버튼 제거
+  & .custom__clip-button--disabled,
+
+  // 좁은 화면 버튼 제거
+  & .pzp-viewmode-button {
+    display: none;
+  }
+
+  // 사이드 메뉴 제거
+  //   & div[class^="live_information_player_control"] {
+  //     display: none;
+  //   }
+
+  &.minified {
+    // "실시간" 텍스트 제거
+    & .pzp-live-time,
+
+    // 전체 화면 버튼 제거
+    & .pzp-fullscreen-button,
+
+    // PIP 버튼 제거
+    & .pzp-pip-button {
+      display: none;
+    }
+
+    // 방송 정보 텍스트 제거
+    & .pzp .player_header > .header_info {
+      display: none;
+    }
+
+    // 사이드 메뉴 제거
+    & div[class^="live_information_player_control"] {
+      display: none;
+    }
+  }
+}

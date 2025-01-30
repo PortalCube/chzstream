@@ -1,0 +1,438 @@
+import classNames from "classnames";
+import { useAtom } from "jotai";
+import { useMemo } from "react";
+import {
+  ApplicationMode,
+  applicationModeAtom,
+  blockListAtom,
+  removeBlock,
+} from "src/librarys/grid.ts";
+import styled, { css } from "styled-components";
+
+import { MdClose, MdLock } from "react-icons/md";
+import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
+import {
+  extraLargeBlockMixin,
+  extraSmallBlockMixin,
+  largeBlockMixin,
+  mediumBlockMixin,
+  smallBlockMixin,
+} from "src/scripts/styled.ts";
+import Channel from "./Channel.tsx";
+import Keyword, { KeywordProps } from "./Keyword.tsx";
+import OfflineIcon from "./OfflineIcon.tsx";
+import { InfoType } from "./InfoOverlay.ts";
+
+const Container = styled.div<{ $dpr: number }>`
+  overflow: hidden;
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  min-width: 210px;
+
+  border: 1px solid #1f1f1f;
+  background-color: #121212;
+
+  display: flex;
+  flex-direction: column;
+
+  ${extraLargeBlockMixin(css`
+    padding: 48px 36px;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    align-items: center;
+    justify-content: center;
+  `)}
+
+  ${largeBlockMixin(css`
+    padding: 36px 28px;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    align-items: center;
+    justify-content: center;
+  `)}
+
+  ${mediumBlockMixin(css`
+    padding: 28px 18px;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    align-items: center;
+    justify-content: center;
+  `)}
+
+  ${smallBlockMixin(css`
+    padding: 0 12px;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+  `)}
+
+  ${extraSmallBlockMixin(css`
+    padding: 0 8px;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+  `)}
+
+  opacity: 1;
+  transition: opacity 100ms;
+
+  &.hidden {
+    display: none;
+  }
+`;
+
+const RemoveButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  border: none;
+  border-radius: 4px;
+  padding: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(255, 255, 255, 1);
+  cursor: pointer;
+
+  transition: background-color 100ms;
+  background-color: rgba(255, 255, 255, 0);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  & > svg {
+    transition:
+      width 100ms,
+      height 100ms;
+
+    ${extraLargeBlockMixin(css`
+      width: 24px;
+      height: 24px;
+    `)}
+
+    ${largeBlockMixin(css`
+      width: 24px;
+      height: 24px;
+    `)}
+
+    ${mediumBlockMixin(css`
+      width: 20px;
+      height: 20px;
+    `)}
+
+    ${smallBlockMixin(css`
+      width: 20px;
+      height: 20px;
+    `)}
+
+    ${extraSmallBlockMixin(css`
+      width: 16px;
+      height: 16px;
+    `)}
+  }
+`;
+
+const Title = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  width: 100%;
+
+  ${extraLargeBlockMixin(css`
+    font-size: 40px;
+    align-items: flex-start;
+    align-items: center;
+    gap: 12px;
+  `)}
+
+  ${largeBlockMixin(css`
+    font-size: 32px;
+    align-items: flex-start;
+    align-items: center;
+    gap: 12px;
+  `)}
+
+  ${mediumBlockMixin(css`
+    font-size: 24px;
+    align-items: flex-start;
+    align-items: center;
+    gap: 10px;
+  `)}
+
+  ${smallBlockMixin(css`
+    font-size: 18px;
+    align-items: center;
+    gap: 8px;
+  `)}
+
+  ${extraSmallBlockMixin(css`
+    font-size: 14px;
+    align-items: center;
+    gap: 8px;
+  `)}
+`;
+
+const Row = styled.div`
+  max-width: 100%;
+
+  display: flex;
+  align-items: center;
+  white-space: pre-wrap;
+
+  font-weight: 800;
+`;
+
+const Text = styled.span`
+  flex-shrink: 0;
+`;
+
+const Description = styled.p`
+  margin-top: 8px;
+  font-weight: 400;
+  color: rgba(159, 159, 159, 1);
+
+  text-wrap: balance;
+  word-break: keep-all;
+
+  ${extraLargeBlockMixin(css`
+    font-size: 18px;
+    text-align: center;
+  `)}
+
+  ${largeBlockMixin(css`
+    font-size: 15px;
+    text-align: center;
+  `)}
+
+  ${mediumBlockMixin(css`
+    font-size: 12px;
+    text-align: center;
+  `)}
+
+  ${smallBlockMixin(css`
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+  `)}
+    
+  ${extraSmallBlockMixin(css`
+    font-size: 10px;
+    line-height: 12px;
+    text-align: center;
+  `)}
+`;
+
+const KEYWORDS: Record<string, KeywordProps> = {
+  offline: {
+    text: "오프라인",
+    icon: OfflineIcon,
+    textColor: "rgb(200, 200, 200)",
+    backgroundColor: "rgb(68, 68, 68)",
+  },
+  adult: {
+    text: "연령 제한 방송",
+    icon: MdLock,
+    textColor: "rgb(255, 255, 255)",
+    backgroundColor: "rgb(221, 31, 72)",
+  },
+};
+
+type Info = {
+  id: string;
+  title: Template[];
+  message: string;
+};
+
+type Template = (string | ElementInfo)[];
+
+const INFOS: Info[] = [
+  {
+    id: "offline",
+    title: [
+      template`${"channel"}님은`,
+      template`현재 ${"keyword:offline"} 입니다`,
+    ],
+    message: "방송이 시작되면 여기에 화면이 표시됩니다.",
+  },
+  {
+    id: "adult",
+    title: [
+      template`${"channel"}님은`,
+      template`현재 ${"keyword:adult"} 중입니다`,
+    ],
+    message: "방송을 시청하려면 해당 플랫폼에서 성인 계정으로 로그인하세요.",
+  },
+  {
+    id: "error",
+    title: [template`플레이어에서 오류가 발생했습니다`],
+    message: "페이지를 새로 고치고 있습니다. 잠시만 기다려주세요...",
+  },
+  {
+    id: "no-channel",
+    title: [template`채널이 지정되지 않았습니다`],
+    message: "편집 모드에서 이 블록의 채널을 지정하세요.",
+  },
+];
+
+type ElementInfo = {
+  type: "none" | "channel" | "keyword";
+} & Record<string, unknown>;
+
+function getElementInfo(token: string[]): ElementInfo {
+  const elementType = token[0];
+
+  if (elementType === "channel") {
+    return {
+      type: "channel",
+    };
+  } else if (elementType === "keyword") {
+    const elementArg = token[1];
+
+    if (elementArg in KEYWORDS) {
+      return {
+        type: "keyword",
+        ...KEYWORDS[elementArg],
+      };
+    }
+  }
+
+  return {
+    type: "none",
+  };
+}
+
+function template(texts: TemplateStringsArray, ...tokens: string[]) {
+  const result: Template = [];
+  for (let i = 0; i < texts.length; i++) {
+    result.push(texts[i]);
+
+    if (i < tokens.length) {
+      const token = tokens[i].split(":");
+      const elementInfo = getElementInfo(token);
+      result.push(elementInfo);
+    }
+  }
+  return result;
+}
+
+function render(id: number, info: Info) {
+  const title = info.title.map((row: Template, index: number) => {
+    return (
+      <Row key={index}>
+        {row.map((element: string | ElementInfo, index: number) => {
+          if (typeof element === "string") {
+            return <Text key={index}>{element}</Text>;
+          }
+
+          if (element.type === "channel") {
+            return <Channel key={index} id={id} />;
+          } else if (element.type === "keyword") {
+            const text = element.text as string;
+            const icon = element.icon as (props: object) => JSX.Element;
+            const textColor = element.textColor as string;
+            const backgroundColor = element.backgroundColor as string;
+
+            return (
+              <Keyword
+                key={index}
+                text={text}
+                icon={icon}
+                textColor={textColor}
+                backgroundColor={backgroundColor}
+              />
+            );
+          }
+
+          return null;
+        })}
+      </Row>
+    );
+  });
+
+  return (
+    <>
+      <Title>{title}</Title>
+      <Description>{info.message}</Description>
+    </>
+  );
+}
+
+function InfoOverlay({ id, type }: InfoOverlayProps) {
+  const [mode, setMode] = useAtom(applicationModeAtom);
+  const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
+  const [blockList, setBlockList] = useAtom(blockListAtom);
+
+  const isShow = useMemo(
+    () => mode === ApplicationMode.View && type !== "none",
+    [mode, type]
+  );
+
+  const content = useMemo(() => {
+    if (type === "none") {
+      return null;
+    }
+
+    const info = INFOS.find((info) => info.id === type);
+
+    if (info === undefined) {
+      return null;
+    }
+
+    return render(id, info);
+  }, [id, type]);
+
+  const className = classNames({
+    hidden: !isShow,
+  });
+
+  const onRemoveButtonClick = () => {
+    setBlockList(removeBlock(id));
+  };
+
+  const onDragEnter: React.DragEventHandler = (event) => {
+    event.preventDefault();
+  };
+
+  const onDragOver: React.DragEventHandler = (event) => {
+    event.preventDefault();
+  };
+
+  return (
+    <Container
+      className={className}
+      $dpr={displayPixelRatio}
+      onDragEnter={onDragEnter}
+      onDragOver={onDragOver}
+    >
+      <RemoveButton onClick={onRemoveButtonClick}>
+        <MdClose />
+      </RemoveButton>
+      {content}
+    </Container>
+  );
+}
+
+type InfoOverlayProps = {
+  id: number;
+  type: InfoType;
+};
+
+export default InfoOverlay;

@@ -1,0 +1,42 @@
+import { isTypedObject } from "../../util.ts";
+import { isMessage, Message } from "../base.ts";
+
+const MESSAGE_KEY = "_isChzzkServiceMessage";
+
+export enum ChzzkServiceType {
+  ChannelInfo = "channel-info",
+  ChannelSearch = "channel-search",
+  LiveInfo = "live-info",
+  LiveSearch = "live-search",
+  LiveList = "live-list",
+}
+
+export enum ChzzkServiceMessageType {
+  Request = "request",
+  Response = "response",
+}
+
+export type ChzzkServiceMessageData = {
+  serviceType: ChzzkServiceType;
+  messageType: ChzzkServiceMessageType;
+};
+
+export type ChzzkServiceMessage = Message & {
+  data: {
+    [MESSAGE_KEY]: true;
+  } & ChzzkServiceMessageData;
+};
+
+export function isChzzkServiceMessage(
+  message: unknown
+): message is ChzzkServiceMessage {
+  if (isMessage(message) === false) {
+    return false;
+  }
+
+  if (isTypedObject(message.data, MESSAGE_KEY) === false) {
+    return false;
+  }
+
+  return true;
+}
