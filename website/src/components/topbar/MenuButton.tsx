@@ -1,10 +1,8 @@
 import { IconType } from "react-icons";
-import { largeScreenMixin } from "src/scripts/styled.ts";
+import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
 const Container = styled.button`
-  padding: 4px 8px;
-  border-radius: 4px;
   display: flex;
   gap: 8px;
 
@@ -21,8 +19,32 @@ const Container = styled.button`
 
   transition: background-color 100ms;
 
+  ${Mixin.screen.greater.large(css`
+    padding: 4px 8px;
+    border-radius: 4px;
+  `)}
+
+  ${Mixin.screen.less.large(css`
+    padding: 6px;
+    border-radius: 50%;
+  `)}
+
   &:hover {
     background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  & > svg {
+    color: rgba(255, 255, 255, 1);
+
+    ${Mixin.screen.greater.large(css`
+      width: 28px;
+      height: 28px;
+    `)}
+
+    ${Mixin.screen.less.large(css`
+      width: 20px;
+      height: 20px;
+    `)}
   }
 `;
 
@@ -30,7 +52,7 @@ const Text = styled.span`
   font-size: 16px;
   font-weight: 500;
 
-  ${largeScreenMixin(css`
+  ${Mixin.screen.less.extraLarge(css`
     display: none;
   `)}
 `;
@@ -38,7 +60,7 @@ const Text = styled.span`
 function MenuButton({ Icon, text, onClick = () => {} }: MenuButtonProps) {
   return (
     <Container onClick={onClick}>
-      <Icon size={28} color="#ffffff" />
+      <Icon />
       <Text>{text}</Text>
     </Container>
   );

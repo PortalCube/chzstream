@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { useAtom } from "jotai";
 import { useMemo } from "react";
-import styled, { css } from "styled-components";
 import { BlockType } from "src/librarys/block.ts";
 import {
   ApplicationMode,
@@ -9,13 +8,8 @@ import {
   findBlock,
 } from "src/librarys/grid.ts";
 import { MessageClient } from "src/scripts/message.ts";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
+import { Mixin } from "src/scripts/styled.ts";
+import styled, { css } from "styled-components";
 
 const resizeMixin = (scale: number) => {
   const elementSize = 100 / scale;
@@ -52,7 +46,7 @@ const Container = styled.iframe`
   }
 
   &.chat {
-    ${extraSmallBlockMixin(css`
+    ${Mixin.block.less.small(css`
       ${resizeMixin(0.75)}
     `)}
   }

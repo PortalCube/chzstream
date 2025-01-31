@@ -1,18 +1,11 @@
-import classNames from "classnames";
 import { useMemo, useRef } from "react";
-import styled, { css } from "styled-components";
-import { BlockChannel } from "src/librarys/block.ts";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
 import DragImage from "src/components/drag/DragImage.tsx";
-import { useModal } from "src/librarys/modal.ts";
+import { BlockChannel } from "src/librarys/block.ts";
 import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
 import { useGrid } from "src/librarys/grid.ts";
+import { useModal } from "src/librarys/modal.ts";
+import { Mixin } from "src/scripts/styled.ts";
+import styled, { css } from "styled-components";
 
 const Container = styled.div`
   position: absolute;
@@ -54,23 +47,11 @@ const InfoGroup = styled.div`
 
   transition: gap 100ms;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.large(css`
     gap: 12px;
   `)}
 
-  ${largeBlockMixin(css`
-    gap: 12px;
-  `)}
-
-  ${mediumBlockMixin(css`
-    gap: 8px;
-  `)}
-
-  ${smallBlockMixin(css`
-    gap: 8px;
-  `)}
-
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.large(css`
     gap: 8px;
   `)}
 `;
@@ -86,27 +67,22 @@ const Icon = styled.img`
     width 100ms,
     height 100ms;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.large(css`
     width: 54px;
     height: 54px;
   `)}
 
-  ${largeBlockMixin(css`
-    width: 54px;
-    height: 54px;
-  `)}
-
-  ${mediumBlockMixin(css`
+  ${Mixin.block.less.large(css`
     width: 36px;
     height: 36px;
   `)}
 
-  ${smallBlockMixin(css`
+  ${Mixin.block.less.medium(css`
     width: 28px;
     height: 28px;
   `)}
 
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.small(css`
     width: 20px;
     height: 20px;
   `)}
@@ -137,23 +113,19 @@ const Name = styled.p`
 
   transition: font-size 100ms;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.large(css`
     font-size: 24px;
   `)}
 
-  ${largeBlockMixin(css`
-    font-size: 24px;
-  `)}
-
-  ${mediumBlockMixin(css`
+  ${Mixin.block.less.large(css`
     font-size: 18px;
   `)}
 
-  ${smallBlockMixin(css`
+  ${Mixin.block.less.medium(css`
     font-size: 14px;
   `)}
 
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.small(css`
     font-size: 12px;
   `)}
 `;
@@ -163,23 +135,19 @@ const Title = styled.p`
 
   transition: font-size 100ms;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.large(css`
     font-size: 18px;
   `)}
 
-  ${largeBlockMixin(css`
-    font-size: 18px;
-  `)}
-
-  ${mediumBlockMixin(css`
+  ${Mixin.block.less.large(css`
     font-size: 13px;
   `)}
 
-  ${smallBlockMixin(css`
+  ${Mixin.block.less.medium(css`
     font-size: 11px;
   `)}
 
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.small(css`
     font-size: 9px;
     display: none;
   `)}

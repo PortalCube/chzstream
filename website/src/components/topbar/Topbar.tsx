@@ -25,13 +25,8 @@ import ChannelGroup from "./ChannelGroup.tsx";
 import MenuButton from "./MenuButton.tsx";
 
 import LogoImage from "src/assets/logo.png";
-import { modalAtom, ModalType, useModal } from "src/librarys/modal.ts";
-import {
-  extraLargeScreenMixin,
-  largeScreenMixin,
-  mediumScreenMixin,
-  smallScreenMixin,
-} from "src/scripts/styled.ts";
+import { useModal } from "src/librarys/modal.ts";
+import { Mixin } from "src/scripts/styled.ts";
 
 const Container = styled.div`
   width: 100%;
@@ -51,10 +46,12 @@ const Container = styled.div`
 
   transition: transform 200ms;
 
-  --height: 40px;
-
-  ${largeScreenMixin(css`
+  ${Mixin.screen.greater.large(css`
     --height: 70px;
+  `)}
+
+  ${Mixin.screen.less.large(css`
+    --height: 48px;
   `)}
 
   &.hide {
@@ -68,8 +65,15 @@ const Container = styled.div`
 `;
 
 const Title = styled.img`
-  height: 28px;
   object-fit: contain;
+
+  ${Mixin.screen.greater.large(css`
+    height: 28px;
+  `)}
+
+  ${Mixin.screen.less.large(css`
+    height: 20px;
+  `)}
 `;
 
 const MenuGroup = styled.div`

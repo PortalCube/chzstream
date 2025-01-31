@@ -1,14 +1,7 @@
 import { useMemo } from "react";
 import styled, { css } from "styled-components";
 
-import { IconType } from "react-icons";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
+import { Mixin } from "src/scripts/styled.ts";
 
 type ContainerProps = {
   $background: string;
@@ -24,27 +17,27 @@ const Container = styled.span<ContainerProps>`
   align-items: center;
   justify-content: center;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.extraLarge(css`
     padding: 6px 12px;
     margin: -6px -8px;
   `)}
 
-  ${largeBlockMixin(css`
+  ${Mixin.block.less.extraLarge(css`
     padding: 6px 10px;
     margin: -6px -6px;
   `)}
-
-  ${mediumBlockMixin(css`
+  
+  ${Mixin.block.less.large(css`
     padding: 4px 8px;
     margin: -4px -4px;
   `)}
-
-  ${smallBlockMixin(css`
+  
+  ${Mixin.block.less.medium(css`
     padding: 4px 4px;
     margin: -4px -4px;
   `)}
-
-  ${extraSmallBlockMixin(css`
+  
+  ${Mixin.block.less.small(css`
     padding: 2px 4px;
     margin: -2px -2px;
   `)}
@@ -52,27 +45,27 @@ const Container = styled.span<ContainerProps>`
   transform: scale(0.9) rotate(${({ $rotation }) => $rotation}deg);
 
   & > svg {
-    ${extraLargeBlockMixin(css`
+    ${Mixin.block.greater.extraLarge(css`
       width: 36px;
       height: 36px;
     `)}
 
-    ${largeBlockMixin(css`
+    ${Mixin.block.less.extraLarge(css`
       width: 28px;
       height: 28px;
     `)}
-
-    ${mediumBlockMixin(css`
+    
+    ${Mixin.block.less.large(css`
       width: 20px;
       height: 20px;
     `)}
-
-    ${smallBlockMixin(css`
+    
+    ${Mixin.block.less.medium(css`
       width: 16px;
       height: 16px;
     `)}
-
-    ${extraSmallBlockMixin(css`
+    
+    ${Mixin.block.less.small(css`
       width: 14px;
       height: 14px;
     `)}

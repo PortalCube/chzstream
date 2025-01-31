@@ -9,13 +9,7 @@ import {
   findBlock,
   removeBlock,
 } from "src/librarys/grid.ts";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
+import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 import Background from "./Background.tsx";
 import Channel from "./Channel.tsx";
@@ -28,23 +22,11 @@ const Container = styled.div<{ $dpr: number }>`
   border-radius: 8px;
   padding: 16px;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.large(css`
     --block-margin: calc(16px + var(--block-margin-base));
   `)}
 
-  ${largeBlockMixin(css`
-    --block-margin: calc(16px + var(--block-margin-base));
-  `)}
-
-  ${mediumBlockMixin(css`
-    --block-margin: calc(12px + var(--block-margin-base));
-  `)}
-
-  ${smallBlockMixin(css`
-    --block-margin: calc(12px + var(--block-margin-base));
-  `)}
-
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.large(css`
     --block-margin: calc(12px + var(--block-margin-base));
   `)}
 
@@ -109,27 +91,17 @@ const RemoveButton = styled.button`
       width 100ms,
       height 100ms;
 
-    ${extraLargeBlockMixin(css`
+    ${Mixin.block.greater.large(css`
       width: 24px;
       height: 24px;
     `)}
 
-    ${largeBlockMixin(css`
-      width: 24px;
-      height: 24px;
-    `)}
-
-    ${mediumBlockMixin(css`
+    ${Mixin.block.less.large(css`
       width: 20px;
       height: 20px;
     `)}
 
-    ${smallBlockMixin(css`
-      width: 20px;
-      height: 20px;
-    `)}
-
-    ${extraSmallBlockMixin(css`
+    ${Mixin.block.less.small(css`
       width: 16px;
       height: 16px;
     `)}

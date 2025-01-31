@@ -11,17 +11,11 @@ import styled, { css } from "styled-components";
 
 import { MdClose, MdLock } from "react-icons/md";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
+import { Mixin } from "src/scripts/styled.ts";
 import Channel from "./Channel.tsx";
+import { InfoType } from "./InfoOverlay.ts";
 import Keyword, { KeywordProps } from "./Keyword.tsx";
 import OfflineIcon from "./OfflineIcon.tsx";
-import { InfoType } from "./InfoOverlay.ts";
 
 const Container = styled.div<{ $dpr: number }>`
   overflow: hidden;
@@ -41,48 +35,32 @@ const Container = styled.div<{ $dpr: number }>`
   display: flex;
   flex-direction: column;
 
-  ${extraLargeBlockMixin(css`
+  align-items: center;
+  justify-content: center;
+
+  ${Mixin.block.greater.extraLarge(css`
     padding: 48px 36px;
     gap: 16px;
-    align-items: flex-start;
-    justify-content: flex-end;
-
-    align-items: center;
-    justify-content: center;
   `)}
 
-  ${largeBlockMixin(css`
+  ${Mixin.block.less.extraLarge(css`
     padding: 36px 28px;
     gap: 12px;
-    align-items: flex-start;
-    justify-content: flex-end;
-
-    align-items: center;
-    justify-content: center;
   `)}
-
-  ${mediumBlockMixin(css`
+  
+  ${Mixin.block.less.large(css`
     padding: 28px 18px;
     gap: 8px;
-    align-items: flex-start;
-    justify-content: flex-end;
-
-    align-items: center;
-    justify-content: center;
   `)}
-
-  ${smallBlockMixin(css`
+  
+  ${Mixin.block.less.medium(css`
     padding: 0 12px;
     gap: 6px;
-    align-items: center;
-    justify-content: center;
   `)}
-
-  ${extraSmallBlockMixin(css`
+  
+  ${Mixin.block.less.small(css`
     padding: 0 8px;
     gap: 4px;
-    align-items: center;
-    justify-content: center;
   `)}
 
   opacity: 1;
@@ -121,27 +99,17 @@ const RemoveButton = styled.button`
       width 100ms,
       height 100ms;
 
-    ${extraLargeBlockMixin(css`
+    ${Mixin.block.greater.large(css`
       width: 24px;
       height: 24px;
     `)}
 
-    ${largeBlockMixin(css`
-      width: 24px;
-      height: 24px;
-    `)}
-
-    ${mediumBlockMixin(css`
+    ${Mixin.block.less.large(css`
       width: 20px;
       height: 20px;
     `)}
-
-    ${smallBlockMixin(css`
-      width: 20px;
-      height: 20px;
-    `)}
-
-    ${extraSmallBlockMixin(css`
+  
+    ${Mixin.block.less.small(css`
       width: 16px;
       height: 16px;
     `)}
@@ -149,43 +117,39 @@ const RemoveButton = styled.button`
 `;
 
 const Title = styled.div`
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  align-items: center;
 
-  width: 100%;
-
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.extraLarge(css`
     font-size: 40px;
     align-items: flex-start;
-    align-items: center;
     gap: 12px;
   `)}
 
-  ${largeBlockMixin(css`
+  ${Mixin.block.less.extraLarge(css`
     font-size: 32px;
     align-items: flex-start;
-    align-items: center;
     gap: 12px;
   `)}
-
-  ${mediumBlockMixin(css`
+  
+  ${Mixin.block.less.large(css`
     font-size: 24px;
     align-items: flex-start;
-    align-items: center;
     gap: 10px;
   `)}
-
-  ${smallBlockMixin(css`
+  
+  ${Mixin.block.less.medium(css`
     font-size: 18px;
-    align-items: center;
     gap: 8px;
   `)}
-
-  ${extraSmallBlockMixin(css`
+  
+  ${Mixin.block.less.small(css`
     font-size: 14px;
-    align-items: center;
     gap: 8px;
   `)}
 `;
@@ -212,31 +176,28 @@ const Description = styled.p`
   text-wrap: balance;
   word-break: keep-all;
 
-  ${extraLargeBlockMixin(css`
+  text-align: center;
+
+  ${Mixin.block.greater.extraLarge(css`
     font-size: 18px;
-    text-align: center;
   `)}
 
-  ${largeBlockMixin(css`
+  ${Mixin.block.less.extraLarge(css`
     font-size: 15px;
-    text-align: center;
   `)}
-
-  ${mediumBlockMixin(css`
+  
+  ${Mixin.block.less.large(css`
     font-size: 12px;
-    text-align: center;
   `)}
-
-  ${smallBlockMixin(css`
+  
+  ${Mixin.block.less.medium(css`
     font-size: 12px;
     line-height: 14px;
-    text-align: center;
   `)}
-    
-  ${extraSmallBlockMixin(css`
+  
+  ${Mixin.block.less.small(css`
     font-size: 10px;
     line-height: 12px;
-    text-align: center;
   `)}
 `;
 

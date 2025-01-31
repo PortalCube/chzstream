@@ -1,15 +1,7 @@
-import { useMemo } from "react";
 import styled, { css } from "styled-components";
 
-import { IconType } from "react-icons";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
 import { findBlock } from "src/librarys/grid.ts";
+import { Mixin } from "src/scripts/styled.ts";
 
 const Container = styled.div`
   overflow: hidden;
@@ -17,49 +9,49 @@ const Container = styled.div`
   display: flex;
   align-items: center;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.extraLarge(css`
     gap: 12px;
   `)}
 
-  ${largeBlockMixin(css`
+  ${Mixin.block.less.extraLarge(css`
     gap: 10px;
   `)}
-
-  ${mediumBlockMixin(css`
+  
+  ${Mixin.block.less.large(css`
     gap: 8px;
   `)}
-
-  ${smallBlockMixin(css`
+  
+  ${Mixin.block.less.medium(css`
     gap: 6px;
   `)}
-
-  ${extraSmallBlockMixin(css`
+  
+  ${Mixin.block.less.small(css`
     gap: 4px;
   `)}
 `;
 
 const Icon = styled.img`
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.extraLarge(css`
     width: 44px;
     height: 44px;
   `)}
 
-  ${largeBlockMixin(css`
+  ${Mixin.block.less.extraLarge(css`
     width: 36px;
     height: 36px;
   `)}
-
-  ${mediumBlockMixin(css`
+  
+  ${Mixin.block.less.large(css`
     width: 28px;
     height: 28px;
   `)}
-
-  ${smallBlockMixin(css`
+  
+  ${Mixin.block.less.medium(css`
     width: 20px;
     height: 20px;
   `)}
-
-  ${extraSmallBlockMixin(css`
+  
+  ${Mixin.block.less.small(css`
     width: 14px;
     height: 14px;
   `)}

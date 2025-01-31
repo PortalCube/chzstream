@@ -54,26 +54,6 @@ export const blockGreaterThanMixin =
     }
   `;
 
-export const extraSmallBlockMixin = blockLessThanMixin(
-  theme.breakpoint.block.small
-);
-
-export const smallBlockMixin = blockGreaterThanMixin(
-  theme.breakpoint.block.small
-);
-
-export const mediumBlockMixin = blockGreaterThanMixin(
-  theme.breakpoint.block.medium
-);
-
-export const largeBlockMixin = blockGreaterThanMixin(
-  theme.breakpoint.block.large
-);
-
-export const extraLargeBlockMixin = blockGreaterThanMixin(
-  theme.breakpoint.block.extraLarge
-);
-
 export const screenLessThanMixin =
   (width: number) => (content: RuleSet<object>) => css`
     @media screen and (max-width: ${width}px) {
@@ -87,26 +67,6 @@ export const screenGreaterThanMixin =
       ${content}
     }
   `;
-
-export const extraSmallScreenMixin = screenLessThanMixin(
-  theme.breakpoint.screen.small
-);
-
-export const smallScreenMixin = screenGreaterThanMixin(
-  theme.breakpoint.screen.small
-);
-
-export const mediumScreenMixin = screenGreaterThanMixin(
-  theme.breakpoint.screen.medium
-);
-
-export const largeScreenMixin = screenGreaterThanMixin(
-  theme.breakpoint.screen.large
-);
-
-export const extraLargeScreenMixin = screenGreaterThanMixin(
-  theme.breakpoint.screen.extraLarge
-);
 
 export const Mixin = {
   screen: {
@@ -123,6 +83,22 @@ export const Mixin = {
       medium: screenGreaterThanMixin(theme.breakpoint.screen.medium),
       large: screenGreaterThanMixin(theme.breakpoint.screen.large),
       extraLarge: screenGreaterThanMixin(theme.breakpoint.screen.extraLarge),
+    },
+  },
+  block: {
+    less: {
+      extraSmall: blockLessThanMixin(theme.breakpoint.block.extraSmall),
+      small: blockLessThanMixin(theme.breakpoint.block.small),
+      medium: blockLessThanMixin(theme.breakpoint.block.medium),
+      large: blockLessThanMixin(theme.breakpoint.block.large),
+      extraLarge: blockLessThanMixin(theme.breakpoint.block.extraLarge),
+    },
+    greater: {
+      extraSmall: blockGreaterThanMixin(theme.breakpoint.block.extraSmall),
+      small: blockGreaterThanMixin(theme.breakpoint.block.small),
+      medium: blockGreaterThanMixin(theme.breakpoint.block.medium),
+      large: blockGreaterThanMixin(theme.breakpoint.block.large),
+      extraLarge: blockGreaterThanMixin(theme.breakpoint.block.extraLarge),
     },
   },
 };

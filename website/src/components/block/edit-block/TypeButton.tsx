@@ -1,20 +1,14 @@
 import { useAtom } from "jotai";
 import React from "react";
 import { MdHelp } from "react-icons/md";
-import styled, { css } from "styled-components";
 import {
   BlockType,
   getBlockTypeIcon,
   getBlockTypeName,
 } from "src/librarys/block.ts";
 import { blockListAtom, setBlockType } from "src/librarys/grid.ts";
-import {
-  extraLargeBlockMixin,
-  extraSmallBlockMixin,
-  largeBlockMixin,
-  mediumBlockMixin,
-  smallBlockMixin,
-} from "src/scripts/styled.ts";
+import { Mixin } from "src/scripts/styled.ts";
+import styled, { css } from "styled-components";
 
 const Container = styled.button`
   border: none;
@@ -26,23 +20,11 @@ const Container = styled.button`
 
   transition: padding 100ms;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.small(css`
     padding: 4px 8px;
   `)}
 
-  ${largeBlockMixin(css`
-    padding: 4px 8px;
-  `)}
-
-  ${mediumBlockMixin(css`
-    padding: 4px 8px;
-  `)}
-
-  ${smallBlockMixin(css`
-    padding: 4px 8px;
-  `)}
-
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.small(css`
     padding: 4px;
   `)}
 
@@ -62,27 +44,17 @@ const Container = styled.button`
       width 100ms,
       height 100ms;
 
-    ${extraLargeBlockMixin(css`
+    ${Mixin.block.greater.large(css`
       width: 24px;
       height: 24px;
     `)}
 
-    ${largeBlockMixin(css`
-      width: 24px;
-      height: 24px;
-    `)}
-
-    ${mediumBlockMixin(css`
+    ${Mixin.block.less.large(css`
       width: 20px;
       height: 20px;
     `)}
 
-    ${smallBlockMixin(css`
-      width: 20px;
-      height: 20px;
-    `)}
-
-    ${extraSmallBlockMixin(css`
+    ${Mixin.block.less.small(css`
       width: 16px;
       height: 16px;
     `)}
@@ -94,23 +66,15 @@ const Text = styled.p`
 
   transition: font-size 100ms;
 
-  ${extraLargeBlockMixin(css`
+  ${Mixin.block.greater.large(css`
     font-size: 16px;
   `)}
 
-  ${largeBlockMixin(css`
-    font-size: 16px;
-  `)}
-
-  ${mediumBlockMixin(css`
+  ${Mixin.block.less.large(css`
     font-size: 13px;
   `)}
 
-  ${smallBlockMixin(css`
-    font-size: 13px;
-  `)}
-
-  ${extraSmallBlockMixin(css`
+  ${Mixin.block.less.small(css`
     font-size: 12px;
     display: none;
   `)}

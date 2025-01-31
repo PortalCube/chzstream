@@ -1,37 +1,24 @@
+import { useAtom } from "jotai";
+import { useMemo } from "react";
 import { MdAdd, MdRefresh } from "react-icons/md";
+import { favoriteChannelsAtom } from "src/librarys/app.ts";
+import { useModal } from "src/librarys/modal.ts";
+import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "src/scripts/storage.ts";
+import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 import Channel from "./Channel.tsx";
 import ChannelButton from "./ChannelButton.tsx";
-import { useMemo, useState } from "react";
-import { favoriteChannelsAtom } from "src/librarys/app.ts";
-import { useAtom } from "jotai";
-import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "src/scripts/storage.ts";
-import { useModal } from "src/librarys/modal.ts";
-import {
-  extraSmallScreenMixin,
-  largeScreenMixin,
-  mediumScreenMixin,
-  smallScreenMixin,
-} from "src/scripts/styled.ts";
 
 const Container = styled.div`
   display: flex;
   gap: 12px;
 
-  ${extraSmallScreenMixin(css`
-    display: none;
-  `)}
-
-  ${smallScreenMixin(css`
-    display: none;
-  `)}
-  
-  ${mediumScreenMixin(css`
-    display: none;
-  `)}
-
-  ${largeScreenMixin(css`
+  ${Mixin.screen.greater.large(css`
     display: flex;
+  `)}
+
+  ${Mixin.screen.less.large(css`
+    display: none;
   `)}
 `;
 
