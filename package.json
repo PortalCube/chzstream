@@ -1,8 +1,8 @@
 {
   "name": "chzstream",
-  "version": "1.0.0",
+  "description": "치지직 스트리밍을 하나의 화면으로 편하게 시청하세요.",
+  "version": "0.20.0",
   "type": "module",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "web": "pnpm -F @chzstream/website",

@@ -46,21 +46,6 @@ async function convertToPartitionCookie(target: CookieInfo, domain: string) {
     return;
   }
 
-  console.log("convertToPartitionCookie", {
-    url: target.url,
-    name: target.name,
-    value: currentCookie.value,
-    partitionKey: {
-      topLevelSite: domain,
-    },
-    domain: currentCookie.domain,
-    httpOnly: currentCookie.httpOnly,
-    path: currentCookie.path,
-    sameSite: "no_restriction",
-    secure: true,
-    expirationDate: currentCookie.expirationDate,
-  });
-
   await browser.cookies.set({
     url: target.url,
     name: target.name,

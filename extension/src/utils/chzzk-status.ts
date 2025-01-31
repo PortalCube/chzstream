@@ -70,8 +70,6 @@ function checkPlayerError() {
         return;
       }
 
-      console.log(mutation);
-
       if (element.classList.contains("pzp-pc--dialog-error") === true) {
         sendPlayerEvent(PlayerEventType.Error);
         location.reload();

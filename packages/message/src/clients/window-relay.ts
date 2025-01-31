@@ -11,12 +11,8 @@ type RelayEventMap = {
   disconnect: CustomEvent<void>;
 };
 
-// WindowRelay는 WindowClient가 전송한 window.postMessage를 받아서
-// browser.runtime.connect를 통해 ExtensionServer로 전송하는 릴레이입니다.
-
-// Note: iframe-client.ts에서 언급한대로 Firefox의 content script에서는
-// EventTarget이 작동하지 않는 버그가 있습니다.
-// 그래서 사실 WindowRelay의 EventTarget도 작동하지 않지만 쓰이는 곳이 전혀 없으므로 그냥 냅뒀습니다
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1896267
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1820521
 
 export class WindowRelay extends TypedEventTarget<RelayEventMap> {
   get name() {
