@@ -6,7 +6,7 @@ function App() {
     width: "300px",
     height: "300px",
   };
-  return <div style={style}>Chzstream</div>;
+  return <div style={style}>chzstream</div>;
 }
 
 export default App;
