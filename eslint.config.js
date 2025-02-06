@@ -44,6 +44,9 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+
+      "no-empty-pattern": "warn",
+      "@typescript-eslint/no-empty-object-type": "warn",
     },
   },
   eslintConfigPrettier
