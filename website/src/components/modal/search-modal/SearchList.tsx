@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Category from "./Category.tsx";
 import Pagination from "./Pagination.tsx";
 import SearchMessage from "./SearchMessage.tsx";
-import { SearchItemType, useSearchModal } from "src/librarys/search-modal.ts";
+import { SearchItemType, useSearchModal } from "src/librarys/search.ts";
 import SearchItem from "./SearchItem.tsx";
 import { useEffect, useMemo, useState } from "react";
 

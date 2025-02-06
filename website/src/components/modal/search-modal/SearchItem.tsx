@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { MdVerified } from "react-icons/md";
 import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
 import { useModal } from "src/librarys/modal.ts";
-import { SearchItemType } from "src/librarys/search-modal.ts";
+import { SearchItemType } from "src/librarys/search";
 import { formatFollowerCount } from "src/scripts/format.ts";
 import styled from "styled-components";
 

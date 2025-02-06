@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useMemo } from "react";
-import { SearchCategory, useSearchModal } from "src/librarys/search-modal.ts";
+import { SearchCategory, useSearchModal } from "src/librarys/search.ts";
 import styled from "styled-components";
 import Category from "./Category.tsx";
 import SearchList from "./SearchList.tsx";

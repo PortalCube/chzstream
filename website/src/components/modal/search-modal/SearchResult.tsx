@@ -5,7 +5,7 @@ import Category from "./Category.tsx";
 import SearchSummary from "./SearchSummary.tsx";
 import SearchDetail from "./SearchDetail.tsx";
 import { useEffect, useState } from "react";
-import { useSearchModal } from "src/librarys/search-modal.ts";
+import { useSearchModal } from "src/librarys/search.ts";
 
 const Container = styled.div`
   width: 100%;
