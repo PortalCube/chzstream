@@ -1,12 +1,12 @@
-import { useAtom } from "jotai";
-import React from "react";
+import React, { useContext } from "react";
 import { MdHelp } from "react-icons/md";
+import { BlockContext } from "src/librarys/block-context.ts";
 import {
   BlockType,
   getBlockTypeIcon,
   getBlockTypeName,
 } from "src/librarys/block.ts";
-import { blockListAtom, setBlockType } from "src/librarys/grid.ts";
+import { useLayout } from "src/librarys/layout.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
@@ -80,8 +80,9 @@ const Text = styled.p`
   `)}
 `;
 
-function TypeButton({ id, type }: BlockTypeButtonProps) {
-  const [_, setBlockList] = useAtom(blockListAtom);
+function TypeButton({}: BlockTypeButtonProps) {
+  const { setBlockType } = useLayout();
+  const { id, type } = useContext(BlockContext);
 
   const TypeIcon = type !== null ? getBlockTypeIcon(type) : MdHelp;
   const typeName = type !== null ? getBlockTypeName(type) : "";
@@ -89,10 +90,10 @@ function TypeButton({ id, type }: BlockTypeButtonProps) {
   const onButtonClick: React.MouseEventHandler = () => {
     switch (type) {
       case BlockType.Stream:
-        setBlockList(setBlockType(id, BlockType.Chat));
+        setBlockType(id, BlockType.Chat);
         break;
       case BlockType.Chat:
-        setBlockList(setBlockType(id, BlockType.Stream));
+        setBlockType(id, BlockType.Stream);
         break;
       default:
         break;
@@ -107,9 +108,6 @@ function TypeButton({ id, type }: BlockTypeButtonProps) {
   );
 }
 
-type BlockTypeButtonProps = {
-  id: number;
-  type: BlockType | null;
-};
+type BlockTypeButtonProps = {};
 
 export default TypeButton;

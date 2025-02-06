@@ -1,27 +1,13 @@
-import { atom, useAtom } from "jotai";
-import { useEffect, useState } from "react";
-import { isFullscreenAtom } from "./useFullscreenDetect.tsx";
-import {
-  activateBlockStatus,
-  ApplicationMode,
-  applicationModeAtom,
-  blockListAtom,
-} from "src/librarys/grid.ts";
+import { useEffect } from "react";
+import { useLayout } from "src/librarys/layout.ts";
 
 export function useShortcutKey() {
-  const [isFullscreen] = useAtom(isFullscreenAtom);
-  const [mode, setMode] = useAtom(applicationModeAtom);
-  const [blockList, setBlockList] = useAtom(blockListAtom);
+  const { switchLayoutMode } = useLayout();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "F9") {
-        if (mode === ApplicationMode.View) {
-          setMode(ApplicationMode.Modify);
-        } else if (mode === ApplicationMode.Modify) {
-          setMode(ApplicationMode.View);
-          setBlockList(activateBlockStatus());
-        }
+        switchLayoutMode();
       }
     };
 
@@ -30,5 +16,5 @@ export function useShortcutKey() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [mode]);
+  }, [switchLayoutMode]);
 }

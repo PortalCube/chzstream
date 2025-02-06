@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  MdSignalWifiConnectedNoInternet0,
   MdSignalWifiConnectedNoInternet1,
   MdSignalWifiConnectedNoInternet2,
   MdSignalWifiConnectedNoInternet3,
@@ -8,7 +7,6 @@ import {
 } from "react-icons/md";
 
 const icons = [
-  //   MdSignalWifiConnectedNoInternet0,
   MdSignalWifiConnectedNoInternet1,
   MdSignalWifiConnectedNoInternet2,
   MdSignalWifiConnectedNoInternet3,

@@ -4,9 +4,10 @@ import { PreviewBlockHandle } from "src/librarys/block.ts";
 import {
   previewBlockAtom,
   startModifyBlockPreview,
-} from "src/librarys/grid-preview.ts";
-import { findBlock } from "src/librarys/grid.ts";
+} from "src/librarys/layout-preview.ts";
 import classNames from "classnames";
+import { useContext } from "react";
+import { BlockContext } from "src/librarys/block-context.ts";
 
 const Container = styled.div`
   padding: 4px;
@@ -86,15 +87,11 @@ function getLineClass(direction: PreviewBlockHandle) {
   }
 }
 
-function LineHandle({ id, direction }: LineHandleProps) {
+function LineHandle({ direction }: LineHandleProps) {
   const [blockPreview, setBlockPreview] = useAtom(previewBlockAtom);
-  const block = findBlock(id);
+  const block = useContext(BlockContext);
 
   const onPointerDown: React.PointerEventHandler = () => {
-    if (block.id === -1) {
-      return;
-    }
-
     setBlockPreview(startModifyBlockPreview(block, direction));
   };
 
@@ -109,7 +106,6 @@ function LineHandle({ id, direction }: LineHandleProps) {
 }
 
 type LineHandleProps = {
-  id: number;
   direction: PreviewBlockHandle;
 };
 

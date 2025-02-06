@@ -1,12 +1,8 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
+import { BlockContext } from "src/librarys/block-context.ts";
 import { BlockType } from "src/librarys/block.ts";
-import {
-  ApplicationMode,
-  applicationModeAtom,
-  findBlock,
-} from "src/librarys/grid.ts";
+import { LayoutMode, useLayout } from "src/librarys/layout.ts";
 import { MessageClient } from "src/scripts/message.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
@@ -52,9 +48,9 @@ const Container = styled.iframe`
   }
 `;
 
-function ViewBlock({ id, loaded }: ViewBlockProps) {
-  const [mode, setMode] = useAtom(applicationModeAtom);
-  const { type, status, lock, channel } = findBlock(id);
+function ViewBlock({ loaded }: ViewBlockProps) {
+  const { layoutMode } = useLayout();
+  const { id, type, status, lock, channel } = useContext(BlockContext);
 
   const src = useMemo((): string => {
     // 채널 정보가 비어있는 블록
@@ -78,7 +74,7 @@ function ViewBlock({ id, loaded }: ViewBlockProps) {
 
   const className = classNames({
     loading: loaded === false,
-    "modify-mode": mode === ApplicationMode.Modify,
+    "modify-mode": layoutMode === LayoutMode.Modify,
     chat: type === BlockType.Chat,
     lock,
   });
@@ -94,7 +90,6 @@ function ViewBlock({ id, loaded }: ViewBlockProps) {
 }
 
 type ViewBlockProps = {
-  id: number;
   loaded: boolean;
 };
 

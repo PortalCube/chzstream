@@ -1,10 +1,9 @@
 import classNames from "classnames";
 import { useAtom } from "jotai";
 import { useState } from "react";
+import { LayoutMode, layoutModeAtom } from "src/librarys/layout.ts";
 import styled, { keyframes } from "styled-components";
-import { ApplicationMode, applicationModeAtom } from "src/librarys/grid.ts";
 
-import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
 import Spinner from "./Spinner.tsx";
 
 const randomRange = (min: number, max: number) =>
@@ -67,13 +66,13 @@ const Container = styled.div<{ $delay: number }>`
   }
 `;
 
-function LoadingOverlay({ id, loaded }: LoadingOverlayProps) {
-  const [mode, setMode] = useAtom(applicationModeAtom);
+function LoadingOverlay({ loaded }: LoadingOverlayProps) {
+  const [mode, setMode] = useAtom(layoutModeAtom);
 
   const [delay] = useState(randomRange(-2000, 0));
 
   const className = classNames({
-    hidden: mode === ApplicationMode.Modify,
+    hidden: mode === LayoutMode.Modify,
     load: loaded,
   });
 
@@ -99,7 +98,6 @@ function LoadingOverlay({ id, loaded }: LoadingOverlayProps) {
 }
 
 type LoadingOverlayProps = {
-  id: number;
   loaded: boolean;
 };
 

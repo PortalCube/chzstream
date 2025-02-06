@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
 import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "src/scripts/constants.ts";
 import {
-  ApplicationMode,
-  applicationModeAtom,
+  LayoutMode,
+  layoutModeAtom,
   nextBlockIdAtom,
-} from "src/librarys/grid.ts";
+} from "src/librarys/layout.ts";
 import classNames from "classnames";
 
 import LogoImage from "src/assets/logo.png";
@@ -123,7 +123,7 @@ function GridBackground({
 }: GridBackgroundProps) {
   const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
 
-  const [mode, setMode] = useAtom(applicationModeAtom);
+  const [mode, setMode] = useAtom(layoutModeAtom);
 
   const [blockId, setBlockId] = useAtom(nextBlockIdAtom);
 
@@ -159,8 +159,8 @@ function GridBackground({
     return columnLines;
   }, [displayPixelRatio, width, subWidth]);
 
-  const className = classNames({ "view-mode": mode === ApplicationMode.View });
-  const welcomeClassName = classNames({ show: blockId === 0 });
+  const className = classNames({ "view-mode": mode === LayoutMode.View });
+  const welcomeClassName = classNames({ show: blockId === 1 });
 
   return (
     <Container className={className}>

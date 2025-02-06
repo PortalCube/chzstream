@@ -7,37 +7,35 @@ import { useAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { BlockType } from "src/librarys/block.ts";
 import {
-  _findBlock,
-  activateBlockStatus,
-  applicationModeAtom,
   blockListAtom,
-  findBlock,
-  gridSizeAtom,
+  layoutSizeAtom,
   mouseIsTopAtom,
-  setBlockChannel,
-  setBlockLock,
-  setBlockPosition,
-  useGrid,
-} from "src/librarys/grid.ts";
+  useLayout,
+} from "src/librarys/layout.ts";
 import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
 import { getGridStyle } from "src/scripts/grid-layout.ts";
-import { MessageClient, PlayerEvent } from "src/scripts/message.ts";
+import {
+  getIframeId,
+  MessageClient,
+  PlayerEvent,
+} from "src/scripts/message.ts";
 import styled, { keyframes } from "styled-components";
 import EditBlock from "./edit-block/EditBlock.tsx";
 import LoadingOverlay from "./LoadingOverlay.tsx";
 import { InfoType } from "./overlay/InfoOverlay.ts";
 import InfoOverlay from "./overlay/InfoOverlay.tsx";
 import ViewBlock from "./ViewBlock.tsx";
+import { BlockContext } from "src/librarys/block-context.ts";
 
 const popinAnimation = keyframes`
-    0% {
-        transform: scale(0.9);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+  0% {
+    transform: scale(0.97);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 `;
 
 const Container = styled.div`
@@ -58,14 +56,20 @@ const Container = styled.div`
 
 function Block({ id }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useAtom(applicationModeAtom);
-  const [blockList, setBlockList] = useAtom(blockListAtom);
-
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
-  const { updateChannel } = useGrid();
-  const { type, status, position, channel } = findBlock(id);
+  const {
+    setBlockChannel,
+    activateBlockStatus,
+    updateChannel,
+    setBlockLock,
+    swapBlockPosition,
+    findBlock,
+  } = useLayout();
+  const block = findBlock(id);
+  const { type, status, position, channel } = block;
   const [loaded, setLoaded] = useState(false);
   const [infoType, setInfoType] = useState<InfoType>(InfoType.None);
+  const [[gridWidth, gridHeight]] = useAtom(layoutSizeAtom);
 
   useEffect(() => {
     if (MessageClient.active === false) {
@@ -88,7 +92,11 @@ function Block({ id }: BlockProps) {
         return;
       }
 
-      if (message.data.iframeId !== id) {
+      if (message.sender === null) {
+        return;
+      }
+
+      if (getIframeId(message.sender) !== id) {
         return;
       }
 
@@ -110,7 +118,11 @@ function Block({ id }: BlockProps) {
 
   useEffect(() => {
     const listener = ({ detail: message }: PlayerEvent) => {
-      if (message.data.iframeId !== id) {
+      if (message.sender === null) {
+        return;
+      }
+
+      if (getIframeId(message.sender) !== id) {
         return;
       }
 
@@ -142,12 +154,8 @@ function Block({ id }: BlockProps) {
     };
   }, [id]);
 
-  const [[gridWidth, gridHeight]] = useAtom(gridSizeAtom);
-
-  const style = getGridStyle(position, gridWidth, gridHeight);
-
   const onPointerLeave: React.PointerEventHandler = () => {
-    setBlockList(setBlockLock(id, true));
+    setBlockLock(id, true);
   };
 
   const onDrop: React.DragEventHandler = async (event) => {
@@ -173,11 +181,7 @@ function Block({ id }: BlockProps) {
         return;
       }
 
-      const block = _findBlock(data.id, blockList);
-
-      if (block === null) {
-        return;
-      }
+      const block = findBlock(data.id);
 
       if (block.channel === null) {
         return;
@@ -188,39 +192,39 @@ function Block({ id }: BlockProps) {
       }
 
       if (type === BlockType.Chat && block.type === BlockType.Stream) {
-        setBlockList(setBlockChannel(id, block.channel));
-        setBlockList(activateBlockStatus());
+        setBlockChannel(id, block.channel);
+        activateBlockStatus();
+
         setLoaded(false);
         setInfoType(InfoType.None);
       } else {
-        setBlockList(setBlockPosition(id, block.position));
-        setBlockList(setBlockPosition(data.id, position));
+        swapBlockPosition(id, data.id);
       }
     }
   };
 
-  const onDragEnter: React.DragEventHandler = (event) => {
+  const preventDragHandler: React.DragEventHandler = (event) => {
     event.preventDefault();
   };
 
-  const onDragOver: React.DragEventHandler = (event) => {
-    event.preventDefault();
-  };
+  const style = getGridStyle(position, gridWidth, gridHeight);
 
   return (
-    <Container
-      ref={ref}
-      style={style}
-      onPointerLeave={onPointerLeave}
-      onDrop={onDrop}
-      onDragEnter={onDragEnter}
-      onDragOver={onDragOver}
-    >
-      <InfoOverlay id={id} type={infoType} />
-      <LoadingOverlay id={id} loaded={loaded} />
-      <EditBlock id={id} />
-      <ViewBlock id={id} loaded={loaded} />
-    </Container>
+    <BlockContext.Provider value={block}>
+      <Container
+        ref={ref}
+        style={style}
+        onPointerLeave={onPointerLeave}
+        onDrop={onDrop}
+        onDragEnter={preventDragHandler}
+        onDragOver={preventDragHandler}
+      >
+        <InfoOverlay type={infoType} />
+        <LoadingOverlay loaded={loaded} />
+        <EditBlock />
+        <ViewBlock loaded={loaded} />
+      </Container>
+    </BlockContext.Provider>
   );
 }
 

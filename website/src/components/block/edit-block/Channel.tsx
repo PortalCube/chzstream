@@ -1,8 +1,9 @@
-import { useMemo, useRef } from "react";
+import { useContext, useMemo, useRef } from "react";
 import DragImage from "src/components/drag/DragImage.tsx";
+import { BlockContext } from "src/librarys/block-context.ts";
 import { BlockChannel } from "src/librarys/block.ts";
 import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
-import { useGrid } from "src/librarys/grid.ts";
+import { useLayout } from "src/librarys/layout.ts";
 import { useModal } from "src/librarys/modal.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
@@ -153,10 +154,11 @@ const Title = styled.p`
   `)}
 `;
 
-function Channel({ id, channel }: ChannelProps) {
+function Channel({}: ChannelProps) {
   const ref = useRef<HTMLImageElement>(null);
   const { openSearchModal } = useModal();
-  const { updateChannel } = useGrid();
+  const { updateChannel } = useLayout();
+  const { id, channel } = useContext(BlockContext);
 
   const { iconUrl, name, title } = useMemo(() => {
     if (channel === null) {
@@ -216,9 +218,6 @@ function Channel({ id, channel }: ChannelProps) {
   );
 }
 
-type ChannelProps = {
-  id: number;
-  channel: BlockChannel | null;
-};
+type ChannelProps = {};
 
 export default Channel;

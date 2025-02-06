@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useAtom } from "jotai";
 import React, { useEffect, useRef } from "react";
-import styled from "styled-components";
+import Block from "src/components/block/Block.tsx";
 import { PreviewBlockStatus } from "src/librarys/block.ts";
 import {
   endCreateBlockPreview,
@@ -9,23 +9,15 @@ import {
   moveModifyBlockPreview,
   previewBlockAtom,
   startCreateBlockPreview,
-} from "src/librarys/grid-preview.ts";
-import {
-  addBlock,
-  ApplicationMode,
-  applicationModeAtom,
-  blockListAtom,
-  gridSizeAtom,
-  nextBlockIdAtom,
-  setBlockPosition,
-} from "src/librarys/grid.ts";
+} from "src/librarys/layout-preview.ts";
+import { LayoutMode, layoutSizeAtom, useLayout } from "src/librarys/layout.ts";
 import {
   GRID_SIZE_HEIGHT,
   GRID_SIZE_WIDTH,
   MIN_BLOCK_HEIGHT,
   MIN_BLOCK_WIDTH,
 } from "src/scripts/constants.ts";
-import Block from "src/components/block/Block.tsx";
+import styled from "styled-components";
 import BlockPreview from "./BlockPreview.tsx";
 import GridBackground from "./GridBackground.tsx";
 
@@ -82,14 +74,12 @@ function getGridPosition(
 
 function Grid() {
   const ref = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useAtom(applicationModeAtom);
-  const [blockList, setBlockList] = useAtom(blockListAtom);
   const [previewBlock, setPreviewBlock] = useAtom(previewBlockAtom);
-  const [id, setId] = useAtom(nextBlockIdAtom);
-  const [gridSize, setGridSize] = useAtom(gridSizeAtom);
+  const [layoutSize, setLayoutSize] = useAtom(layoutSizeAtom);
+  const { blockList, layoutMode, addBlock, setBlockPosition } = useLayout();
 
   const className = classNames({
-    "view-mode": mode === ApplicationMode.View,
+    "view-mode": layoutMode === LayoutMode.View,
   });
 
   const blockElements: JSX.Element[] = blockList.map((block) => (
@@ -99,7 +89,7 @@ function Grid() {
   const onPointerDown: React.PointerEventHandler = (event) => {
     if (event.target !== event.currentTarget) return;
     if (event.button !== 0) return;
-    if (mode !== ApplicationMode.Modify) return;
+    if (layoutMode !== LayoutMode.Modify) return;
     if (ref.current == null) return;
 
     const { clientX, clientY } = event;
@@ -111,13 +101,13 @@ function Grid() {
   useEffect(() => {
     if (ref && ref.current) {
       const { clientWidth, clientHeight } = ref.current;
-      setGridSize([clientWidth, clientHeight]);
+      setLayoutSize([clientWidth, clientHeight]);
 
       const onResize = () => {
         if (ref.current === null) return;
         const { clientWidth, clientHeight } = ref.current;
 
-        setGridSize([clientWidth, clientHeight]);
+        setLayoutSize([clientWidth, clientHeight]);
       };
 
       const onPointerMove = (event: PointerEvent) => {
@@ -128,13 +118,14 @@ function Grid() {
 
         if (previewBlock.status === PreviewBlockStatus.Create) {
           setPreviewBlock(moveCreateBlockPreview(x, y, blockList));
-        } else if (previewBlock.status === PreviewBlockStatus.Modify) {
+        } else if (
+          previewBlock.status === PreviewBlockStatus.Modify &&
+          previewBlock.linkedBlockId !== null
+        ) {
           setPreviewBlock(
             moveModifyBlockPreview(x, y, previewBlock.linkedBlockId, blockList)
           );
-          setBlockList(
-            setBlockPosition(previewBlock.linkedBlockId, previewBlock.position)
-          );
+          setBlockPosition(previewBlock.linkedBlockId, previewBlock.position);
         }
       };
 
@@ -168,8 +159,7 @@ function Grid() {
           return;
         }
 
-        setBlockList(addBlock(id, top, left, width, height));
-        setId((prev) => prev + 1);
+        addBlock(top, left, width, height);
       };
 
       window.addEventListener("resize", onResize);
@@ -182,16 +172,7 @@ function Grid() {
         document.removeEventListener("pointerup", onPointerUp);
       };
     }
-  }, [
-    ref,
-    previewBlock,
-    setBlockList,
-    setPreviewBlock,
-    blockList,
-    id,
-    setId,
-    setGridSize,
-  ]);
+  }, [ref, previewBlock, blockList]);
 
   return (
     <Container ref={ref} className={className} onPointerDown={onPointerDown}>

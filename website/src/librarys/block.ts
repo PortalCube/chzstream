@@ -34,6 +34,8 @@ export type Block = {
   lock: boolean;
   position: BlockPosition;
   channel: BlockChannel | null;
+  volume: number;
+  quality: number;
 };
 
 export enum PreviewBlockStatus {

@@ -1,7 +1,8 @@
 import styled, { css } from "styled-components";
-
-import { findBlock } from "src/librarys/grid.ts";
 import { Mixin } from "src/scripts/styled.ts";
+import { useContext } from "react";
+import { BlockContext } from "src/librarys/block-context.ts";
+import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
 
 const Container = styled.div`
   overflow: hidden;
@@ -66,11 +67,11 @@ const Name = styled.span`
   text-overflow: ellipsis;
 `;
 
-function Channel({ id }: ChannelProps) {
-  const { channel } = findBlock(id);
+function Channel({}: ChannelProps) {
+  const { channel } = useContext(BlockContext);
 
-  const name = channel?.name ?? "스트리머";
-  const iconUrl = channel?.iconUrl ?? "";
+  const name = channel?.name ?? "알 수 없는 채널";
+  const iconUrl = getProfileImageUrl(channel?.iconUrl);
 
   return (
     <Container>
@@ -80,8 +81,6 @@ function Channel({ id }: ChannelProps) {
   );
 }
 
-type ChannelProps = {
-  id: number;
-};
+type ChannelProps = {};
 
 export default Channel;

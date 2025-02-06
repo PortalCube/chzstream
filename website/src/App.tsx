@@ -47,7 +47,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (MessageClient.available === false) {
+    if (MessageClient.active === false) {
       setRestrictedMode(true);
     }
   }, []);

@@ -1,7 +1,8 @@
 import classNames from "classnames";
-import { findBlock } from "src/librarys/grid.ts";
+import { useContext } from "react";
 
 import LogoImage from "src/assets/logo.png";
+import { BlockContext } from "src/librarys/block-context.ts";
 
 import { BlockType } from "src/librarys/block.ts";
 import styled from "styled-components";
@@ -125,8 +126,8 @@ const Logo = styled.img`
   width: 40%;
 `;
 
-function Background({ id }: BackgroundProps) {
-  const { type, channel } = findBlock(id);
+function Background({}: BackgroundProps) {
+  const { type, channel } = useContext(BlockContext);
 
   const thumbnailUrl = channel?.thumbnailUrl ?? "";
   const iconUrl = channel?.iconUrl ?? "";
@@ -162,8 +163,6 @@ function Background({ id }: BackgroundProps) {
     </Container>
   );
 }
-type BackgroundProps = {
-  id: number;
-};
+type BackgroundProps = {};
 
 export default Background;

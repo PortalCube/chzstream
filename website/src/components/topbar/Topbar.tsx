@@ -5,20 +5,15 @@ import {
   MdEdit,
   MdExpandLess,
   MdExpandMore,
+  MdFullscreen,
+  MdFullscreenExit,
   MdOndemandVideo,
   MdRefresh,
   MdSettings,
-  MdZoomInMap,
-  MdZoomOutMap,
+  MdVolumeUp,
 } from "react-icons/md";
 import { isFullscreenAtom } from "src/hooks/useFullscreenDetect.tsx";
-import {
-  activateBlockStatus,
-  ApplicationMode,
-  applicationModeAtom,
-  blockListAtom,
-  mouseIsTopAtom,
-} from "src/librarys/grid.ts";
+import { LayoutMode, mouseIsTopAtom, useLayout } from "src/librarys/layout.ts";
 import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
 import styled, { css } from "styled-components";
 import ChannelGroup from "./ChannelGroup.tsx";
@@ -84,12 +79,12 @@ const MenuGroup = styled.div`
 `;
 
 function Topbar() {
-  const [mode, setMode] = useAtom(applicationModeAtom);
   const [isFullscreen, setFullscreen] = useAtom(isFullscreenAtom);
-  const [blockList, setBlockList] = useAtom(blockListAtom);
   const [isShow, setShow] = useState(true);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
-  const { openSettingModal } = useModal();
+  const { openSettingModal, openMixerModal } = useModal();
+
+  const { layoutMode, clearBlock, switchLayoutMode } = useLayout();
 
   const toggleFullscreen = () => {
     if (isFullscreen) {
@@ -132,7 +127,7 @@ function Topbar() {
 
   const onClearButtonClick: React.MouseEventHandler = () => {
     if (confirm("레이아웃을 초기화할까요?") === true) {
-      setBlockList([]);
+      clearBlock();
     }
   };
 
@@ -145,66 +140,64 @@ function Topbar() {
   };
 
   const onModeButtonClick: React.MouseEventHandler = () => {
-    if (mode === ApplicationMode.View) {
-      setMode(ApplicationMode.Modify);
-    } else if (mode === ApplicationMode.Modify) {
-      setMode(ApplicationMode.View);
-      setBlockList(activateBlockStatus());
-    }
+    switchLayoutMode();
   };
 
-  const buttons = [
-    {
-      key: "refresh",
-      Icon: MdRefresh,
-      text: "초기화",
-      onClick: onClearButtonClick,
-      filter: [ApplicationMode.Modify],
-    },
-    {
-      key: "fold",
-      Icon: isShow ? MdExpandLess : MdExpandMore,
-      text: isShow ? "접기" : "펼치기",
-      onClick: onFoldButtonClick,
-      filter: [ApplicationMode.Modify, ApplicationMode.View],
-    },
-    {
-      key: "fullscreen",
-      Icon: isFullscreen ? MdZoomInMap : MdZoomOutMap,
-      text: isFullscreen ? "전체 화면 종료" : "전체 화면",
-      onClick: toggleFullscreen,
-      filter: [ApplicationMode.Modify, ApplicationMode.View],
-    },
-    {
-      key: "mode",
-      Icon: mode === ApplicationMode.View ? MdEdit : MdOndemandVideo,
-      text: mode === ApplicationMode.View ? "편집 모드" : "시청 모드",
-      onClick: onModeButtonClick,
-      filter: [ApplicationMode.Modify, ApplicationMode.View],
-    },
-    {
-      key: "setting",
-      Icon: MdSettings,
-      text: "설정",
-      onClick: openSettingModal,
-      filter: [ApplicationMode.Modify, ApplicationMode.View],
-    },
-  ];
-
-  const buttonElements = useMemo(() => {
-    return buttons
-      .filter((item) => item.filter.includes(mode))
-      .map((item) => {
-        return (
-          <MenuButton
-            key={item.key}
-            Icon={item.Icon}
-            text={item.text}
-            onClick={item.onClick}
-          />
-        );
-      });
-  }, [mode, isShow]);
+  const buttons = useMemo(() => {
+    return [
+      {
+        key: "refresh",
+        Icon: MdRefresh,
+        text: "레이아웃 초기화",
+        onClick: onClearButtonClick,
+        filter: [LayoutMode.Modify],
+      },
+      {
+        key: "fullscreen",
+        Icon: isFullscreen ? MdFullscreenExit : MdFullscreen,
+        text: isFullscreen ? "전체 화면 종료" : "전체 화면",
+        onClick: toggleFullscreen,
+        filter: [LayoutMode.Modify, LayoutMode.View],
+      },
+      {
+        key: "mode",
+        Icon: layoutMode === LayoutMode.View ? MdEdit : MdOndemandVideo,
+        text: layoutMode === LayoutMode.View ? "편집 모드" : "시청 모드",
+        onClick: onModeButtonClick,
+        filter: [LayoutMode.Modify, LayoutMode.View],
+      },
+      {
+        key: "mixer",
+        Icon: MdVolumeUp,
+        text: "미디어 믹서",
+        onClick: openMixerModal,
+        filter: [LayoutMode.Modify, LayoutMode.View],
+      },
+      {
+        key: "setting",
+        Icon: MdSettings,
+        text: "설정",
+        onClick: openSettingModal,
+        filter: [LayoutMode.Modify, LayoutMode.View],
+      },
+      {
+        key: "fold",
+        Icon: isShow ? MdExpandLess : MdExpandMore,
+        text: isShow ? "접기" : "펼치기",
+        onClick: onFoldButtonClick,
+        filter: [LayoutMode.Modify, LayoutMode.View],
+      },
+    ]
+      .filter((item) => item.filter.includes(layoutMode))
+      .map((item) => (
+        <MenuButton
+          key={item.key}
+          Icon={item.Icon}
+          text={item.text}
+          onClick={item.onClick}
+        />
+      ));
+  }, [isShow, layoutMode]);
 
   const className = classNames({
     hide: isShow === false,
@@ -218,7 +211,7 @@ function Topbar() {
     >
       <Title src={LogoImage} alt="chzstream" />
       <ChannelGroup />
-      <MenuGroup>{buttonElements}</MenuGroup>
+      <MenuGroup>{buttons}</MenuGroup>
     </Container>
   );
 }

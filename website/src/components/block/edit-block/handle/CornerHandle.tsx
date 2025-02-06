@@ -1,10 +1,11 @@
 import { useAtom } from "jotai";
+import { useContext } from "react";
+import { BlockContext } from "src/librarys/block-context.ts";
 import { PreviewBlockHandle } from "src/librarys/block.ts";
 import {
   previewBlockAtom,
   startModifyBlockPreview,
-} from "src/librarys/grid-preview.ts";
-import { findBlock } from "src/librarys/grid.ts";
+} from "src/librarys/layout-preview.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -222,16 +223,12 @@ function getCompoenent(direction: PreviewBlockHandle | null) {
   }
 }
 
-function CornerHandle({ id, direction }: CornerHandleProps) {
-  const block = findBlock(id);
+function CornerHandle({ direction }: CornerHandleProps) {
+  const block = useContext(BlockContext);
   const [blockPreview, setBlockPreview] = useAtom(previewBlockAtom);
   const Component = getCompoenent(direction);
 
   const onPointerDown: React.PointerEventHandler = () => {
-    if (block.id === -1) {
-      return;
-    }
-
     setBlockPreview(startModifyBlockPreview(block, direction));
   };
 
@@ -243,7 +240,6 @@ function CornerHandle({ id, direction }: CornerHandleProps) {
 }
 
 type CornerHandleProps = {
-  id: number;
   direction: PreviewBlockHandle;
 };
 

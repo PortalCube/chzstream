@@ -2,19 +2,15 @@ import classNames from "classnames";
 import { useAtom } from "jotai";
 import { MdClose } from "react-icons/md";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import {
-  ApplicationMode,
-  applicationModeAtom,
-  blockListAtom,
-  findBlock,
-  removeBlock,
-} from "src/librarys/grid.ts";
+import { LayoutMode, useLayout } from "src/librarys/layout.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 import Background from "./Background.tsx";
 import Channel from "./Channel.tsx";
 import TypeButton from "./TypeButton.tsx";
 import Handle from "./handle/Handle.tsx";
+import { BlockContext } from "src/librarys/block-context.ts";
+import { useContext } from "react";
 
 const Container = styled.div<{ $dpr: number }>`
   /* margin: ${(props) => 4 / props.$dpr + "px"}; */
@@ -108,35 +104,32 @@ const RemoveButton = styled.button`
   }
 `;
 
-function EditBlock({ id }: EditBlockProps) {
-  const [mode, setMode] = useAtom(applicationModeAtom);
-  const [_, setBlockList] = useAtom(blockListAtom);
-  const { channel, type } = findBlock(id);
+function EditBlock({}: EditBlockProps) {
+  const { layoutMode, removeBlock } = useLayout();
+  const { id } = useContext(BlockContext);
 
   const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
 
-  const className = classNames({ "view-mode": mode === ApplicationMode.View });
+  const className = classNames({ "view-mode": layoutMode === LayoutMode.View });
 
   const onRemoveClick = () => {
-    setBlockList(removeBlock(id));
+    removeBlock(id);
   };
 
   return (
     <Container className={className} $dpr={displayPixelRatio}>
-      <Background id={id} />
-      <Handle id={id} />
+      <Background />
+      <Handle />
       <IconGroup>
-        <TypeButton id={id} type={type} />
+        <TypeButton />
         <RemoveButton onClick={onRemoveClick}>
           <MdClose />
         </RemoveButton>
       </IconGroup>
-      <Channel id={id} channel={channel} />
+      <Channel />
     </Container>
   );
 }
-type EditBlockProps = {
-  id: number;
-};
+type EditBlockProps = {};
 
 export default EditBlock;

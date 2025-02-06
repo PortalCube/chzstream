@@ -1,12 +1,7 @@
 import classNames from "classnames";
 import { useAtom } from "jotai";
-import { useMemo } from "react";
-import {
-  ApplicationMode,
-  applicationModeAtom,
-  blockListAtom,
-  removeBlock,
-} from "src/librarys/grid.ts";
+import { useContext, useMemo } from "react";
+import { LayoutMode, useLayout } from "src/librarys/layout.ts";
 import styled, { css } from "styled-components";
 
 import { MdClose, MdLock } from "react-icons/md";
@@ -16,6 +11,7 @@ import Channel from "./Channel.tsx";
 import { InfoType } from "./InfoOverlay.ts";
 import Keyword, { KeywordProps } from "./Keyword.tsx";
 import OfflineIcon from "./OfflineIcon.tsx";
+import { BlockContext } from "src/librarys/block-context.ts";
 
 const Container = styled.div<{ $dpr: number }>`
   overflow: hidden;
@@ -294,7 +290,7 @@ function template(texts: TemplateStringsArray, ...tokens: string[]) {
   return result;
 }
 
-function render(id: number, info: Info) {
+function render(info: Info) {
   const title = info.title.map((row: Template, index: number) => {
     return (
       <Row key={index}>
@@ -304,7 +300,7 @@ function render(id: number, info: Info) {
           }
 
           if (element.type === "channel") {
-            return <Channel key={index} id={id} />;
+            return <Channel key={index} />;
           } else if (element.type === "keyword") {
             const text = element.text as string;
             const icon = element.icon as (props: object) => JSX.Element;
@@ -336,14 +332,14 @@ function render(id: number, info: Info) {
   );
 }
 
-function InfoOverlay({ id, type }: InfoOverlayProps) {
-  const [mode, setMode] = useAtom(applicationModeAtom);
+function InfoOverlay({ type }: InfoOverlayProps) {
   const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
-  const [blockList, setBlockList] = useAtom(blockListAtom);
+  const { layoutMode, removeBlock } = useLayout();
+  const { id } = useContext(BlockContext);
 
   const isShow = useMemo(
-    () => mode === ApplicationMode.View && type !== "none",
-    [mode, type]
+    () => layoutMode === LayoutMode.View && type !== "none",
+    [layoutMode, type]
   );
 
   const content = useMemo(() => {
@@ -357,15 +353,15 @@ function InfoOverlay({ id, type }: InfoOverlayProps) {
       return null;
     }
 
-    return render(id, info);
-  }, [id, type]);
+    return render(info);
+  }, [type]);
 
   const className = classNames({
     hidden: !isShow,
   });
 
   const onRemoveButtonClick = () => {
-    setBlockList(removeBlock(id));
+    removeBlock(id);
   };
 
   const onDragEnter: React.DragEventHandler = (event) => {
@@ -392,7 +388,6 @@ function InfoOverlay({ id, type }: InfoOverlayProps) {
 }
 
 type InfoOverlayProps = {
-  id: number;
   type: InfoType;
 };
 
