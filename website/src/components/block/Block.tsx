@@ -1,16 +1,21 @@
 import {
   ClientMessageEvent,
   IframePointerMoveMessage,
+  PlayerControlMessage,
   PlayerEventType,
 } from "@chzstream/message";
-import { useAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { layoutSizeAtom, mouseIsTopAtom } from "src/librarys/app.ts";
+import type { Block } from "src/librarys/block.ts";
 import { BlockType } from "src/librarys/block.ts";
+import { BlockContext } from "src/librarys/context.ts";
 import {
-  blockListAtom,
-  layoutSizeAtom,
-  mouseIsTopAtom,
-  useLayout,
+  activateBlockAtom,
+  fetchChzzkChannelAtom,
+  modifyBlockAtom,
+  swapBlockAtom,
+  updateBlockAtom,
 } from "src/librarys/layout.ts";
 import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
 import { getGridStyle } from "src/scripts/grid-layout.ts";
@@ -18,6 +23,7 @@ import {
   getIframeId,
   MessageClient,
   PlayerEvent,
+  sendPlayerControl,
 } from "src/scripts/message.ts";
 import styled, { keyframes } from "styled-components";
 import EditBlock from "./edit-block/EditBlock.tsx";
@@ -25,7 +31,6 @@ import LoadingOverlay from "./LoadingOverlay.tsx";
 import { InfoType } from "./overlay/InfoOverlay.ts";
 import InfoOverlay from "./overlay/InfoOverlay.tsx";
 import ViewBlock from "./ViewBlock.tsx";
-import { BlockContext } from "src/librarys/block-context.ts";
 
 const popinAnimation = keyframes`
   0% {
@@ -54,22 +59,20 @@ const Container = styled.div`
   animation-timing-function: ease-out;
 `;
 
-function Block({ id }: BlockProps) {
+function Block({ block }: BlockProps) {
+  const { id, type, status, position, channel, setting } = block;
   const ref = useRef<HTMLDivElement>(null);
-  const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
-  const {
-    setBlockChannel,
-    activateBlockStatus,
-    updateChannel,
-    setBlockLock,
-    swapBlockPosition,
-    findBlock,
-  } = useLayout();
-  const block = findBlock(id);
-  const { type, status, position, channel } = block;
+  const setMouseTop = useSetAtom(mouseIsTopAtom);
+
+  const modifyBlock = useSetAtom(modifyBlockAtom);
+  const updateBlock = useSetAtom(updateBlockAtom);
+  const activateBlock = useSetAtom(activateBlockAtom);
+  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
+  const swapBlock = useSetAtom(swapBlockAtom);
+
   const [loaded, setLoaded] = useState(false);
   const [infoType, setInfoType] = useState<InfoType>(InfoType.None);
-  const [[gridWidth, gridHeight]] = useAtom(layoutSizeAtom);
+  const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
 
   useEffect(() => {
     if (MessageClient.active === false) {
@@ -117,6 +120,34 @@ function Block({ id }: BlockProps) {
   }, [ref]);
 
   useEffect(() => {
+    const onPlayerControl = ({
+      detail: message,
+    }: ClientMessageEvent<PlayerControlMessage>) => {
+      if (message.sender === null) {
+        return;
+      }
+
+      if (getIframeId(message.sender) !== id) {
+        return;
+      }
+
+      const { volume, quality, muted } = message.data;
+
+      updateBlock(id, (prev) => {
+        if (volume !== undefined) prev.setting.volume = volume;
+        if (quality !== undefined) prev.setting.quality = quality;
+        if (muted !== undefined) prev.setting.muted = muted;
+      });
+    };
+
+    MessageClient.addEventListener("player-control", onPlayerControl);
+
+    return () => {
+      MessageClient.removeEventListener("player-control", onPlayerControl);
+    };
+  }, []);
+
+  useEffect(() => {
     const listener = ({ detail: message }: PlayerEvent) => {
       if (message.sender === null) {
         return;
@@ -129,6 +160,12 @@ function Block({ id }: BlockProps) {
       if (message.data.event === PlayerEventType.Ready) {
         setLoaded(true);
         setInfoType(InfoType.None);
+
+        sendPlayerControl(id, {
+          volume: setting.volume,
+          quality: setting.quality,
+          muted: setting.muted,
+        });
       }
 
       if (message.data.event === PlayerEventType.End) {
@@ -152,10 +189,10 @@ function Block({ id }: BlockProps) {
     return () => {
       MessageClient.removeEventListener("player-event", listener);
     };
-  }, [id]);
+  }, [id, setting]);
 
   const onPointerLeave: React.PointerEventHandler = () => {
-    setBlockLock(id, true);
+    modifyBlock({ id, lock: true });
   };
 
   const onDrop: React.DragEventHandler = async (event) => {
@@ -166,7 +203,7 @@ function Block({ id }: BlockProps) {
     const json = JSON.parse(event.dataTransfer.getData("application/json"));
 
     if (json._isChannel === true) {
-      updateChannel(id, json.uuid);
+      await fetchChzzkChannel(id, json.uuid);
     } else if (json._isBlock === true) {
       if (position === null) {
         return;
@@ -174,31 +211,29 @@ function Block({ id }: BlockProps) {
 
       const data = json as {
         _isBlock: true;
-        id: number;
+        block: Block;
       };
 
-      if (id === data.id) {
+      if (id === data.block.id) {
         return;
       }
 
-      const block = findBlock(data.id);
-
-      if (block.channel === null) {
+      if (data.block.channel === null) {
         return;
       }
 
-      if (block.position === null) {
+      if (data.block.position === null) {
         return;
       }
 
-      if (type === BlockType.Chat && block.type === BlockType.Stream) {
-        setBlockChannel(id, block.channel);
-        activateBlockStatus();
+      if (type === BlockType.Chat && data.block.type === BlockType.Stream) {
+        modifyBlock({ id, channel: data.block.channel });
+        activateBlock();
 
         setLoaded(false);
         setInfoType(InfoType.None);
       } else {
-        swapBlockPosition(id, data.id);
+        swapBlock(id, data.block.id);
       }
     }
   };
@@ -229,7 +264,7 @@ function Block({ id }: BlockProps) {
 }
 
 type BlockProps = {
-  id: number;
+  block: Block;
 };
 
 export default Block;

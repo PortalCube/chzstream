@@ -1,7 +1,6 @@
-import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useAtomValue } from "jotai";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 const ratioMixin = (value: number) => {
   return ({ $dpr }: { $dpr: number }) => {
@@ -70,7 +69,7 @@ const Description = styled.p<{ $dpr: number }>`
 // Note: Windows에서는 DragImage가 300x300을 초과하면 방사형 투명도 그라데이션이 적용됨
 
 function DragImage({ _ref, src, name }: DragImageProps) {
-  const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
+  const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
   return (
     <Container ref={_ref} $dpr={displayPixelRatio}>

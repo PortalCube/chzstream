@@ -1,8 +1,10 @@
 import classNames from "classnames";
+import { useAtomValue } from "jotai";
 import { useContext, useMemo } from "react";
-import { BlockContext } from "src/librarys/block-context.ts";
+import { layoutModeAtom } from "src/librarys/app.ts";
 import { BlockType } from "src/librarys/block.ts";
-import { LayoutMode, useLayout } from "src/librarys/layout.ts";
+import { BlockContext } from "src/librarys/context";
+import { LayoutMode } from "src/librarys/layout.ts";
 import { MessageClient } from "src/scripts/message.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
@@ -49,7 +51,7 @@ const Container = styled.iframe`
 `;
 
 function ViewBlock({ loaded }: ViewBlockProps) {
-  const { layoutMode } = useLayout();
+  const layoutMode = useAtomValue(layoutModeAtom);
   const { id, type, status, lock, channel } = useContext(BlockContext);
 
   const src = useMemo((): string => {

@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 import { Mixin } from "src/scripts/styled.ts";
 import { useContext } from "react";
-import { BlockContext } from "src/librarys/block-context.ts";
+import { BlockContext } from "src/librarys/context";
 import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
 
 const Container = styled.div`
@@ -71,7 +71,7 @@ function Channel({}: ChannelProps) {
   const { channel } = useContext(BlockContext);
 
   const name = channel?.name ?? "알 수 없는 채널";
-  const iconUrl = getProfileImageUrl(channel?.iconUrl);
+  const iconUrl = channel?.iconUrl ?? "";
 
   return (
     <Container>

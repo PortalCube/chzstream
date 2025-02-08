@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { useContext } from "react";
 
 import LogoImage from "src/assets/logo.png";
-import { BlockContext } from "src/librarys/block-context.ts";
+import { BlockContext } from "src/librarys/context";
 
 import { BlockType } from "src/librarys/block.ts";
 import styled from "styled-components";

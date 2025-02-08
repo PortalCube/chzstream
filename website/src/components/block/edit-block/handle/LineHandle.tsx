@@ -1,13 +1,10 @@
-import { useAtom } from "jotai";
-import styled from "styled-components";
-import { PreviewBlockHandle } from "src/librarys/block.ts";
-import {
-  previewBlockAtom,
-  startModifyBlockPreview,
-} from "src/librarys/layout-preview.ts";
 import classNames from "classnames";
+import { useSetAtom } from "jotai";
 import { useContext } from "react";
-import { BlockContext } from "src/librarys/block-context.ts";
+import { PreviewBlockHandle } from "src/librarys/block.ts";
+import { BlockContext } from "src/librarys/context";
+import { beginModifyPreviewAtom } from "src/librarys/layout-preview.ts";
+import styled from "styled-components";
 
 const Container = styled.div`
   padding: 4px;
@@ -88,11 +85,11 @@ function getLineClass(direction: PreviewBlockHandle) {
 }
 
 function LineHandle({ direction }: LineHandleProps) {
-  const [blockPreview, setBlockPreview] = useAtom(previewBlockAtom);
   const block = useContext(BlockContext);
+  const beginModifyPreview = useSetAtom(beginModifyPreviewAtom);
 
   const onPointerDown: React.PointerEventHandler = () => {
-    setBlockPreview(startModifyBlockPreview(block, direction));
+    beginModifyPreview(block, direction);
   };
 
   const lineClass = getLineClass(direction);

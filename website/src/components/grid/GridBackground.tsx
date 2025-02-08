@@ -1,16 +1,13 @@
-import { useAtom } from "jotai";
-import { useMemo } from "react";
-import styled from "styled-components";
-import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "src/scripts/constants.ts";
-import {
-  LayoutMode,
-  layoutModeAtom,
-  nextBlockIdAtom,
-} from "src/librarys/layout.ts";
 import classNames from "classnames";
+import { useAtom, useAtomValue } from "jotai";
+import { useMemo } from "react";
+import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
+import { LayoutMode } from "src/librarys/layout.ts";
+import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "src/scripts/constants.ts";
+import styled from "styled-components";
 
 import LogoImage from "src/assets/logo.png";
+import { layoutModeAtom, nextBlockIdAtom } from "src/librarys/app.ts";
 
 const Container = styled.div`
   width: 100%;
@@ -121,11 +118,11 @@ function GridBackground({
   subWidth = 4,
   subHeight = 4,
 }: GridBackgroundProps) {
-  const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
+  const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
-  const [mode, setMode] = useAtom(layoutModeAtom);
+  const mode = useAtomValue(layoutModeAtom);
 
-  const [blockId, setBlockId] = useAtom(nextBlockIdAtom);
+  const blockId = useAtomValue(nextBlockIdAtom);
 
   const rowLines = useMemo(() => {
     const rowLines = [];

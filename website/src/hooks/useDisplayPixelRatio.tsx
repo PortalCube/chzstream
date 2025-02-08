@@ -1,11 +1,11 @@
-import { atom, useAtom } from "jotai";
+import { atom, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 
 const initialValue = window.devicePixelRatio || 1;
 export const displayPixelRatioAtom = atom(initialValue);
 
 export function useDisplayPixelRatio() {
-  const [_, setDisplayPixelRatio] = useAtom(displayPixelRatioAtom);
+  const setDisplayPixelRatio = useSetAtom(displayPixelRatioAtom);
   const [media, setMedia] = useState(
     window.matchMedia(`(resolution: ${initialValue}dppx)`)
   );

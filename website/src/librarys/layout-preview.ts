@@ -1,6 +1,4 @@
-// Grid Preview Context
-
-import { atomWithImmer } from "jotai-immer";
+import { MIN_BLOCK_HEIGHT, MIN_BLOCK_WIDTH } from "src/scripts/constants.ts";
 import {
   Block,
   BlockPosition,
@@ -8,113 +6,102 @@ import {
   PreviewBlockHandle,
   PreviewBlockStatus,
 } from "./block.ts";
-import { MIN_BLOCK_HEIGHT, MIN_BLOCK_WIDTH } from "src/scripts/constants.ts";
+import { atom } from "jotai";
+import { blockListAtom, previewBlockAtom } from "./app.ts";
 
-export const previewBlockAtom = atomWithImmer<PreviewBlock>({
-  status: PreviewBlockStatus.Inactive,
-  position: {
-    top: 0,
-    left: 0,
+export const beginPreviewAtom = atom(null, (get, set, x: number, y: number) => {
+  const blockList = get(blockListAtom);
+
+  const position: BlockPosition = {
+    top: y,
+    left: x,
     width: 1,
     height: 1,
-  },
-  linkedBlockId: null,
-  handle: null,
+  };
+
+  if (hasBlockCollision(position, blockList, null)) {
+    return;
+  }
+
+  set(previewBlockAtom, (prev) => {
+    prev.status = PreviewBlockStatus.Create;
+    prev.position = position;
+    prev.linkedBlockId = null;
+    prev.handle = null;
+  });
 });
 
-export function startCreateBlockPreview(
-  x: number,
-  y: number,
-  blockList: Block[]
-) {
-  return (draft: PreviewBlock) => {
-    const position: BlockPosition = {
-      top: y,
-      left: x,
-      width: 1,
-      height: 1,
-    };
+export const movePreviewAtom = atom(null, (get, set, x: number, y: number) => {
+  const blockList = get(blockListAtom);
+  const previewBlock = get(previewBlockAtom);
 
-    if (hasBlockCollision(position, blockList, null)) {
+  const position = {
+    top: previewBlock.position.top,
+    left: previewBlock.position.left,
+    width: x - previewBlock.position.left + 1,
+    height: y - previewBlock.position.top + 1,
+  };
+
+  if (position.width <= 0) {
+    position.left = position.left + position.width - 1;
+    position.width = 2 - position.width;
+  }
+
+  if (position.height <= 0) {
+    position.top = position.top + position.height - 1;
+    position.height = 2 - position.height;
+  }
+
+  if (hasBlockCollision(position, blockList, null)) {
+    return;
+  }
+
+  set(previewBlockAtom, (prev) => {
+    prev.position.width = x - prev.position.left + 1;
+    prev.position.height = y - prev.position.top + 1;
+  });
+});
+
+export const endPreviewAtom = atom(null, (_get, set) => {
+  set(previewBlockAtom, (prev) => {
+    prev.status = PreviewBlockStatus.Inactive;
+    prev.linkedBlockId = null;
+    prev.handle = null;
+  });
+});
+
+export const beginModifyPreviewAtom = atom(
+  null,
+  (_get, set, block: Block, handle: PreviewBlockHandle) => {
+    set(previewBlockAtom, (prev) => {
+      prev.status = PreviewBlockStatus.Modify;
+      prev.position = {
+        top: block.position.top,
+        left: block.position.left,
+        width: block.position.width,
+        height: block.position.height,
+      };
+      prev.linkedBlockId = block.id;
+      prev.handle = handle;
+    });
+  }
+);
+
+export const moveModifyPreviewAtom = atom(
+  null,
+  (get, set, x: number, y: number) => {
+    const blockList = get(blockListAtom);
+    const previewBlock = get(previewBlockAtom);
+
+    if (previewBlock.handle === null) {
       return;
     }
 
-    draft.status = PreviewBlockStatus.Create;
-    draft.position = position;
-    draft.linkedBlockId = null;
-    draft.handle = null;
-  };
-}
-
-export function moveCreateBlockPreview(
-  x: number,
-  y: number,
-  blockList: Block[]
-) {
-  return (draft: PreviewBlock) => {
-    const position = {
-      top: draft.position.top,
-      left: draft.position.left,
-      width: x - draft.position.left + 1,
-      height: y - draft.position.top + 1,
-    };
-
-    if (position.width <= 0) {
-      position.left = position.left + position.width - 1;
-      position.width = 2 - position.width;
-    }
-
-    if (position.height <= 0) {
-      position.top = position.top + position.height - 1;
-      position.height = 2 - position.height;
-    }
-
-    if (hasBlockCollision(position, blockList, null)) {
-      return;
-    }
-
-    draft.position.width = x - draft.position.left + 1;
-    draft.position.height = y - draft.position.top + 1;
-  };
-}
-
-export function endCreateBlockPreview() {
-  return (draft: PreviewBlock) => {
-    draft.status = PreviewBlockStatus.Inactive;
-    draft.linkedBlockId = null;
-    draft.handle = null;
-  };
-}
-
-export function startModifyBlockPreview(
-  block: Block,
-  handle: PreviewBlockHandle
-) {
-  return (draft: PreviewBlock) => {
-    draft.status = PreviewBlockStatus.Modify;
-    draft.position = {
-      top: block.position.top,
-      left: block.position.left,
-      width: block.position.width,
-      height: block.position.height,
-    };
-    draft.linkedBlockId = block.id;
-    draft.handle = handle;
-  };
-}
-
-export function moveModifyBlockPreview(
-  x: number,
-  y: number,
-  currentId: number | null,
-  blockList: Block[]
-) {
-  return (draft: PreviewBlock) => {
-    let top = draft.position.top;
-    let left = draft.position.left;
-    let width = draft.position.width;
-    let height = draft.position.height;
-    const position: BlockPosition = { top, left, width, height };
+    const position = structuredClone(previewBlock.position);
+    const top = position.top;
+    const left = position.left;
+    const width = position.width;
+    const height = position.height;
 
     const moveLeft = () => {
       if (x < left + width) {
@@ -142,39 +129,19 @@ export function moveModifyBlockPreview(
       }
     };
 
-    // 핸들 방향에 따라서 좌표 값 갱신
-    switch (draft.handle) {
-      case PreviewBlockHandle.TopLeft:
-        moveLeft();
-        moveTop();
-        break;
-      case PreviewBlockHandle.Top:
-        moveTop();
-        break;
-      case PreviewBlockHandle.TopRight:
-        moveTop();
-        moveRight();
-        break;
-      case PreviewBlockHandle.Left:
-        moveLeft();
-        break;
-      case PreviewBlockHandle.Right:
-        moveRight();
-        break;
-      case PreviewBlockHandle.BottomLeft:
-        moveLeft();
-        moveBottom();
-        break;
-      case PreviewBlockHandle.Bottom:
-        moveBottom();
-        break;
-      case PreviewBlockHandle.BottomRight:
-        moveBottom();
-        moveRight();
-        break;
-    }
+    const functions = {
+      [PreviewBlockHandle.TopLeft]: [moveLeft, moveTop],
+      [PreviewBlockHandle.Top]: [moveTop],
+      [PreviewBlockHandle.TopRight]: [moveTop, moveRight],
+      [PreviewBlockHandle.Left]: [moveLeft],
+      [PreviewBlockHandle.Right]: [moveRight],
+      [PreviewBlockHandle.BottomLeft]: [moveLeft, moveBottom],
+      [PreviewBlockHandle.Bottom]: [moveBottom],
+      [PreviewBlockHandle.BottomRight]: [moveBottom, moveRight],
+    };
 
-    // Test 1: 최소 크기 제한
+    functions[previewBlock.handle].forEach((func) => func());
+
     if (position.width < MIN_BLOCK_WIDTH) {
       return;
     }
@@ -183,15 +150,15 @@ export function moveModifyBlockPreview(
       return;
     }
 
-    // Test 2: 블록 간 충돌 체크
-    if (hasBlockCollision(position, blockList, currentId)) {
+    if (hasBlockCollision(position, blockList, previewBlock.linkedBlockId)) {
       return;
     }
 
-    // 새로운 좌표를 적용
-    draft.position = position;
-  };
-}
+    set(previewBlockAtom, (prev) => {
+      prev.position = position;
+    });
+  }
+);
 
 function hasBlockCollision(
   position: BlockPosition,

@@ -1,282 +1,183 @@
-import { Draft } from "immer";
-import { atom, useAtom } from "jotai";
-import { atomWithImmer } from "jotai-immer";
-import { Block, BlockChannel, BlockPosition, BlockType } from "./block.ts";
+import { WritableDraft } from "immer";
+import { atom } from "jotai";
 import {
   MessageClient,
   requestChzzkChannelInfo,
   requestChzzkLiveInfo,
 } from "src/scripts/message.ts";
+import { blockListAtom, layoutModeAtom, nextBlockIdAtom } from "./app.ts";
+import { Block, BlockChannel, BlockPosition, BlockType } from "./block.ts";
 import { getProfileImageUrl } from "./chzzk-util.ts";
-import { useMixer } from "./mixer.ts";
-
-const initialBlockList: Block[] = [];
-const initialId = 1;
+import { defaultMixerItemAtom } from "./mixer.ts";
 
 export enum LayoutMode {
   View = "view",
   Modify = "modify",
 }
 
-export const blockListAtom = atomWithImmer<Block[]>(initialBlockList);
-export const nextBlockIdAtom = atom<number>(initialId);
-export const mouseIsTopAtom = atom<boolean>(false);
-export const layoutModeAtom = atom<LayoutMode>(LayoutMode.Modify);
-export const layoutSizeAtom = atom<[number, number]>([0, 0]);
+export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
+  const nextBlockId = get(nextBlockIdAtom);
+  const defaultMixerItem = get(defaultMixerItemAtom);
 
-export function useLayout() {
-  const { globalItem } = useMixer();
-  const [blockList, setBlockList] = useAtom(blockListAtom);
-  const [nextBlockId, setNextBlockId] = useAtom(nextBlockIdAtom);
-  const [layoutMode, setLayoutMode] = useAtom(layoutModeAtom);
+  const block: Block = {
+    id: nextBlockId,
+    type: BlockType.Stream,
+    status: MessageClient.active === false,
+    lock: true,
+    position: position,
+    channel: null,
+    setting: {
+      volume: defaultMixerItem.setting.volume,
+      quality: defaultMixerItem.setting.quality,
+      muted: defaultMixerItem.setting.muted,
+      lock: false,
+    },
+  };
 
-  function addBlock(
-    top: number,
-    left: number,
-    width: number = 1,
-    height: number = 1
-  ) {
-    const block: Block = {
-      id: nextBlockId,
-      type: BlockType.Stream,
-      status: MessageClient.active === false,
-      lock: true,
-      position: {
-        top,
-        left,
-        width,
-        height,
-      },
-      channel: null,
-      volume: globalItem.volume,
-      quality: globalItem.quality,
-    };
+  set(blockListAtom, (prev) => [...prev, block]);
+  set(nextBlockIdAtom, (prev) => prev + 1);
+});
 
-    setBlockList((draft) => {
-      draft.push(block);
-    });
+export const addBlockAtom = atom(null, (get, set, block: Block) => {
+  const list = get(blockListAtom);
+  const defaultMixerItem = get(defaultMixerItemAtom);
 
-    setNextBlockId((draft) => {
-      return draft + 1;
-    });
+  if (list.find((item) => item.id === block.id) !== undefined) {
+    throw new Error(`Block already exists: ${block.id}`);
   }
 
-  function findBlock(id: number): Block {
+  block.setting = {
+    volume: defaultMixerItem.setting.volume,
+    quality: defaultMixerItem.setting.quality,
+    muted: defaultMixerItem.setting.muted,
+    lock: false,
+  };
+
+  set(blockListAtom, (prev) => [...prev, block]);
+});
+
+export const removeBlockAtom = atom(null, (_get, set, id: number) => {
+  set(blockListAtom, (prev) => prev.filter((item) => item.id !== id));
+});
+
+export const clearBlockAtom = atom(null, (_get, set) => {
+  set(blockListAtom, []);
+  set(nextBlockIdAtom, 1);
+});
+
+export const modifyBlockAtom = atom(
+  null,
+  (_get, set, block: Partial<Block> & Pick<Block, "id">) => {
+    set(blockListAtom, (prev) => {
+      const index = prev.findIndex((item) => item.id === block.id);
+
+      if (index === -1) {
+        throw new Error(`Block not found: ${block.id}`);
+      }
+
+      prev[index] = { ...prev[index], ...block };
+    });
+  }
+);
+
+export const updateBlockAtom = atom(
+  null,
+  (_get, set, id: number, update: (block: WritableDraft<Block>) => void) => {
+    set(blockListAtom, (prev) => {
+      const block = prev.find((item) => item.id === id);
+
+      if (block === undefined) {
+        throw new Error(`Block not found: ${id}`);
+      }
+
+      update(block);
+    });
+  }
+);
+
+export const activateBlockAtom = atom(null, (_get, set) => {
+  set(blockListAtom, (prev) => prev.map((item) => ({ ...item, status: true })));
+});
+
+export const swapBlockAtom = atom(
+  null,
+  (_get, set, sourceId: number, targetId: number) => {
+    set(blockListAtom, (prev) => {
+      const sourceItem = prev.find((item) => item.id === sourceId);
+      const targetItem = prev.find((item) => item.id === targetId);
+
+      if (sourceItem === undefined || targetItem === undefined) {
+        return prev;
+      }
+
+      [sourceItem.position, targetItem.position] = [
+        targetItem.position,
+        sourceItem.position,
+      ];
+    });
+  }
+);
+
+export const fetchChzzkChannelAtom = atom(
+  null,
+  async (get, set, id: number, uuid: string) => {
+    const blockList = get(blockListAtom);
     const block = blockList.find((item) => item.id === id);
 
     if (block === undefined) {
       throw new Error(`Block not found: ${id}`);
     }
 
-    return block;
-  }
+    const channel: BlockChannel = {
+      uuid: uuid,
+      name: "알 수 없음",
+      title: "현재 오프라인 상태입니다",
+      thumbnailUrl: "",
+      iconUrl: getProfileImageUrl(),
+    };
 
-  function removeBlock(id: number) {
-    setBlockList((draft) => {
-      return draft.filter((item) => item.id !== id);
-    });
-  }
-
-  function clearBlock() {
-    setBlockList([]);
-  }
-
-  function setBlockPosition(id: number, position: BlockPosition) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      item.position.left = position.left;
-      item.position.top = position.top;
-      item.position.width = position.width;
-      item.position.height = position.height;
-    });
-  }
-
-  function swapBlockPosition(sourceId: number, targetId: number) {
-    setBlockList((draft) => {
-      const sourceItem = draft.find((item) => item.id === sourceId);
-      const targetItem = draft.find((item) => item.id === targetId);
-
-      if (sourceItem === undefined || targetItem === undefined) {
-        return;
-      }
-
-      const sourcePosition = sourceItem.position;
-      const targetPosition = targetItem.position;
-
-      sourceItem.position = targetPosition;
-      targetItem.position = sourcePosition;
-    });
-  }
-
-  function setBlockUuid(id: number, uuid: string) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      if (item.channel === null) {
-        return;
-      }
-
-      item.channel.uuid = uuid;
-    });
-  }
-
-  function setBlockName(id: number, name: string) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      if (item.channel === null) {
-        return;
-      }
-
-      item.channel.name = name;
-    });
-  }
-
-  function setBlockTitle(id: number, title: string) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      if (item.channel === null) {
-        return;
-      }
-
-      item.channel.title = title;
-    });
-  }
-
-  function setBlockType(id: number, type: BlockType) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      item.type = type;
-
-      if (MessageClient.active) {
-        item.status = false;
-      }
-    });
-  }
-
-  function setBlockLock(id: number, lock: boolean) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      item.lock = lock;
-    });
-  }
-
-  function setBlockChannel(id: number, channel: BlockChannel) {
-    setBlockList((draft) => {
-      const item = draft.find((item) => item.id === id);
-
-      if (item === undefined) {
-        return;
-      }
-
-      item.channel = channel;
-
-      if (MessageClient.active) {
-        item.status = false;
-      }
-    });
-  }
-
-  function activateBlockStatus() {
-    setBlockList((draft) => {
-      for (const item of draft) {
-        item.status = true;
-      }
-    });
-  }
-
-  async function updateChannel(id: number, uuid: string) {
     const channelResponse = await requestChzzkChannelInfo(uuid);
-
-    const liveResponse =
-      (channelResponse?.openLive && (await requestChzzkLiveInfo(uuid))) ||
-      undefined;
-
-    const name = channelResponse?.channelName ?? "알 수 없음";
-    const title = liveResponse?.liveTitle ?? "현재 오프라인 상태입니다";
-    const thumbnailUrl =
-      liveResponse?.liveImageUrl?.replace("{type}", "720") ?? "";
-    const iconUrl = getProfileImageUrl(channelResponse?.channelImageUrl);
-
-    setBlockChannel(id, {
-      uuid,
-      name,
-      title,
-      thumbnailUrl,
-      iconUrl,
-    });
-
-    if (layoutMode === LayoutMode.View) {
-      activateBlockStatus();
+    if (channelResponse === null) {
+      throw new Error(`Channel not found: ${uuid}`);
     }
-  }
 
-  function activateViewMode() {
-    setLayoutMode(LayoutMode.View);
-    activateBlockStatus();
-  }
+    channel.name = channelResponse.channelName;
+    channel.iconUrl = getProfileImageUrl(channelResponse.channelImageUrl);
 
-  function activateEditMode() {
-    setLayoutMode(LayoutMode.Modify);
-  }
-
-  function switchLayoutMode() {
-    if (layoutMode === LayoutMode.View) {
-      activateEditMode();
-    } else if (layoutMode === LayoutMode.Modify) {
-      activateViewMode();
+    if (channelResponse.openLive === false) {
+      set(modifyBlockAtom, { id, channel });
+      return;
     }
-  }
 
-  return {
-    nextBlockId,
-    blockList,
-    addBlock,
-    findBlock,
-    removeBlock,
-    clearBlock,
-    setBlockPosition,
-    setBlockUuid,
-    setBlockName,
-    setBlockTitle,
-    setBlockType,
-    setBlockLock,
-    swapBlockPosition,
-    activateBlockStatus,
-    setBlockChannel,
-    updateChannel,
-    layoutMode,
-    setLayoutMode,
-    activateViewMode,
-    activateEditMode,
-    switchLayoutMode,
-  };
-}
+    const liveResponse = await requestChzzkLiveInfo(uuid);
+    if (liveResponse === null) {
+      throw new Error(`Live not found: ${uuid}`);
+    }
+
+    channel.title = liveResponse.liveTitle;
+
+    if (liveResponse.liveImageUrl !== null) {
+      channel.thumbnailUrl = liveResponse.liveImageUrl.replace("{type}", "720");
+    }
+
+    set(modifyBlockAtom, { id, channel });
+  }
+);
+
+export const activateViewModeAtom = atom(null, (_get, set) => {
+  set(layoutModeAtom, LayoutMode.View);
+  set(activateBlockAtom);
+});
+
+export const activateEditModeAtom = atom(null, (_get, set) => {
+  set(layoutModeAtom, LayoutMode.Modify);
+});
+
+export const switchLayoutModeAtom = atom(null, (get, set) => {
+  const mode = get(layoutModeAtom);
+  if (mode === LayoutMode.View) {
+    set(activateEditModeAtom);
+  } else if (mode === LayoutMode.Modify) {
+    set(activateViewModeAtom);
+  }
+});

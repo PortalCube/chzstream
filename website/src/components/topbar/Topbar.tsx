@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
 import {
   MdEdit,
@@ -13,13 +13,18 @@ import {
   MdVolumeUp,
 } from "react-icons/md";
 import { isFullscreenAtom } from "src/hooks/useFullscreenDetect.tsx";
-import { LayoutMode, mouseIsTopAtom, useLayout } from "src/librarys/layout.ts";
+import {
+  clearBlockAtom,
+  LayoutMode,
+  switchLayoutModeAtom,
+} from "src/librarys/layout.ts";
 import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
 import styled, { css } from "styled-components";
 import ChannelGroup from "./ChannelGroup.tsx";
 import MenuButton from "./MenuButton.tsx";
 
 import LogoImage from "src/assets/logo.png";
+import { layoutModeAtom, mouseIsTopAtom } from "src/librarys/app.ts";
 import { useModal } from "src/librarys/modal.ts";
 import { Mixin } from "src/scripts/styled.ts";
 
@@ -79,12 +84,14 @@ const MenuGroup = styled.div`
 `;
 
 function Topbar() {
-  const [isFullscreen, setFullscreen] = useAtom(isFullscreenAtom);
+  const isFullscreen = useAtomValue(isFullscreenAtom);
   const [isShow, setShow] = useState(true);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
   const { openSettingModal, openMixerModal } = useModal();
 
-  const { layoutMode, clearBlock, switchLayoutMode } = useLayout();
+  const layoutMode = useAtomValue(layoutModeAtom);
+  const clearBlock = useSetAtom(clearBlockAtom);
+  const switchLayoutMode = useSetAtom(switchLayoutModeAtom);
 
   const toggleFullscreen = () => {
     if (isFullscreen) {
@@ -169,7 +176,7 @@ function Topbar() {
       {
         key: "mixer",
         Icon: MdVolumeUp,
-        text: "미디어 믹서",
+        text: "스트림 믹서",
         onClick: openMixerModal,
         filter: [LayoutMode.Modify, LayoutMode.View],
       },

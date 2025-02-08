@@ -1,10 +1,9 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
+import { layoutSizeAtom, previewBlockAtom } from "src/librarys/app.ts";
 import { PreviewBlockStatus } from "src/librarys/block.ts";
-import { layoutSizeAtom } from "src/librarys/layout.ts";
-import { previewBlockAtom } from "src/librarys/layout-preview.ts";
 import { getGridStyle } from "src/scripts/grid-layout.ts";
 import styled from "styled-components";
 
@@ -31,11 +30,11 @@ const Container = styled.div<{ $dpr: number }>`
 `;
 
 function BlockPreview() {
-  const [previewBlock] = useAtom(previewBlockAtom);
-  const [[gridWidth, gridHeight]] = useAtom(layoutSizeAtom);
+  const previewBlock = useAtomValue(previewBlockAtom);
+  const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
   const { status, position } = previewBlock;
 
-  const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
+  const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
   const style = useMemo(
     () => getGridStyle(position, gridWidth, gridHeight),

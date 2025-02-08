@@ -1,8 +1,9 @@
+import { useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { useLayout } from "src/librarys/layout.ts";
+import { switchLayoutModeAtom } from "src/librarys/layout.ts";
 
 export function useShortcutKey() {
-  const { switchLayoutMode } = useLayout();
+  const switchLayoutMode = useSetAtom(switchLayoutModeAtom);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

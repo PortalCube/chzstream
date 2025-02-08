@@ -1,5 +1,5 @@
-import { atom, useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { atom, useSetAtom } from "jotai";
+import { useEffect } from "react";
 
 const media = window.matchMedia("(display-mode: fullscreen)");
 
@@ -7,7 +7,7 @@ const initialValue = media.matches;
 export const isFullscreenAtom = atom(initialValue);
 
 export function useFullscreenDetect() {
-  const [_, setFullscreenAtom] = useAtom(isFullscreenAtom);
+  const setFullscreenAtom = useSetAtom(isFullscreenAtom);
 
   useEffect(() => {
     const listener = ({ matches }: { matches: boolean }) => {

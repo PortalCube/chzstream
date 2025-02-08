@@ -1,16 +1,17 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useContext } from "react";
 import { MdClose } from "react-icons/md";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import { LayoutMode, useLayout } from "src/librarys/layout.ts";
+import { layoutModeAtom } from "src/librarys/app.ts";
+import { BlockContext } from "src/librarys/context.ts";
+import { LayoutMode, removeBlockAtom } from "src/librarys/layout.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 import Background from "./Background.tsx";
 import Channel from "./Channel.tsx";
 import TypeButton from "./TypeButton.tsx";
 import Handle from "./handle/Handle.tsx";
-import { BlockContext } from "src/librarys/block-context.ts";
-import { useContext } from "react";
 
 const Container = styled.div<{ $dpr: number }>`
   /* margin: ${(props) => 4 / props.$dpr + "px"}; */
@@ -105,10 +106,11 @@ const RemoveButton = styled.button`
 `;
 
 function EditBlock({}: EditBlockProps) {
-  const { layoutMode, removeBlock } = useLayout();
+  const layoutMode = useAtomValue(layoutModeAtom);
+  const removeBlock = useSetAtom(removeBlockAtom);
   const { id } = useContext(BlockContext);
 
-  const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
+  const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
   const className = classNames({ "view-mode": layoutMode === LayoutMode.View });
 

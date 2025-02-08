@@ -1,11 +1,8 @@
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useContext } from "react";
-import { BlockContext } from "src/librarys/block-context.ts";
 import { PreviewBlockHandle } from "src/librarys/block.ts";
-import {
-  previewBlockAtom,
-  startModifyBlockPreview,
-} from "src/librarys/layout-preview.ts";
+import { BlockContext } from "src/librarys/context";
+import { beginModifyPreviewAtom } from "src/librarys/layout-preview.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -208,7 +205,7 @@ function BottomLeftCornerHandle({
   );
 }
 
-function getCompoenent(direction: PreviewBlockHandle | null) {
+function getComponent(direction: PreviewBlockHandle | null) {
   switch (direction) {
     case PreviewBlockHandle.TopLeft:
       return TopLeftCornerHandle;
@@ -225,11 +222,11 @@ function getCompoenent(direction: PreviewBlockHandle | null) {
 
 function CornerHandle({ direction }: CornerHandleProps) {
   const block = useContext(BlockContext);
-  const [blockPreview, setBlockPreview] = useAtom(previewBlockAtom);
-  const Component = getCompoenent(direction);
+  const Component = getComponent(direction);
+  const beginModifyPreview = useSetAtom(beginModifyPreviewAtom);
 
   const onPointerDown: React.PointerEventHandler = () => {
-    setBlockPreview(startModifyBlockPreview(block, direction));
+    beginModifyPreview(block, direction);
   };
 
   return (

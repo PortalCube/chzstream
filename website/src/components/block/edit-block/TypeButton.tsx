@@ -1,12 +1,13 @@
+import { useSetAtom } from "jotai";
 import React, { useContext } from "react";
 import { MdHelp } from "react-icons/md";
-import { BlockContext } from "src/librarys/block-context.ts";
 import {
   BlockType,
   getBlockTypeIcon,
   getBlockTypeName,
 } from "src/librarys/block.ts";
-import { useLayout } from "src/librarys/layout.ts";
+import { BlockContext } from "src/librarys/context";
+import { modifyBlockAtom } from "src/librarys/layout.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
@@ -81,7 +82,7 @@ const Text = styled.p`
 `;
 
 function TypeButton({}: BlockTypeButtonProps) {
-  const { setBlockType } = useLayout();
+  const modifyBlock = useSetAtom(modifyBlockAtom);
   const { id, type } = useContext(BlockContext);
 
   const TypeIcon = type !== null ? getBlockTypeIcon(type) : MdHelp;
@@ -90,10 +91,10 @@ function TypeButton({}: BlockTypeButtonProps) {
   const onButtonClick: React.MouseEventHandler = () => {
     switch (type) {
       case BlockType.Stream:
-        setBlockType(id, BlockType.Chat);
+        modifyBlock({ id, type: BlockType.Chat });
         break;
       case BlockType.Chat:
-        setBlockType(id, BlockType.Stream);
+        modifyBlock({ id, type: BlockType.Stream });
         break;
       default:
         break;

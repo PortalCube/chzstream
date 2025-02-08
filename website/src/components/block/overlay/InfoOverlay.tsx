@@ -1,17 +1,18 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
-import { LayoutMode, useLayout } from "src/librarys/layout.ts";
+import { LayoutMode, removeBlockAtom } from "src/librarys/layout.ts";
 import styled, { css } from "styled-components";
 
 import { MdClose, MdLock } from "react-icons/md";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
+import { layoutModeAtom } from "src/librarys/app.ts";
+import { BlockContext } from "src/librarys/context.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import Channel from "./Channel.tsx";
 import { InfoType } from "./InfoOverlay.ts";
 import Keyword, { KeywordProps } from "./Keyword.tsx";
 import OfflineIcon from "./OfflineIcon.tsx";
-import { BlockContext } from "src/librarys/block-context.ts";
 
 const Container = styled.div<{ $dpr: number }>`
   overflow: hidden;
@@ -333,8 +334,9 @@ function render(info: Info) {
 }
 
 function InfoOverlay({ type }: InfoOverlayProps) {
-  const [displayPixelRatio] = useAtom(displayPixelRatioAtom);
-  const { layoutMode, removeBlock } = useLayout();
+  const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
+  const layoutMode = useAtomValue(layoutModeAtom);
+  const removeBlock = useSetAtom(removeBlockAtom);
   const { id } = useContext(BlockContext);
 
   const isShow = useMemo(

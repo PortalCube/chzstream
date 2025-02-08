@@ -1,16 +1,25 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import React, { useEffect, useRef } from "react";
 import Block from "src/components/block/Block.tsx";
+import {
+  blockListAtom,
+  layoutModeAtom,
+  layoutSizeAtom,
+  previewBlockAtom,
+} from "src/librarys/app.ts";
 import { PreviewBlockStatus } from "src/librarys/block.ts";
 import {
-  endCreateBlockPreview,
-  moveCreateBlockPreview,
-  moveModifyBlockPreview,
-  previewBlockAtom,
-  startCreateBlockPreview,
+  beginPreviewAtom,
+  endPreviewAtom,
+  moveModifyPreviewAtom,
+  movePreviewAtom,
 } from "src/librarys/layout-preview.ts";
-import { LayoutMode, layoutSizeAtom, useLayout } from "src/librarys/layout.ts";
+import {
+  LayoutMode,
+  modifyBlockAtom,
+  pushBlockAtom,
+} from "src/librarys/layout.ts";
 import {
   GRID_SIZE_HEIGHT,
   GRID_SIZE_WIDTH,
@@ -74,16 +83,25 @@ function getGridPosition(
 
 function Grid() {
   const ref = useRef<HTMLDivElement>(null);
-  const [previewBlock, setPreviewBlock] = useAtom(previewBlockAtom);
-  const [layoutSize, setLayoutSize] = useAtom(layoutSizeAtom);
-  const { blockList, layoutMode, addBlock, setBlockPosition } = useLayout();
+  const previewBlock = useAtomValue(previewBlockAtom);
+  const setLayoutSize = useSetAtom(layoutSizeAtom);
+  const blockList = useAtomValue(blockListAtom);
+  const layoutMode = useAtomValue(layoutModeAtom);
+  const pushBlock = useSetAtom(pushBlockAtom);
+  const modifyBlock = useSetAtom(modifyBlockAtom);
+
+  const beginPreview = useSetAtom(beginPreviewAtom);
+  const movePreview = useSetAtom(movePreviewAtom);
+  const endPreview = useSetAtom(endPreviewAtom);
+
+  const moveModifyBlockPreview = useSetAtom(moveModifyPreviewAtom);
 
   const className = classNames({
     "view-mode": layoutMode === LayoutMode.View,
   });
 
   const blockElements: JSX.Element[] = blockList.map((block) => (
-    <Block key={block.id} id={block.id} />
+    <Block key={block.id} block={block} />
   ));
 
   const onPointerDown: React.PointerEventHandler = (event) => {
@@ -95,7 +113,7 @@ function Grid() {
     const { clientX, clientY } = event;
     const [x, y] = getGridPosition(ref.current, clientX, clientY);
 
-    setPreviewBlock(startCreateBlockPreview(x, y, blockList));
+    beginPreview(x, y);
   };
 
   useEffect(() => {
@@ -117,15 +135,16 @@ function Grid() {
         const [x, y] = getGridPosition(ref.current, clientX, clientY);
 
         if (previewBlock.status === PreviewBlockStatus.Create) {
-          setPreviewBlock(moveCreateBlockPreview(x, y, blockList));
+          movePreview(x, y);
         } else if (
           previewBlock.status === PreviewBlockStatus.Modify &&
           previewBlock.linkedBlockId !== null
         ) {
-          setPreviewBlock(
-            moveModifyBlockPreview(x, y, previewBlock.linkedBlockId, blockList)
-          );
-          setBlockPosition(previewBlock.linkedBlockId, previewBlock.position);
+          moveModifyBlockPreview(x, y);
+          modifyBlock({
+            id: previewBlock.linkedBlockId,
+            position: previewBlock.position,
+          });
         }
       };
 
@@ -134,7 +153,7 @@ function Grid() {
         if (previewBlock.status === PreviewBlockStatus.Inactive) return;
 
         if (previewBlock.status === PreviewBlockStatus.Modify) {
-          setPreviewBlock(endCreateBlockPreview());
+          endPreview();
           return;
         }
 
@@ -153,13 +172,13 @@ function Grid() {
           height = 2 - height;
         }
 
-        setPreviewBlock(endCreateBlockPreview());
+        endPreview();
 
         if (width < MIN_BLOCK_WIDTH || height < MIN_BLOCK_HEIGHT) {
           return;
         }
 
-        addBlock(top, left, width, height);
+        pushBlock({ top, left, width, height });
       };
 
       window.addEventListener("resize", onResize);
