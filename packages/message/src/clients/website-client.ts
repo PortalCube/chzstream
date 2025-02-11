@@ -7,6 +7,7 @@ import {
   isHandshakeIframeMessage,
   isHandshakeResponseMessage,
   isIframePointerMoveMessage,
+  isPlayerControlMessage,
   isPlayerEventMessage,
   Message,
 } from "../messages/index.ts";
@@ -191,6 +192,11 @@ export class WebsiteClient
 
     if (isPlayerEventMessage(message)) {
       dispatch("player-event", message);
+      return;
+    }
+
+    if (isPlayerControlMessage(message)) {
+      dispatch("player-control", message);
       return;
     }
 

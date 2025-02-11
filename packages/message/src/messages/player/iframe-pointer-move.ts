@@ -9,7 +9,6 @@ import {
 const MESSAGE_KEY = "_isIframePointerMoveMessage";
 
 export type IframePointerMoveMessageData = {
-  iframeId: number;
   clientX: number;
   clientY: number;
 };

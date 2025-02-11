@@ -5,6 +5,7 @@ import {
   HandshakeIframeMessage,
   IframePointerMoveMessage,
   Message,
+  PlayerControlMessage,
   PlayerEventMessage,
 } from "../messages/index.ts";
 
@@ -52,6 +53,7 @@ export type WebsiteClientEventMap = {
   message: ClientMessageEvent<Message>;
   disconnect: CustomEvent<void>;
   "player-event": ClientMessageEvent<PlayerEventMessage>;
+  "player-control": ClientMessageEvent<PlayerControlMessage>;
   "chzzk-channel-info": ClientMessageEvent<ChzzkChannelInfoResponseMessage>;
   "chzzk-channel-search": ClientMessageEvent<ChzzkChannelInfoResponseMessage>;
   "chzzk-live-info": ClientMessageEvent<ChzzkLiveInfoResponseMessage>;

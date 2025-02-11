@@ -46,3 +46,63 @@ export async function getStorageFavoriteChannels(): Promise<string[]> {
 export async function setStorageFavoriteChannels(value: string[]) {
   await set(FAVORITE_CHANNELS_KEY, value);
 }
+
+// player_default_volume
+const PLAYER_VOLUME_KEY = "player_volume";
+
+export const PLAYER_VOLUME_INITIAL_DATA = 30;
+
+export async function getStoragePlayerVolume(): Promise<number> {
+  const response = await get<number>(PLAYER_VOLUME_KEY);
+
+  if (response === undefined) {
+    await setStoragePlayerVolume(PLAYER_VOLUME_INITIAL_DATA);
+    return PLAYER_VOLUME_INITIAL_DATA;
+  }
+
+  return response;
+}
+
+export async function setStoragePlayerVolume(value: number) {
+  await set(PLAYER_VOLUME_KEY, value);
+}
+
+// player_default_muted
+const PLAYER_MUTED_KEY = "player_muted";
+
+export const PLAYER_MUTED_INITIAL_DATA = true;
+
+export async function getStoragePlayerMuted(): Promise<boolean> {
+  const response = await get<boolean>(PLAYER_MUTED_KEY);
+
+  if (response === undefined) {
+    await setStoragePlayerMuted(PLAYER_MUTED_INITIAL_DATA);
+    return PLAYER_MUTED_INITIAL_DATA;
+  }
+
+  return response;
+}
+
+export async function setStoragePlayerMuted(value: boolean) {
+  await set(PLAYER_MUTED_KEY, value);
+}
+
+// player_default_quality
+const PLAYER_QUALITY_KEY = "player_quality";
+
+export const PLAYER_QUALITY_INITIAL_DATA = 0;
+
+export async function getStoragePlayerQuality(): Promise<number> {
+  const response = await get<number>(PLAYER_QUALITY_KEY);
+
+  if (response === undefined) {
+    await setStoragePlayerQuality(PLAYER_QUALITY_INITIAL_DATA);
+    return PLAYER_QUALITY_INITIAL_DATA;
+  }
+
+  return response;
+}
+
+export async function setStoragePlayerQuality(value: number) {
+  await set(PLAYER_QUALITY_KEY, value);
+}

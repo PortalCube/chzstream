@@ -8,9 +8,10 @@ import { useDisplayPixelRatio } from "./hooks/useDisplayPixelRatio.tsx";
 import { useFullscreenDetect } from "./hooks/useFullscreenDetect.tsx";
 import { useShortcutKey } from "./hooks/useShortcutKey.tsx";
 import { useStorage } from "./hooks/useStorage.tsx";
+import { restrictedModeAtom } from "./librarys/app.ts";
+import { useMixer } from "./librarys/mixer.ts";
 import { initializeClientMessage, MessageClient } from "./scripts/message.ts";
 import { theme } from "./scripts/styled.ts";
-import { restrictedModeAtom } from "./librarys/app.ts";
 
 const Container = styled.div`
   width: 100%;
@@ -26,6 +27,7 @@ const Container = styled.div`
 initializeClientMessage();
 
 function App() {
+  const { initializeMixer } = useMixer();
   useDisplayPixelRatio();
   useFullscreenDetect();
   useShortcutKey();
@@ -47,10 +49,12 @@ function App() {
   }, []);
 
   useEffect(() => {
+    initializeMixer();
     if (MessageClient.active === false) {
       setRestrictedMode(true);
     }
   }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <Modal />

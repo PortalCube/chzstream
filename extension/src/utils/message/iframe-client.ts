@@ -1,8 +1,11 @@
 import {
   createHandshakeIframeMessage,
   createIframePointerMoveMessage,
+  createPlayerControlMessage,
   createPlayerEventMessage,
   IframeClient,
+  PlayerControlMessage,
+  PlayerControlMessageData,
   PlayerEventType,
 } from "@chzstream/message";
 import { getNumberParam } from "../url.ts";
@@ -27,6 +30,9 @@ export async function initializeClientMessage() {
     console.error("Iframe ID가 제대로 지정되지 않았습니다.");
     return;
   }
+
+  // 이벤트 리스너 등록
+  client.addEventListener("player-control", onPlayerControlMessage);
 
   await client.connect();
 
@@ -65,7 +71,6 @@ export async function sendPlayerEvent(event: PlayerEventType) {
     },
     {
       event,
-      iframeId,
     }
   );
 
@@ -91,11 +96,38 @@ export async function sendPointerMove(clientX: number, clientY: number) {
       receiver: parentId,
     },
     {
-      iframeId,
       clientX,
       clientY,
     }
   );
 
   await client.send(message);
+}
+
+export async function sendPlayerControl(data: PlayerControlMessageData) {
+  if (client.active === false) {
+    return;
+  }
+
+  if (isNumber(parentId) === false) {
+    return;
+  }
+
+  if (isNumber(iframeId) === false) {
+    return;
+  }
+
+  const message = createPlayerControlMessage(
+    {
+      sender: client.id,
+      receiver: parentId,
+    },
+    data
+  );
+
+  await client.send(message);
+}
+
+function onPlayerControlMessage(message: PlayerControlMessage) {
+  setPlayerControl(message.data);
 }

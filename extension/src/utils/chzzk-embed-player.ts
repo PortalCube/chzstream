@@ -1,12 +1,16 @@
 import { createNanoEvents } from "nanoevents";
 import "./chzzk-embed-player.scss";
+import { PlayerControlMessageData } from "@chzstream/message";
 
 const EMBED_CLASS_NAME = "chzzk-embed-player";
 
 const MINIFIED_PLAYER_WIDTH = 360;
 
+const QUALITY_ARRAY = [360, 480, 720, 1080];
+
 type EmbedEvent = {
   load: () => void;
+  change: (data: PlayerControlMessageData) => void;
 };
 
 export const embedEvent = createNanoEvents<EmbedEvent>();
@@ -49,21 +53,37 @@ export function makeEmbedPlayer() {
       onLargeModeActivated();
     };
 
+    const isQualityChanged = (item: Node) => {
+      if (item instanceof HTMLLIElement === false) return;
+      if (
+        item.classList.contains("pzp-ui-setting-pane-item--checked") === false
+      )
+        return;
+      if (item.classList.contains("pzp-ui-setting-quality-item") === false)
+        return;
+
+      onPlayerChange();
+    };
+
     const isSmallMode = (layout: Node) => {
       if (isEmbedPlayerLoaded() === false) return;
       if (layout instanceof HTMLDivElement === false) return;
       if (layout.id !== "live_player_layout") return;
-
       if (layout.classList.contains("is_large") === true) return;
 
       // large 모드가 풀림 => large 모드 활성화
       clickElement("button.pzp-viewmode-button");
     };
 
+    const functions = [
+      isPlayerLoaded,
+      isLargeMode,
+      isSmallMode,
+      isQualityChanged,
+    ];
+
     mutations.forEach((mutation) => {
-      isPlayerLoaded(mutation.target);
-      isLargeMode(mutation.target);
-      isSmallMode(mutation.target);
+      functions.forEach((fn) => fn(mutation.target));
     });
   });
 
@@ -71,10 +91,6 @@ export function makeEmbedPlayer() {
     subtree: true,
     attributes: true,
   });
-
-  setTimeout(() => {
-    observer.disconnect();
-  }, 15000);
 }
 
 function clickElement(selector: string) {
@@ -93,8 +109,32 @@ function onLargeModeActivated() {
   // 임베드 플레이어가 적용됨을 알리는 클래스 추가
   document.body.classList.add(EMBED_CLASS_NAME);
 
+  // 볼륨 변경 이벤트 등록
+  registerVolumeChangeEvent();
+
   // load 이벤트 emit
   embedEvent.emit("load");
+}
+
+function registerVolumeChangeEvent() {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return;
+
+  videoElement.addEventListener("volumechange", onPlayerChange);
+}
+
+function onPlayerChange() {
+  const volume = getVolume();
+  const muted = getMuted();
+  const quality = getQuality();
+
+  const data: PlayerControlMessageData = {};
+
+  if (volume !== null) data.volume = volume;
+  if (muted !== null) data.muted = muted;
+  if (quality !== null) data.quality = quality;
+
+  embedEvent.emit("change", data);
 }
 
 function onResize() {
@@ -104,6 +144,135 @@ function onResize() {
 
 function isEmbedPlayerLoaded() {
   return document.body.classList.contains(EMBED_CLASS_NAME);
+}
+
+function getVolume() {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return null;
+
+  return Math.round(videoElement.volume * 100);
+}
+
+function setVolume(value: number) {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return;
+
+  const volume = value / 100;
+  videoElement.volume = volume;
+}
+
+function getMuted() {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return null;
+
+  return videoElement.muted;
+}
+
+function setMuted(value: boolean) {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return;
+
+  videoElement.muted = value;
+}
+
+function getQuality() {
+  const qualityElement = document.querySelector<HTMLLIElement>(
+    ".pzp-ui-setting-quality-item.pzp-ui-setting-pane-item--checked"
+  );
+  if (qualityElement === null) return null;
+
+  return extractQualityValue(qualityElement);
+}
+
+function setQuality(value: number) {
+  const quality = QUALITY_ARRAY[value];
+  if (quality === undefined) {
+    throw new Error(`Invalid quality: ${value}`);
+  }
+
+  // quality보다 작은 해상도 중 가장 높은 해상도를 선택
+  const qualityElements = Array.from(
+    document.querySelectorAll<HTMLLIElement>(".pzp-ui-setting-quality-item")
+  );
+
+  let selectedQuality: number | null = null;
+  let selectedElement: HTMLLIElement | null = null;
+
+  for (const element of qualityElements) {
+    const quality = extractQualityValue(element);
+    if (quality === null) continue;
+
+    if (quality > value) continue;
+
+    if (selectedQuality === null || selectedQuality < quality) {
+      selectedQuality = quality;
+      selectedElement = element;
+    }
+  }
+
+  if (selectedElement === null) return;
+  selectedElement.click();
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function waitForPlayerControl(
+  videoElement: HTMLVideoElement
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const time = setTimeout(() => {
+      reject(new Error("Failed to wait for player control"));
+    }, 5000);
+
+    videoElement.addEventListener("loadeddata", async () => {
+      // 화질이 너무 빨리 변경되면 플레이어가 일시 정지되는 문제가 있음
+      await sleep(100);
+      resolve();
+      clearTimeout(time);
+    });
+  });
+}
+
+export async function setPlayerControl(data: PlayerControlMessageData) {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return;
+
+  if (videoElement.readyState !== 4) {
+    await waitForPlayerControl(videoElement);
+  }
+
+  console.log(data);
+
+  if (data.quality !== undefined) {
+    setQuality(data.quality);
+  }
+
+  if (data.volume !== undefined) {
+    setVolume(data.volume);
+  }
+
+  if (data.muted !== undefined) {
+    setMuted(data.muted);
+  }
+}
+
+function extractQualityValue(element: HTMLLIElement) {
+  const qualityTextElement = element.querySelector<HTMLSpanElement>(
+    ".pzp-ui-setting-quality-item__prefix"
+  );
+  if (qualityTextElement === null) return null;
+
+  const qualityText = qualityTextElement.textContent;
+  if (qualityText === null) return null;
+
+  const qualityValue = Number(qualityText.trim().replaceAll(/\D/g, ""));
+
+  const quality = QUALITY_ARRAY.findIndex((value) => value === qualityValue);
+  if (quality === -1) return null;
+
+  return quality;
 }
 
 export function removeEmbedPlayer() {

@@ -10,12 +10,16 @@ import {
   createChzzkLiveInfoRequestMessage,
   createChzzkLiveListRequestMessage,
   createChzzkLiveSearchRequestMessage,
+  createPlayerControlMessage,
+  HandshakeIframeMessage,
   isChzzkChannelInfoResponseMessage,
   isChzzkChannelSearchResponseMessage,
   isChzzkLiveInfoResponseMessage,
   isChzzkLiveListResponseMessage,
   isChzzkLiveSearchResponseMessage,
+  PlayerControlMessageData,
   PlayerEventMessage,
+  PlayerEventType,
   ReceiverType,
   WebsiteClient,
   WindowClient,
@@ -30,26 +34,32 @@ export const MessageClient = WebsiteClient.isAvailable()
 export async function initializeClientMessage() {
   console.log("[website-client] initialize");
 
+  MessageClient.addEventListener("iframe-handshake", onIframeHandshake);
+
   await MessageClient.connect();
 
   if (MessageClient.active === false) {
     alert("확장프로그램을 인식하지 못했습니다!");
     return;
   }
+}
 
-  MessageClient.addEventListener("iframe-handshake", ({ detail: message }) => {
-    const clientId = message.sender;
-    const iframeId = message.data.iframeId;
+export function getIframeId(clientId: number): number | null {
+  if (iframeClientMap.has(clientId) === false) {
+    return null;
+  }
 
-    if (clientId === null) {
-      console.error("[message] iframe-handshake: sender is null", message);
-      return;
+  return iframeClientMap.get(clientId)!;
+}
+
+export function getClientId(iframeId: number): number | null {
+  for (const [clientId, id] of iframeClientMap) {
+    if (id === iframeId) {
+      return clientId;
     }
+  }
 
-    console.log("[message] got iframe handshake", iframeId, clientId, message);
-
-    iframeClientMap.set(iframeId, clientId);
-  });
+  return null;
 }
 
 export type PlayerEvent = ClientMessageEvent<PlayerEventMessage>;
@@ -175,4 +185,44 @@ export async function requestChzzkLiveList(
   );
 
   return response.data.body;
+}
+
+export async function sendPlayerControl(
+  blockId: number,
+  data: PlayerControlMessageData
+) {
+  if (MessageClient.active === false) {
+    return;
+  }
+
+  const id = getClientId(blockId);
+  if (id === null) {
+    throw new Error(`blockId not found: ${blockId}`);
+  }
+
+  const message = createPlayerControlMessage(
+    {
+      sender: MessageClient.id,
+      receiver: id,
+    },
+    data
+  );
+
+  MessageClient.send(message);
+}
+
+function onIframeHandshake({
+  detail: message,
+}: ClientMessageEvent<HandshakeIframeMessage>) {
+  const clientId = message.sender;
+  const iframeId = message.data.iframeId;
+
+  if (clientId === null) {
+    console.error("[message] iframe-handshake: sender is null", message);
+    return;
+  }
+
+  console.log("[message] got iframe handshake", iframeId, clientId, message);
+
+  iframeClientMap.set(clientId, iframeId);
 }

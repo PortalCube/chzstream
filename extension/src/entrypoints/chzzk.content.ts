@@ -1,5 +1,5 @@
 import { initializeIframeEventCapture } from "@/utils/iframe-event.ts";
-import { PlayerEventType } from "@chzstream/message";
+import { PlayerControlMessageData, PlayerEventType } from "@chzstream/message";
 import { isEmbedChat, makeEmbedChat } from "../utils/chzzk-embed-chat.ts";
 import {
   embedEvent,
@@ -8,11 +8,12 @@ import {
 } from "../utils/chzzk-embed-player.ts";
 import {
   initializeClientMessage,
+  sendPlayerControl,
   sendPlayerEvent,
 } from "../utils/message/iframe-client.ts";
 
 export default defineContentScript({
-  //   runAt: "document_idle",
+  // runAt: "document_idle",
   matches: ["https://chzzk.naver.com/live/*"],
   allFrames: true,
   async main(context) {
@@ -40,6 +41,10 @@ function isEmbed() {
 
 async function initializeEmbedPlayer() {
   makeEmbedPlayer();
+
+  embedEvent.on("change", async (data) => {
+    await sendPlayerControl(data);
+  });
 
   embedEvent.on("load", async () => {
     await sendPlayerEvent(PlayerEventType.Ready);

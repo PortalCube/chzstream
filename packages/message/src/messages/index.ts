@@ -159,3 +159,13 @@ export type {
   IframePointerMoveMessage,
   IframePointerMoveMessageData,
 } from "./player/iframe-pointer-move.ts";
+
+// PlayerControl
+export {
+  isPlayerControlMessage,
+  createPlayerControlMessage,
+} from "./player/player-control.ts";
+export type {
+  PlayerControlMessage,
+  PlayerControlMessageData,
+} from "./player/player-control.ts";

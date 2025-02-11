@@ -27,6 +27,13 @@ export type BlockChannel = {
   iconUrl: string;
 };
 
+export type BlockPlayerSetting = {
+  volume: number;
+  quality: number;
+  lock: boolean;
+  muted: boolean;
+};
+
 export type Block = {
   id: number;
   type: BlockType;
@@ -34,8 +41,7 @@ export type Block = {
   lock: boolean;
   position: BlockPosition;
   channel: BlockChannel | null;
-  volume: number;
-  quality: number;
+  setting: BlockPlayerSetting;
 };
 
 export enum PreviewBlockStatus {

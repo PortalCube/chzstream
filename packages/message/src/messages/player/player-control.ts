@@ -6,29 +6,23 @@ import {
   Message,
 } from "../base.ts";
 
-const MESSAGE_KEY = "_isPlayerEventMessage";
+const MESSAGE_KEY = "_isPlayerControlMessage";
 
-export type PlayerEventMessageData = {
-  event: PlayerEventType;
+export type PlayerControlMessageData = {
+  quality?: number;
+  volume?: number;
+  muted?: boolean;
 };
 
-export type PlayerEventMessage = Message & {
+export type PlayerControlMessage = Message & {
   data: {
     [MESSAGE_KEY]: true;
-  } & PlayerEventMessageData;
+  } & PlayerControlMessageData;
 };
 
-export enum PlayerEventType {
-  Loading = "loading",
-  Ready = "ready",
-  End = "end",
-  Adult = "adult",
-  Error = "error",
-}
-
-export function isPlayerEventMessage(
+export function isPlayerControlMessage(
   message: unknown
-): message is PlayerEventMessage {
+): message is PlayerControlMessage {
   if (isMessage(message) === false) {
     return false;
   }
@@ -40,10 +34,10 @@ export function isPlayerEventMessage(
   return true;
 }
 
-export function createPlayerEventMessage(
+export function createPlayerControlMessage(
   options: CreateMessageOptions,
-  data: PlayerEventMessageData
-): PlayerEventMessage {
+  data: PlayerControlMessageData
+): PlayerControlMessage {
   return {
     ...createMessage(options),
     data: {

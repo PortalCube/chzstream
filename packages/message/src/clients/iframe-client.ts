@@ -3,13 +3,16 @@ import { isMessage, ReceiverType } from "../messages/base.ts";
 import {
   createHandshakeRequestMessage,
   isHandshakeResponseMessage,
+  isPlayerControlMessage,
   Message,
+  PlayerControlMessage,
 } from "../messages/index.ts";
 import { browser, ClientType } from "./base.ts";
 
 export type IframeClientEvent = {
   message: (message: Message) => void;
   disconnect: () => void;
+  "player-control": (message: PlayerControlMessage) => void;
 };
 
 type Listener = {
@@ -145,6 +148,10 @@ export class IframeClient {
     }
 
     this.#emitter.emit("message", message);
+
+    if (isPlayerControlMessage(message)) {
+      this.#emitter.emit("player-control", message);
+    }
   }
 
   #onDisconnect() {
