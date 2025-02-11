@@ -157,7 +157,10 @@ export const fetchChzzkChannelAtom = atom(
     channel.title = liveResponse.liveTitle;
 
     if (liveResponse.liveImageUrl !== null) {
-      channel.thumbnailUrl = liveResponse.liveImageUrl.replace("{type}", "720");
+      channel.thumbnailUrl = liveResponse.liveImageUrl.replace(
+        "{type}",
+        "1080"
+      );
     }
 
     set(modifyBlockAtom, { id, channel });
