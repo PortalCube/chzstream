@@ -224,5 +224,11 @@ function onIframeHandshake({
 
   console.log("[message] got iframe handshake", iframeId, clientId, message);
 
+  const prevClientId = getClientId(iframeId);
+
+  if (prevClientId !== null) {
+    iframeClientMap.delete(prevClientId);
+  }
+
   iframeClientMap.set(clientId, iframeId);
 }
