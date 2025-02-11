@@ -1,11 +1,9 @@
 import classNames from "classnames";
-import { ModalEventType, ModalType, useModal } from "src/librarys/modal.ts";
-import styled from "styled-components";
-import Category from "./Category.tsx";
-import SearchSummary from "./SearchSummary.tsx";
-import SearchDetail from "./SearchDetail.tsx";
-import { useEffect, useState } from "react";
+import { ModalType, useModalListener } from "src/librarys/modal.ts";
 import { useSearchModal } from "src/librarys/search.ts";
+import styled from "styled-components";
+import SearchDetail from "./SearchDetail.tsx";
+import SearchSummary from "./SearchSummary.tsx";
 
 const Container = styled.div`
   width: 100%;
@@ -28,21 +26,15 @@ const Container = styled.div`
 `;
 
 function SearchResult({}: SearchResultProps) {
-  const { addModalListener, removeModalListener } = useModal();
   const { setQuery, showRecommend } = useSearchModal();
   const className = classNames({});
 
-  useEffect(() => {
-    const onOpen = () => {
-      setQuery("");
-      showRecommend();
-    };
-
-    addModalListener(ModalType.Search, ModalEventType.Open, onOpen);
-    return () => {
-      removeModalListener(ModalType.Search, ModalEventType.Open, onOpen);
-    };
-  }, []);
+  useModalListener((_get, _set, newVal, prevVal) => {
+    if (prevVal.type === newVal.type) return;
+    if (newVal.type !== ModalType.Search) return;
+    setQuery("");
+    showRecommend();
+  });
 
   return (
     <Container className={className}>

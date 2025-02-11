@@ -1,6 +1,8 @@
 import classNames from "classnames";
-import { ModalType, useModal } from "src/librarys/modal.ts";
+import { useAtomValue, useSetAtom } from "jotai";
+import { closeModalAtom, modalAtom, ModalType } from "src/librarys/modal.ts";
 import styled from "styled-components";
+import MixerModal from "./mixer/MixerModal.tsx";
 import SearchModal from "./search-modal/SearchModal.tsx";
 import SettingModal from "./SettingModal.tsx";
 
@@ -29,7 +31,8 @@ const Container = styled.div`
 `;
 
 function Modal({}: ModalProps) {
-  const { modal, closeModal } = useModal();
+  const modal = useAtomValue(modalAtom);
+  const closeModal = useSetAtom(closeModalAtom);
 
   const className = classNames({
     disable: modal.type === ModalType.None,
@@ -44,6 +47,7 @@ function Modal({}: ModalProps) {
     <Container className={className} onPointerDown={onPointerDown}>
       <SettingModal />
       <SearchModal />
+      <MixerModal />
     </Container>
   );
 }

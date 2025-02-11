@@ -1,8 +1,9 @@
 import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { MdVerified } from "react-icons/md";
 import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
-import { useModal } from "src/librarys/modal.ts";
+import { closeModalAtom, modalAtom } from "src/librarys/modal.ts";
 import { SearchItemType } from "src/librarys/search";
 import { formatFollowerCount } from "src/scripts/format.ts";
 import styled from "styled-components";
@@ -112,7 +113,8 @@ const Count = styled.span`
 `;
 
 function SearchItem({ item }: SearchItemProps) {
-  const { modal, closeModal } = useModal();
+  const modal = useAtomValue(modalAtom);
+  const closeModal = useSetAtom(closeModalAtom);
   const className = classNames({});
 
   const verifiedClassName = classNames({

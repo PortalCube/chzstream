@@ -1,8 +1,8 @@
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { MdAdd, MdRefresh } from "react-icons/md";
 import { favoriteChannelsAtom } from "src/librarys/app.ts";
-import { useModal } from "src/librarys/modal.ts";
+import { openSearchModalAtom } from "src/librarys/modal.ts";
 import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "src/scripts/storage.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
@@ -24,7 +24,7 @@ const Container = styled.div`
 
 function ChannelGroup() {
   const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
-  const { openSearchModal } = useModal();
+  const openSearchModal = useSetAtom(openSearchModalAtom);
 
   const gap = useMemo(
     () => Math.min(-16, -8 - favoriteChannels.length),

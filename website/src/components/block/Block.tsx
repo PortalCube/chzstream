@@ -5,7 +5,7 @@ import {
   PlayerEventType,
 } from "@chzstream/message";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { layoutSizeAtom, mouseIsTopAtom } from "src/librarys/app.ts";
 import type { Block } from "src/librarys/block.ts";
 import { BlockType } from "src/librarys/block.ts";

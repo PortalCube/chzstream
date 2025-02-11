@@ -1,8 +1,6 @@
 import classNames from "classnames";
-import { ModalType, useModal } from "src/librarys/modal.ts";
-import styled from "styled-components";
-import Category from "./Category.tsx";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;

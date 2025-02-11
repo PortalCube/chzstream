@@ -25,7 +25,10 @@ import MenuButton from "./MenuButton.tsx";
 
 import LogoImage from "src/assets/logo.png";
 import { layoutModeAtom, mouseIsTopAtom } from "src/librarys/app.ts";
-import { useModal } from "src/librarys/modal.ts";
+import {
+  openMixerModalAtom,
+  openSettingModalAtom,
+} from "src/librarys/modal.ts";
 import { Mixin } from "src/scripts/styled.ts";
 
 const Container = styled.div`
@@ -87,11 +90,13 @@ function Topbar() {
   const isFullscreen = useAtomValue(isFullscreenAtom);
   const [isShow, setShow] = useState(true);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
-  const { openSettingModal, openMixerModal } = useModal();
 
   const layoutMode = useAtomValue(layoutModeAtom);
   const clearBlock = useSetAtom(clearBlockAtom);
   const switchLayoutMode = useSetAtom(switchLayoutModeAtom);
+
+  const openSettingModal = useSetAtom(openSettingModalAtom);
+  const openMixerModal = useSetAtom(openMixerModalAtom);
 
   const toggleFullscreen = () => {
     if (isFullscreen) {

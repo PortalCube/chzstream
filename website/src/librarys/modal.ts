@@ -1,18 +1,25 @@
-import { atom, useAtom } from "jotai";
-import { useEffect, useRef } from "react";
-import { BlockChannel } from "./block.ts";
-import { SearchItemType } from "./search-modal.ts";
+import { atom } from "jotai";
+import { atomWithListeners } from "src/hooks/atomWithListeners.tsx";
+import { SearchItemType } from "./search.ts";
 
 export enum ModalType {
   None = "none",
   Setting = "setting",
   Search = "search",
+  Mixer = "mixer",
 }
 
 export enum ModalEventType {
   Open = "open",
   Close = "close",
 }
+
+type ModalCallback = SearchCallbackType;
+type ModalMessage =
+  | NoneModalMessage
+  | SettingModalMessage
+  | SearchModalMessage
+  | MixerModalMessage;
 
 export interface ModalMessageBase<
   Type extends ModalType,
@@ -35,70 +42,27 @@ export type SearchModalMessage = ModalMessageBase<
   SearchCallbackType
 >;
 
-type ModalCallback = SearchCallbackType;
-type ModalMessage = NoneModalMessage | SettingModalMessage | SearchModalMessage;
+export type MixerModalMessage = ModalMessageBase<ModalType.Mixer>;
 
-export const modalAtom = atom<ModalMessage>({
+export const [modalAtom, useModalListener] = atomWithListeners<ModalMessage>({
   type: ModalType.None,
 });
 
-function getEventName(type: ModalType, event: ModalEventType) {
-  return [type, event].join("-");
-}
+export const openSettingModalAtom = atom(null, (_get, set) => {
+  set(modalAtom, { type: ModalType.Setting });
+});
 
-const emitter = new EventTarget();
-
-export function useModal() {
-  const ref = useRef<EventTarget>(emitter);
-  const [modal, setModal] = useAtom(modalAtom);
-
-  function openSettingModal() {
-    setModal({ type: ModalType.Setting });
-    dispatch(ModalType.Setting, ModalEventType.Open);
+export const openSearchModalAtom = atom(
+  null,
+  (_get, set, callback: SearchCallbackType) => {
+    set(modalAtom, { type: ModalType.Search, callback });
   }
+);
 
-  function openSearchModal(callback: SearchCallbackType) {
-    setModal({ type: ModalType.Search, callback });
-    dispatch(ModalType.Search, ModalEventType.Open);
-  }
+export const openMixerModalAtom = atom(null, (_get, set) => {
+  set(modalAtom, { type: ModalType.Mixer });
+});
 
-  function closeModal() {
-    if (modal.type !== ModalType.None) {
-      dispatch(modal.type, ModalEventType.Close);
-    }
-    setModal({ type: ModalType.None });
-  }
-
-  function addModalListener(
-    type: ModalType,
-    event: ModalEventType,
-    callback: () => void
-  ) {
-    const eventName = getEventName(type, event);
-    ref.current.removeEventListener(eventName, callback);
-    ref.current.addEventListener(eventName, callback);
-  }
-
-  function removeModalListener(
-    type: ModalType,
-    event: ModalEventType,
-    callback: () => void
-  ) {
-    const eventName = getEventName(type, event);
-    ref.current.removeEventListener(eventName, callback);
-  }
-
-  function dispatch(type: ModalType, event: ModalEventType) {
-    const eventName = getEventName(type, event);
-    ref.current.dispatchEvent(new CustomEvent(eventName));
-  }
-
-  return {
-    modal,
-    openSettingModal,
-    openSearchModal,
-    closeModal,
-    addModalListener,
-    removeModalListener,
-  };
-}
+export const closeModalAtom = atom(null, (_get, set) => {
+  set(modalAtom, { type: ModalType.None });
+});

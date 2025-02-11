@@ -1,12 +1,11 @@
 import classNames from "classnames";
-import { ModalEventType, ModalType, useModal } from "src/librarys/modal.ts";
-import styled from "styled-components";
-import Category from "./Category.tsx";
-import Pagination from "./Pagination.tsx";
-import SearchMessage from "./SearchMessage.tsx";
-import { SearchItemType, useSearchModal } from "src/librarys/search.ts";
-import SearchItem from "./SearchItem.tsx";
 import { useEffect, useMemo, useState } from "react";
+import { ModalType, useModalListener } from "src/librarys/modal.ts";
+import { SearchItemType, useSearchModal } from "src/librarys/search.ts";
+import styled from "styled-components";
+import Pagination from "./Pagination.tsx";
+import SearchItem from "./SearchItem.tsx";
+import SearchMessage from "./SearchMessage.tsx";
 
 const Container = styled.div`
   width: 100%;
@@ -33,7 +32,6 @@ const List = styled.div`
 `;
 
 function SearchList({ items, size = 10, preview = false }: SearchListProps) {
-  const { addModalListener, removeModalListener } = useModal();
   const { category } = useSearchModal();
   const [page, setPage] = useState(1);
   const className = classNames({});
@@ -65,16 +63,11 @@ function SearchList({ items, size = 10, preview = false }: SearchListProps) {
     setPage(page - 1);
   };
 
-  useEffect(() => {
-    const onOpen = () => {
-      setPage(1);
-    };
-
-    addModalListener(ModalType.Search, ModalEventType.Open, onOpen);
-    return () => {
-      removeModalListener(ModalType.Search, ModalEventType.Open, onOpen);
-    };
-  }, []);
+  useModalListener((_get, _set, newVal, prevVal) => {
+    if (prevVal.type === newVal.type) return;
+    if (newVal.type !== ModalType.Search) return;
+    setPage(1);
+  });
 
   useEffect(() => {
     setPage(1);

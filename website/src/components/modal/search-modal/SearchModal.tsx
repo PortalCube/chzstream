@@ -1,10 +1,9 @@
 import classNames from "classnames";
-import { ModalType, ModalEventType, useModal } from "src/librarys/modal.ts";
+import { useAtomValue } from "jotai";
+import { modalAtom, ModalType } from "src/librarys/modal.ts";
 import styled from "styled-components";
 import SearchBar from "./SearchBar.tsx";
 import SearchResult from "./SearchResult.tsx";
-import { MdInfo } from "react-icons/md";
-import { useEffect } from "react";
 
 const Container = styled.div`
   max-width: 600px;
@@ -44,7 +43,7 @@ const Hint = styled.p`
 `;
 
 function SearchModal({}: SearchModalProps) {
-  const { modal } = useModal();
+  const modal = useAtomValue(modalAtom);
 
   const className = classNames({
     disable: modal.type !== ModalType.Search,

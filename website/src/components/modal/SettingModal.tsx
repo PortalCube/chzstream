@@ -1,5 +1,6 @@
 import classNames from "classnames";
-import { ModalType, useModal } from "src/librarys/modal.ts";
+import { useAtomValue } from "jotai";
+import { modalAtom, ModalType } from "src/librarys/modal.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -41,7 +42,7 @@ const Description = styled.p`
 `;
 
 function SettingModal({}: SettingModalProps) {
-  const { modal } = useModal();
+  const modal = useAtomValue(modalAtom);
 
   const className = classNames({
     disable: modal.type !== ModalType.Setting,

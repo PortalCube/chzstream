@@ -4,7 +4,7 @@ import DragImage from "src/components/drag/DragImage.tsx";
 import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
 import { BlockContext } from "src/librarys/context";
 import { fetchChzzkChannelAtom } from "src/librarys/layout.ts";
-import { useModal } from "src/librarys/modal.ts";
+import { openSearchModalAtom } from "src/librarys/modal.ts";
 import { Mixin } from "src/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
@@ -156,7 +156,7 @@ const Title = styled.p`
 
 function Channel({}: ChannelProps) {
   const ref = useRef<HTMLImageElement>(null);
-  const { openSearchModal } = useModal();
+  const openSearchModal = useSetAtom(openSearchModalAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
   const block = useContext(BlockContext);
   const { id, channel } = block;
