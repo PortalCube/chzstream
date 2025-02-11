@@ -37,6 +37,8 @@ const Button = styled.button`
   font-size: 16px;
   color: rgba(127, 127, 127, 1);
 
+  user-select: none;
+  -webkit-user-select: none;
   cursor: pointer;
 
   transition: color 100ms;
