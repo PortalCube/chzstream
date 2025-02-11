@@ -1,8 +1,18 @@
 import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
 import React, { useMemo } from "react";
-import { useMixer } from "src/librarys/mixer.ts";
+import { MixerContext } from "src/librarys/context.ts";
+import {
+  type MixerItem,
+  setLockAtom,
+  setSoloAtom,
+  soloBlockIdAtom,
+  updateAllMuteAtom,
+  updateMuteAtom,
+} from "src/librarys/mixer.ts";
 import styled from "styled-components";
-import MixerSlider from "./MixerSlider.tsx";
+import MixerQuality from "./MixerQuality.tsx";
+import MixerVolume from "./MixerVolume.tsx";
 
 const Container = styled.div`
   padding: 8px;
@@ -13,10 +23,18 @@ const Container = styled.div`
   align-items: center;
   gap: 12px;
 
-  transition: background-color 100ms;
+  transition:
+    opacity 100ms,
+    background-color 100ms;
+
+  opacity: 1;
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  &.hide {
+    /* opacity: 0.5; */
   }
 `;
 
@@ -104,85 +122,68 @@ const SoloButton = styled(Button)`
   }
 `;
 
-function MixerItem({ id }: MixerItemProps) {
-  const {
-    findMixerItem,
-    getSolo,
-    getVolume,
-    setQuality,
-    setVolume,
-    switchMute,
-    switchLock,
-    switchSolo,
-  } = useMixer();
-  const mixerItem = findMixerItem(id);
-  const solo = getSolo(id);
-  const volume = getVolume(id);
-  const { name, setting } = mixerItem;
+function MixerItem({ item }: MixerItemProps) {
+  const setLock = useSetAtom(setLockAtom);
+  const setSolo = useSetAtom(setSoloAtom);
 
-  const onQualityInput = (value: number) => {
-    setQuality(id, value);
-  };
+  const updateMute = useSetAtom(updateMuteAtom);
 
-  const onVolumeInput = (value: number) => {
-    setVolume(id, value);
-  };
-
-  const onMuteClick: React.MouseEventHandler = () => {
-    switchMute(id);
-  };
+  const { id, name, mixer } = item;
+  const { lock } = mixer;
+  const soloBlockId = useAtomValue(soloBlockIdAtom);
+  const solo = useMemo(() => soloBlockId === id, [soloBlockId, id]);
 
   const onLockClick: React.MouseEventHandler = () => {
-    switchLock(id);
+    setLock(id, null);
   };
 
   const onSoloClick: React.MouseEventHandler = () => {
-    switchSolo(id);
+    setSolo(id, null);
+    updateMute(0);
   };
 
+  const isSpecialItem = useMemo(() => id === null || id === 0, [id]);
+
+  const className = classNames({
+    hide: !isSpecialItem && soloBlockId !== null && solo === false,
+  });
+
   const blockIconClassName = classNames({
-    hidden: id === null || id === 0,
+    hidden: isSpecialItem,
   });
 
   const lockButtonClassName = classNames({
-    active: setting.lock,
-    hidden: id === null || id === 0,
+    active: lock,
+    hidden: isSpecialItem,
   });
 
   const soloButtonClassName = classNames({
     active: solo,
-    hidden: id === null || id === 0,
+    hidden: isSpecialItem,
   });
 
   return (
-    <Container>
-      <Block>
-        <BlockIcon className={blockIconClassName}>{id}</BlockIcon>
-        <BlockText>{name}</BlockText>
-      </Block>
-      <MixerSlider
-        value={setting.quality}
-        onInput={onQualityInput}
-        isQuality={true}
-      />
-      <MixerSlider
-        value={volume}
-        onInput={onVolumeInput}
-        onIconClick={onMuteClick}
-        isQuality={false}
-      />
-      <LockButton className={lockButtonClassName} onClick={onLockClick}>
-        LOCK
-      </LockButton>
-      <SoloButton className={soloButtonClassName} onClick={onSoloClick}>
-        SOLO
-      </SoloButton>
-    </Container>
+    <MixerContext.Provider value={item}>
+      <Container className={className}>
+        <Block>
+          <BlockIcon className={blockIconClassName}>{id}</BlockIcon>
+          <BlockText>{name}</BlockText>
+        </Block>
+        <MixerQuality />
+        <MixerVolume />
+        <LockButton className={lockButtonClassName} onClick={onLockClick}>
+          LOCK
+        </LockButton>
+        <SoloButton className={soloButtonClassName} onClick={onSoloClick}>
+          SOLO
+        </SoloButton>
+      </Container>
+    </MixerContext.Provider>
   );
 }
 
 type MixerItemProps = {
-  id: number | null;
+  item: MixerItem;
 };
 
 export default MixerItem;

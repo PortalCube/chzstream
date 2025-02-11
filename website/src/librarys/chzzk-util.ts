@@ -1,7 +1,11 @@
 import { CHZZK_EMPTY_PROFILE_IMAGE } from "src/scripts/constants.ts";
 
 export function getProfileImageUrl(imageUrl?: unknown): string {
-  if (typeof imageUrl !== "string" || imageUrl === "") {
+  if (typeof imageUrl !== "string") {
+    imageUrl = CHZZK_EMPTY_PROFILE_IMAGE;
+  }
+
+  if (imageUrl === "") {
     imageUrl = CHZZK_EMPTY_PROFILE_IMAGE;
   }
 
@@ -9,11 +13,11 @@ export function getProfileImageUrl(imageUrl?: unknown): string {
 }
 
 export function getChzzkUuid(url: string) {
-  const regexp = /([0-9a-fA-F]{32,32})/g;
-  const result = url.match(regexp);
-  if (result === null) {
+  const matchedStrings = url.match(/([0-9a-fA-F]{32,32})/g);
+
+  if (matchedStrings === null) {
     return null;
   }
 
-  return result[0];
+  return matchedStrings[0];
 }

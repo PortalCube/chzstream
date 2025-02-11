@@ -60,7 +60,7 @@ const Container = styled.div`
 `;
 
 function Block({ block }: BlockProps) {
-  const { id, type, status, position, channel, setting } = block;
+  const { id, type, status, position, channel, mixer: setting } = block;
   const ref = useRef<HTMLDivElement>(null);
   const setMouseTop = useSetAtom(mouseIsTopAtom);
 
@@ -134,9 +134,9 @@ function Block({ block }: BlockProps) {
       const { volume, quality, muted } = message.data;
 
       updateBlock(id, (prev) => {
-        if (volume !== undefined) prev.setting.volume = volume;
-        if (quality !== undefined) prev.setting.quality = quality;
-        if (muted !== undefined) prev.setting.muted = muted;
+        if (volume !== undefined) prev.player.volume = volume;
+        if (quality !== undefined) prev.player.quality = quality;
+        if (muted !== undefined) prev.player.muted = muted;
       });
     };
 

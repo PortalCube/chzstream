@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import Grid from "./components/grid/Grid.tsx";
@@ -9,7 +9,7 @@ import { useFullscreenDetect } from "./hooks/useFullscreenDetect.tsx";
 import { useShortcutKey } from "./hooks/useShortcutKey.tsx";
 import { useStorage } from "./hooks/useStorage.tsx";
 import { restrictedModeAtom } from "./librarys/app.ts";
-import { useMixer } from "./librarys/mixer.ts";
+import { loadDefaultMixerAtom } from "./librarys/mixer.ts";
 import { initializeClientMessage, MessageClient } from "./scripts/message.ts";
 import { theme } from "./scripts/styled.ts";
 
@@ -27,13 +27,13 @@ const Container = styled.div`
 initializeClientMessage();
 
 function App() {
-  const { initializeMixer } = useMixer();
+  const setRestrictedMode = useSetAtom(restrictedModeAtom);
+  const loadDefaultMixer = useSetAtom(loadDefaultMixerAtom);
+
   useDisplayPixelRatio();
   useFullscreenDetect();
   useShortcutKey();
   useStorage();
-
-  const [restrictedMode, setRestrictedMode] = useAtom(restrictedModeAtom);
 
   // iOS Safari prevent scrolling
   useEffect(() => {
@@ -49,7 +49,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    initializeMixer();
+    loadDefaultMixer();
+
     if (MessageClient.active === false) {
       setRestrictedMode(true);
     }

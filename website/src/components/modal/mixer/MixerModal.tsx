@@ -1,7 +1,19 @@
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useMixer } from "src/librarys/mixer.ts";
-import { closeModalAtom, modalAtom, ModalType } from "src/librarys/modal.ts";
+import {
+  bandwidthAtom,
+  batchMixerItemAtom,
+  defaultMixerItemAtom,
+  mixerItemsAtom,
+  setupMixerAtom,
+  updateBatchQualityAtom,
+} from "src/librarys/mixer.ts";
+import {
+  closeModalAtom,
+  modalAtom,
+  ModalType,
+  useModalListener,
+} from "src/librarys/modal.ts";
 import styled from "styled-components";
 import MixerItem from "./MixerItem.tsx";
 
@@ -38,10 +50,13 @@ const Title = styled.p`
 `;
 
 const List = styled.div`
+  max-height: 400px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
+
+  overflow-y: auto;
 `;
 
 const Divider = styled.div`
@@ -90,7 +105,12 @@ const ApplyButton = styled.button`
 function MixerModal({}: MixerModalProps) {
   const modal = useAtomValue(modalAtom);
   const closeModal = useSetAtom(closeModalAtom);
-  const { mixerItems, bandwidth } = useMixer();
+  const mixerItems = useAtomValue(mixerItemsAtom);
+  const defaultMixerItem = useAtomValue(defaultMixerItemAtom);
+  const batchMixerItem = useAtomValue(batchMixerItemAtom);
+  const bandwidth = useAtomValue(bandwidthAtom);
+  const updateAllQuality = useSetAtom(updateBatchQualityAtom);
+  const setupMixer = useSetAtom(setupMixerAtom);
 
   const onApplyClick: React.MouseEventHandler = () => closeModal();
 
@@ -99,15 +119,27 @@ function MixerModal({}: MixerModalProps) {
   });
 
   const items = mixerItems.map((item) => (
-    <MixerItem key={item.id} id={item.id} />
+    <MixerItem key={item.id} item={item} />
   ));
+
+  useModalListener((_get, _set, newVal, prevVal) => {
+    if (prevVal.type !== ModalType.Mixer) return;
+    if (newVal.type !== ModalType.None) return;
+    updateAllQuality();
+  });
+
+  useModalListener((_get, _set, newVal, prevVal) => {
+    if (prevVal.type === newVal.type) return;
+    if (newVal.type !== ModalType.Mixer) return;
+    setupMixer();
+  });
 
   return (
     <Container className={className}>
       <Title>스트림 믹서</Title>
       <List>
-        <MixerItem id={null} />
-        <MixerItem id={0} />
+        <MixerItem item={defaultMixerItem} />
+        <MixerItem item={batchMixerItem} />
       </List>
       <Divider />
       <List>{items}</List>

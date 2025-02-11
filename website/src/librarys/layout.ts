@@ -26,11 +26,16 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
     lock: true,
     position: position,
     channel: null,
-    setting: {
-      volume: defaultMixerItem.setting.volume,
-      quality: defaultMixerItem.setting.quality,
-      muted: defaultMixerItem.setting.muted,
+    mixer: {
+      volume: defaultMixerItem.mixer.volume,
+      quality: defaultMixerItem.mixer.quality,
+      muted: defaultMixerItem.mixer.muted,
       lock: false,
+    },
+    player: {
+      volume: defaultMixerItem.mixer.volume,
+      quality: defaultMixerItem.mixer.quality,
+      muted: defaultMixerItem.mixer.muted,
     },
   };
 
@@ -46,10 +51,10 @@ export const addBlockAtom = atom(null, (get, set, block: Block) => {
     throw new Error(`Block already exists: ${block.id}`);
   }
 
-  block.setting = {
-    volume: defaultMixerItem.setting.volume,
-    quality: defaultMixerItem.setting.quality,
-    muted: defaultMixerItem.setting.muted,
+  block.mixer = {
+    volume: defaultMixerItem.mixer.volume,
+    quality: defaultMixerItem.mixer.quality,
+    muted: defaultMixerItem.mixer.muted,
     lock: false,
   };
 

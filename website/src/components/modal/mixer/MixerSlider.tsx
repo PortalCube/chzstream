@@ -1,11 +1,5 @@
 import classNames from "classnames";
-import { useMemo } from "react";
-import {
-  MdSmartDisplay,
-  MdVolumeDown,
-  MdVolumeOff,
-  MdVolumeUp,
-} from "react-icons/md";
+import { useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -85,6 +79,10 @@ const SliderBackground = styled.div`
   left: 0;
 
   background-color: rgba(255, 255, 255, 0.1);
+
+  &.mute {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 `;
 
 const SliderForeground = styled.div<{ value: number }>`
@@ -96,6 +94,10 @@ const SliderForeground = styled.div<{ value: number }>`
   left: 0;
 
   background-color: rgba(255, 255, 255, 0.7);
+
+  &.mute {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
 `;
 
 const Text = styled.p`
@@ -105,69 +107,65 @@ const Text = styled.p`
   color: rgba(255, 255, 255, 0.5);
 
   font-variant-numeric: tabular-nums;
+
+  &.mute {
+    color: rgba(255, 255, 255, 0.2);
+  }
 `;
 
-const STEP_VALUE = [360, 480, 720, 1080];
-const STEP_MIN = 0;
-const STEP_MAX = STEP_VALUE.length - 1;
-
 function MixerSlider({
+  icon: Icon,
   value,
+  displayValue,
+  min,
+  max,
+  step,
+  scrollStep = 1,
+  mute = false,
   onInput,
   onIconClick,
-  isQuality = false,
 }: MixerSliderProps) {
-  const { Icon, min, max, step, percentage, valueText } = useMemo(() => {
-    if (isQuality) {
-      const percentage = ((value - STEP_MIN) / (STEP_MAX - STEP_MIN)) * 100;
-      const valueText = `${STEP_VALUE[value]}p`;
-
-      return {
-        Icon: MdSmartDisplay,
-        min: STEP_MIN,
-        max: STEP_MAX,
-        step: 1,
-        percentage,
-        valueText,
-      };
-    } else {
-      let Icon;
-      if (value === 0) {
-        Icon = MdVolumeOff;
-      } else if (value < 50) {
-        Icon = MdVolumeDown;
-      } else {
-        Icon = MdVolumeUp;
-      }
-
-      const percentage = value;
-      const valueText = `${value}%`;
-
-      return {
-        Icon,
-        min: 0,
-        max: 100,
-        step: 1,
-        percentage,
-        valueText,
-      };
-    }
-  }, [isQuality, value]);
+  const percentage = useMemo(
+    () => ((value - min) / (max - min)) * 100,
+    [value, min, max]
+  );
 
   const onSliderInput: React.FormEventHandler<HTMLInputElement> = (event) => {
     const value = Number(event.currentTarget.value);
     onInput(value);
   };
 
-  const onSliderWheel: React.WheelEventHandler<HTMLInputElement> = (event) => {
-    const delta = -Math.sign(event.deltaY);
-    const deltaModifier = isQuality ? 1 : 5;
+  const ref = useRef<HTMLInputElement>(null);
 
-    const value = Number(event.currentTarget.value) + delta * deltaModifier;
-    const clampedValue = Math.min(Math.max(value, min), max);
+  useEffect(() => {
+    const onSliderWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const target = event.currentTarget as HTMLInputElement;
 
-    onInput(clampedValue);
-  };
+      const delta = -Math.sign(event.deltaY) * scrollStep;
+      const value = Number(target.value) + delta;
+      const clampedValue = Math.min(Math.max(value, min), max);
+
+      onInput(clampedValue);
+    };
+
+    let element: HTMLInputElement;
+
+    if (ref.current) {
+      element = ref.current;
+      element.addEventListener("wheel", onSliderWheel);
+    }
+
+    return () => {
+      if (element) {
+        element.removeEventListener("wheel", onSliderWheel);
+      }
+    };
+  }, [ref, min, max, scrollStep, onInput]);
+
+  const muteClassName = classNames({
+    mute,
+  });
 
   const iconButtonClassNames = classNames({
     active: onIconClick !== undefined,
@@ -179,9 +177,10 @@ function MixerSlider({
         <Icon />
       </IconButton>
       <Slider>
-        <SliderBackground />
-        <SliderForeground value={percentage} />
+        <SliderBackground className={muteClassName} />
+        <SliderForeground className={muteClassName} value={percentage} />
         <Input
+          ref={ref}
           type="range"
           width="90"
           min={min}
@@ -189,17 +188,22 @@ function MixerSlider({
           step={step}
           value={value}
           onInput={onSliderInput}
-          onWheel={onSliderWheel}
         />
       </Slider>
-      <Text>{valueText}</Text>
+      <Text className={muteClassName}>{displayValue}</Text>
     </Container>
   );
 }
 
 type MixerSliderProps = {
+  icon: React.ElementType;
   value: number;
-  isQuality: boolean;
+  displayValue: string;
+  min: number;
+  max: number;
+  step: number;
+  scrollStep?: number;
+  mute?: boolean;
   onInput: (value: number) => void;
   onIconClick?: React.MouseEventHandler;
 };

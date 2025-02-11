@@ -14,6 +14,10 @@ export enum ModalEventType {
   Close = "close",
 }
 
+/*===========================*
+ * Modal Base
+ *===========================*/
+
 type ModalCallback = SearchCallbackType;
 type ModalMessage =
   | NoneModalMessage
@@ -31,17 +35,26 @@ export interface ModalMessageBase<
   callback?: Callback;
 }
 
+/*===========================*
+ * Modal Types
+ *===========================*/
+
+// -- None --
 export type NoneModalMessage = ModalMessageBase<ModalType.None>;
 
+// Setting
 export type SettingModalMessage = ModalMessageBase<ModalType.Setting>;
 
-type SearchCallbackType = (channel: SearchItemType) => void;
+// Search
 export type SearchModalMessage = ModalMessageBase<
   ModalType.Search,
   undefined,
   SearchCallbackType
 >;
 
+type SearchCallbackType = (channel: SearchItemType) => void;
+
+// Mixer
 export type MixerModalMessage = ModalMessageBase<ModalType.Mixer>;
 
 export const [modalAtom, useModalListener] = atomWithListeners<ModalMessage>({
