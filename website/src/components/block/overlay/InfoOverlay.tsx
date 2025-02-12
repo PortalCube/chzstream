@@ -81,13 +81,16 @@ const RemoveButton = styled.button`
   align-items: center;
   justify-content: center;
 
-  color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 0.25);
   cursor: pointer;
 
-  transition: background-color 100ms;
+  transition:
+    color 100ms,
+    background-color 100ms;
   background-color: rgba(255, 255, 255, 0);
 
   &:hover {
+    color: rgba(255, 255, 255, 1);
     background-color: rgba(255, 255, 255, 0.1);
   }
 
@@ -118,25 +121,20 @@ const Title = styled.div`
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
   align-items: center;
 
   ${Mixin.block.greater.extraLarge(css`
     font-size: 40px;
-    align-items: flex-start;
     gap: 12px;
   `)}
 
   ${Mixin.block.less.extraLarge(css`
     font-size: 32px;
-    align-items: flex-start;
     gap: 12px;
   `)}
   
   ${Mixin.block.less.large(css`
     font-size: 24px;
-    align-items: flex-start;
     gap: 10px;
   `)}
   
