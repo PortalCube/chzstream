@@ -1,17 +1,18 @@
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
-import Grid from "./components/grid/Grid.tsx";
-import Modal from "./components/modal/Modal.tsx";
-import Topbar from "./components/topbar/Topbar.tsx";
-import { useDisplayPixelRatio } from "./hooks/useDisplayPixelRatio.tsx";
-import { useFullscreenDetect } from "./hooks/useFullscreenDetect.tsx";
-import { useShortcutKey } from "./hooks/useShortcutKey.tsx";
-import { useStorage } from "./hooks/useStorage.tsx";
-import { restrictedModeAtom } from "./librarys/app.ts";
-import { loadDefaultMixerAtom } from "./librarys/mixer.ts";
-import { initializeClientMessage, MessageClient } from "./scripts/message.ts";
-import { theme } from "./scripts/styled.ts";
+import Grid from "src/components/grid/Grid.tsx";
+import Modal from "src/components/modal/Modal.tsx";
+import Topbar from "src/components/topbar/Topbar.tsx";
+import { useDisplayPixelRatio } from "src/hooks/useDisplayPixelRatio.tsx";
+import { useFullscreenDetect } from "src/hooks/useFullscreenDetect.tsx";
+import { useShortcutKey } from "src/hooks/useShortcutKey.tsx";
+import { useStorage } from "src/hooks/useStorage.tsx";
+import { restrictedModeAtom } from "src/librarys/app.ts";
+import { loadDefaultMixerAtom } from "src/librarys/mixer.ts";
+import { initializeClientMessage, MessageClient } from "src/scripts/message.ts";
+import { theme } from "src/scripts/styled.ts";
+import { useRefreshChannel } from "src/hooks/useRefreshChannel.tsx";
 
 const Container = styled.div`
   width: 100%;
@@ -34,6 +35,7 @@ function App() {
   useFullscreenDetect();
   useShortcutKey();
   useStorage();
+  useRefreshChannel();
 
   // iOS Safari prevent scrolling
   useEffect(() => {

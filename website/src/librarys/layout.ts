@@ -123,6 +123,32 @@ export const swapBlockAtom = atom(
   }
 );
 
+export const refreshChannelAtom = atom(null, async (get, set) => {
+  const date = Date.now();
+  const delay = 1000 * 60;
+
+  // 시청 중일때는 불필요하게 fetch하지 않음
+  if (get(layoutModeAtom) === LayoutMode.View) return;
+
+  const expiredBlockList = get(blockListAtom).filter((block, index) => {
+    if (block.channel === null) return false;
+    if (block.channel.lastUpdate === null) return false;
+    if (block.channel.lastUpdate + delay > date) return false;
+
+    // null로 마킹하여 fetch의 중복 실행을 방지
+    set(blockListAtom, (draft) => {
+      const item = draft[index];
+      item.channel!.lastUpdate = null;
+    });
+
+    return true;
+  });
+
+  for (const block of expiredBlockList) {
+    await set(fetchChzzkChannelAtom, block.id, block.channel!.uuid);
+  }
+});
+
 export const fetchChzzkChannelAtom = atom(
   null,
   async (get, set, id: number, uuid: string) => {
@@ -139,6 +165,7 @@ export const fetchChzzkChannelAtom = atom(
       title: "현재 오프라인 상태입니다",
       thumbnailUrl: "",
       iconUrl: getProfileImageUrl(),
+      lastUpdate: null,
     };
 
     const channelResponse = await requestChzzkChannelInfo(uuid);
@@ -148,6 +175,7 @@ export const fetchChzzkChannelAtom = atom(
 
     channel.name = channelResponse.channelName;
     channel.iconUrl = getProfileImageUrl(channelResponse.channelImageUrl);
+    channel.lastUpdate = Date.now();
 
     if (channelResponse.openLive === false) {
       set(modifyBlockAtom, { id, channel });
@@ -162,10 +190,8 @@ export const fetchChzzkChannelAtom = atom(
     channel.title = liveResponse.liveTitle;
 
     if (liveResponse.liveImageUrl !== null) {
-      channel.thumbnailUrl = liveResponse.liveImageUrl.replace(
-        "{type}",
-        "1080"
-      );
+      const imageUrl = liveResponse.liveImageUrl.replace("{type}", "1080");
+      channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;
     }
 
     set(modifyBlockAtom, { id, channel });
