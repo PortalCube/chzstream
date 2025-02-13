@@ -15,13 +15,13 @@ import {
   modifyBlockAtom,
   swapBlockAtom,
 } from "src/librarys/layout.ts";
+import { applyPlayerControlAtom } from "src/librarys/mixer.ts";
 import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
 import { getGridStyle } from "src/scripts/grid-layout.ts";
 import {
   getIframeId,
   MessageClient,
   PlayerEvent,
-  sendPlayerControl,
 } from "src/scripts/message.ts";
 import styled, { keyframes } from "styled-components";
 import EditBlock from "./edit-block/EditBlock.tsx";
@@ -29,7 +29,6 @@ import LoadingOverlay from "./LoadingOverlay.tsx";
 import { InfoType } from "./overlay/InfoOverlay.ts";
 import InfoOverlay from "./overlay/InfoOverlay.tsx";
 import ViewBlock from "./ViewBlock.tsx";
-import { applyPlayerControlAtom } from "src/librarys/mixer.ts";
 
 const popinAnimation = keyframes`
   0% {
@@ -59,7 +58,7 @@ const Container = styled.div`
 `;
 
 function Block({ block }: BlockProps) {
-  const { id, type, status, position, channel, player } = block;
+  const { id, type, status, position, channel } = block;
   const ref = useRef<HTMLDivElement>(null);
   const setMouseTop = useSetAtom(mouseIsTopAtom);
 
@@ -116,7 +115,7 @@ function Block({ block }: BlockProps) {
         onIframePointerMove
       );
     };
-  }, [ref]);
+  }, [id, setMouseTop, ref]);
 
   useEffect(() => {
     const listener = ({ detail: message }: PlayerEvent) => {

@@ -19,7 +19,6 @@ import {
   isChzzkLiveSearchResponseMessage,
   PlayerControlMessageData,
   PlayerEventMessage,
-  PlayerEventType,
   ReceiverType,
   WebsiteClient,
   WindowClient,

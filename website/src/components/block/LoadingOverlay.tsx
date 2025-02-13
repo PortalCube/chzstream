@@ -1,11 +1,11 @@
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { LayoutMode } from "src/librarys/layout.ts";
 import styled, { keyframes } from "styled-components";
 
-import Spinner from "./Spinner.tsx";
 import { layoutModeAtom } from "src/librarys/app.ts";
+import Spinner from "./Spinner.tsx";
 
 const randomRange = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
@@ -68,12 +68,12 @@ const Container = styled.div<{ $delay: number }>`
 `;
 
 function LoadingOverlay({ loaded }: LoadingOverlayProps) {
-  const [mode, setMode] = useAtom(layoutModeAtom);
+  const layoutMode = useAtomValue(layoutModeAtom);
 
   const [delay] = useState(randomRange(-2000, 0));
 
   const className = classNames({
-    hidden: mode === LayoutMode.Modify,
+    hidden: layoutMode === LayoutMode.Modify,
     load: loaded,
   });
 

@@ -116,7 +116,7 @@ function onCookieAdded(info: chrome.cookies.CookieChangeInfo) {
 }
 
 // 개발용 -- 쿠키를 모두 지웁니다.
-async function clearCookies() {
+async function _clearCookies() {
   // 일반 쿠키 제거
   for (const target of targetCookies) {
     await browser.cookies.remove({

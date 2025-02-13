@@ -1,5 +1,7 @@
+import { PlayerControlMessageData } from "@chzstream/message";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
+import { sendPlayerControl } from "src/scripts/message.ts";
 import {
   getStoragePlayerMuted,
   getStoragePlayerQuality,
@@ -9,9 +11,7 @@ import {
   setStoragePlayerVolume,
 } from "src/scripts/storage.ts";
 import { blockListAtom } from "./app.ts";
-import { Block, BlockMixer, BlockType } from "./block.ts";
-import { sendPlayerControl } from "src/scripts/message.ts";
-import { PlayerControlMessageData } from "@chzstream/message";
+import { BlockMixer, BlockType } from "./block.ts";
 
 export type MixerItem = {
   id: number | null;
@@ -139,7 +139,7 @@ export const setQualityAtom = atom(
 
 export const setMuteAtom = atom(
   null,
-  (get, set, id: number | null, mute: boolean | null) => {
+  (_get, set, id: number | null, mute: boolean | null) => {
     let newValue: boolean | null = null;
 
     if (id === 0) {

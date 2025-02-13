@@ -1,6 +1,5 @@
 import { makeUrls } from "@/utils/make-url.ts";
 import { initializeRelayMessage } from "@/utils/message/website-relay.ts";
-import { browser } from "wxt/browser/chrome";
 
 export default defineContentScript({
   runAt: "document_start",
@@ -8,7 +7,7 @@ export default defineContentScript({
     ["https://chzstream.vercel.app/*", "https://chzstream.app/*"],
     import.meta.env.MODE
   ),
-  async main(context) {
+  async main(_context) {
     initializeRelayMessage();
   },
 });

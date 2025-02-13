@@ -80,7 +80,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
     browser.runtime.onConnectExternal.addListener(this.#onConnect.bind(this));
 
     browser.runtime.onMessageExternal.addListener(
-      (message, sender, sendResponse) => {
+      (_message, _sender, sendResponse) => {
         sendResponse();
       }
     );

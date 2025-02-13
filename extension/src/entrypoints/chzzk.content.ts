@@ -1,5 +1,5 @@
 import { initializeIframeEventCapture } from "@/utils/iframe-event.ts";
-import { PlayerControlMessageData, PlayerEventType } from "@chzstream/message";
+import { PlayerEventType } from "@chzstream/message";
 import { isEmbedChat, makeEmbedChat } from "../utils/chzzk-embed-chat.ts";
 import {
   embedEvent,
@@ -16,7 +16,7 @@ export default defineContentScript({
   // runAt: "document_idle",
   matches: ["https://chzzk.naver.com/live/*"],
   allFrames: true,
-  async main(context) {
+  async main(_context) {
     if (isEmbed() === false) {
       return;
     }

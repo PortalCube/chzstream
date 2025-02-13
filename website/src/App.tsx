@@ -58,7 +58,7 @@ function App() {
     if (MessageClient.active === false) {
       setRestrictedMode(true);
     }
-  }, []);
+  });
 
   return (
     <ThemeProvider theme={theme}>

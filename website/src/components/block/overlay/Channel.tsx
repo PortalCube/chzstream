@@ -1,8 +1,7 @@
-import styled, { css } from "styled-components";
-import { Mixin } from "src/scripts/styled.ts";
 import { useContext } from "react";
 import { BlockContext } from "src/librarys/context";
-import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
+import { Mixin } from "src/scripts/styled.ts";
+import styled, { css } from "styled-components";
 
 const Container = styled.div`
   overflow: hidden;

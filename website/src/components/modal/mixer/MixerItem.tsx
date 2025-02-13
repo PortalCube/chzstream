@@ -7,7 +7,6 @@ import {
   setLockAtom,
   setSoloAtom,
   soloBlockIdAtom,
-  updateAllMuteAtom,
   updateMuteAtom,
 } from "src/librarys/mixer.ts";
 import styled from "styled-components";

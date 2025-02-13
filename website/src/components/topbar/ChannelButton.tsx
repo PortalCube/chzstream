@@ -1,9 +1,6 @@
-import classNames from "classnames";
-import React, { useEffect, useState } from "react";
-import { requestChzzkChannelInfo } from "src/scripts/message.ts";
-import styled from "styled-components";
-import { MdAdd } from "react-icons/md";
+import React from "react";
 import { IconType } from "react-icons";
+import styled from "styled-components";
 
 const Container = styled.div<{ $gap: number }>`
   width: 42px;

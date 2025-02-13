@@ -9,7 +9,7 @@ const MINIFIED_CHAT_NO_PINNED_HEIGHT = 480;
 export function isEmbedChat() {
   const url = new URL(window.location.href);
   const hasEmbedParam = url.searchParams.has("embed", "true");
-  const isChatPage = /^\/live\/([^\/]+)\/chat\/?$/g.test(url.pathname);
+  const isChatPage = /^\/live\/([^/]+)\/chat\/?$/g.test(url.pathname);
   return hasEmbedParam && isChatPage;
 }
 
@@ -41,6 +41,6 @@ function onResize() {
   document.body.classList.toggle("no-pinned", isNoPinned);
 }
 
-function isEmbedPlayerLoaded() {
+function _isEmbedPlayerLoaded() {
   return document.body.classList.contains(EMBED_CLASS_NAME);
 }

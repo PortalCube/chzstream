@@ -7,7 +7,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["**/dist", "**/.output"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -27,11 +27,6 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
 
-      // unused-imports 제거시 사용
-      // "prefer-const": "off",
-      // "@typescript-eslint/no-unused-vars": "off",
-      // "unused-imports/no-unused-imports": "error",
-
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
@@ -47,6 +42,12 @@ export default tseslint.config(
 
       "no-empty-pattern": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",
+
+      // Build시 사용
+      // "prefer-const": "off",
+      // "@typescript-eslint/no-unused-vars": "off",
+      // "unused-imports/no-unused-imports": "error",
+      // "@typescript-eslint/no-empty-object-type": "off",
     },
   },
   eslintConfigPrettier

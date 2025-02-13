@@ -73,7 +73,7 @@ export class WindowClient
       );
 
       this.#id = response.data.id;
-    } catch (e) {
+    } catch (_e) {
       return;
     }
 

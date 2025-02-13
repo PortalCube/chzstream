@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import styled, { css } from "styled-components";
 
 import { Mixin } from "src/scripts/styled.ts";
@@ -83,7 +82,7 @@ function Keyword({
   textColor,
   backgroundColor,
 }: KeywordProps) {
-  const rotation = useMemo(() => randomRange(-3, 3, 1), []);
+  // const rotation = useMemo(() => randomRange(-3, 3, 1), []);
 
   return (
     <Container $background={backgroundColor} $color={textColor} $rotation={0}>

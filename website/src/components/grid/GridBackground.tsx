@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
 import { LayoutMode } from "src/librarys/layout.ts";

@@ -1,5 +1,3 @@
-import { Message } from "./messages/base.ts";
-
 function _isObject(value: unknown): value is object {
   return typeof value === "object" && value !== null;
 }

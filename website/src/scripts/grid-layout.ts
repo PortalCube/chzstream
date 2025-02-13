@@ -1,10 +1,9 @@
 import { BlockPosition } from "src/librarys/block.ts";
-import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "./constants.ts";
 
 export function getGridStyle(
   position: BlockPosition | null,
-  gridWidth: number,
-  gridHeight: number
+  _gridWidth: number,
+  _gridHeight: number
 ): React.CSSProperties {
   if (position === null) {
     return {};

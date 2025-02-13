@@ -100,7 +100,7 @@ export class WindowRelay extends TypedEventTarget<RelayEventMap> {
     this.#port.postMessage(message);
   }
 
-  #onMessage(message: unknown, port: chrome.runtime.Port) {
+  #onMessage(message: unknown, _port: chrome.runtime.Port) {
     if (isMessage(message) === false) {
       return;
     }
