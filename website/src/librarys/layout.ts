@@ -8,7 +8,12 @@ import {
 import { blockListAtom, layoutModeAtom, nextBlockIdAtom } from "./app.ts";
 import { Block, BlockChannel, BlockPosition, BlockType } from "./block.ts";
 import { getProfileImageUrl } from "./chzzk-util.ts";
-import { defaultMixerItemAtom } from "./mixer.ts";
+import {
+  defaultMixerItemAtom,
+  setSoloAtom,
+  soloBlockIdAtom,
+  updateMuteAtom,
+} from "./mixer.ts";
 
 export enum LayoutMode {
   View = "view",
@@ -61,13 +66,21 @@ export const addBlockAtom = atom(null, (get, set, block: Block) => {
   set(blockListAtom, (prev) => [...prev, block]);
 });
 
-export const removeBlockAtom = atom(null, (_get, set, id: number) => {
+export const removeBlockAtom = atom(null, (get, set, id: number) => {
   set(blockListAtom, (prev) => prev.filter((item) => item.id !== id));
+
+  const soloBlockId = get(soloBlockIdAtom);
+
+  if (soloBlockId === id) {
+    set(setSoloAtom, id, false);
+    set(updateMuteAtom, 0);
+  }
 });
 
 export const clearBlockAtom = atom(null, (_get, set) => {
   set(blockListAtom, []);
   set(nextBlockIdAtom, 1);
+  set(soloBlockIdAtom, null);
 });
 
 export const modifyBlockAtom = atom(

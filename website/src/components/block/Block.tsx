@@ -1,7 +1,6 @@
 import {
   ClientMessageEvent,
   IframePointerMoveMessage,
-  PlayerControlMessage,
   PlayerEventType,
 } from "@chzstream/message";
 import { useAtomValue, useSetAtom } from "jotai";
@@ -15,7 +14,6 @@ import {
   fetchChzzkChannelAtom,
   modifyBlockAtom,
   swapBlockAtom,
-  updateBlockAtom,
 } from "src/librarys/layout.ts";
 import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
 import { getGridStyle } from "src/scripts/grid-layout.ts";
@@ -31,6 +29,7 @@ import LoadingOverlay from "./LoadingOverlay.tsx";
 import { InfoType } from "./overlay/InfoOverlay.ts";
 import InfoOverlay from "./overlay/InfoOverlay.tsx";
 import ViewBlock from "./ViewBlock.tsx";
+import { applyPlayerControlAtom } from "src/librarys/mixer.ts";
 
 const popinAnimation = keyframes`
   0% {
@@ -60,15 +59,15 @@ const Container = styled.div`
 `;
 
 function Block({ block }: BlockProps) {
-  const { id, type, status, position, channel, mixer: setting } = block;
+  const { id, type, status, position, channel, player } = block;
   const ref = useRef<HTMLDivElement>(null);
   const setMouseTop = useSetAtom(mouseIsTopAtom);
 
   const modifyBlock = useSetAtom(modifyBlockAtom);
-  const updateBlock = useSetAtom(updateBlockAtom);
   const activateBlock = useSetAtom(activateBlockAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
   const swapBlock = useSetAtom(swapBlockAtom);
+  const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
 
   const [loaded, setLoaded] = useState(false);
   const [infoType, setInfoType] = useState<InfoType>(InfoType.None);
@@ -120,34 +119,6 @@ function Block({ block }: BlockProps) {
   }, [ref]);
 
   useEffect(() => {
-    const onPlayerControl = ({
-      detail: message,
-    }: ClientMessageEvent<PlayerControlMessage>) => {
-      if (message.sender === null) {
-        return;
-      }
-
-      if (getIframeId(message.sender) !== id) {
-        return;
-      }
-
-      const { volume, quality, muted } = message.data;
-
-      updateBlock(id, (prev) => {
-        if (volume !== undefined) prev.player.volume = volume;
-        if (quality !== undefined) prev.player.quality = quality;
-        if (muted !== undefined) prev.player.muted = muted;
-      });
-    };
-
-    MessageClient.addEventListener("player-control", onPlayerControl);
-
-    return () => {
-      MessageClient.removeEventListener("player-control", onPlayerControl);
-    };
-  }, []);
-
-  useEffect(() => {
     const listener = ({ detail: message }: PlayerEvent) => {
       if (message.sender === null) {
         return;
@@ -160,12 +131,7 @@ function Block({ block }: BlockProps) {
       if (message.data.event === PlayerEventType.Ready) {
         setLoaded(true);
         setInfoType(InfoType.None);
-
-        sendPlayerControl(id, {
-          volume: setting.volume,
-          quality: setting.quality,
-          muted: setting.muted,
-        });
+        applyPlayerControl(id);
       }
 
       if (message.data.event === PlayerEventType.End) {
@@ -189,7 +155,7 @@ function Block({ block }: BlockProps) {
     return () => {
       MessageClient.removeEventListener("player-event", listener);
     };
-  }, [id, setting]);
+  }, [id, applyPlayerControl]);
 
   const onPointerLeave: React.PointerEventHandler = () => {
     modifyBlock({ id, lock: true });

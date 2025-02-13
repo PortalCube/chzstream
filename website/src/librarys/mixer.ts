@@ -9,8 +9,9 @@ import {
   setStoragePlayerVolume,
 } from "src/scripts/storage.ts";
 import { blockListAtom } from "./app.ts";
-import { BlockMixer, BlockType } from "./block.ts";
+import { Block, BlockMixer, BlockType } from "./block.ts";
 import { sendPlayerControl } from "src/scripts/message.ts";
+import { PlayerControlMessageData } from "@chzstream/message";
 
 export type MixerItem = {
   id: number | null;
@@ -33,8 +34,8 @@ export const batchMixerItemAtom = atomWithImmer<MixerItem>({
   id: 0,
   name: "모든 블록에 적용",
   mixer: {
-    quality: 0,
-    volume: 0,
+    quality: 1,
+    volume: 50,
     lock: false,
     muted: false,
   },
@@ -506,11 +507,11 @@ export const updateSingleMuteAtom = atom(null, (get, set, id: number) => {
   set(blockListAtom, (draft) => {
     const item = draft[index];
 
-    const forceMute = soloBlockId !== null && soloBlockId !== item.id;
-    item.player.muted = forceMute ? true : item.mixer.muted;
+    item.player.muted = item.mixer.muted;
 
+    const forceMute = soloBlockId !== null && soloBlockId !== item.id;
     sendPlayerControl(item.id, {
-      muted: item.player.muted,
+      muted: forceMute ? true : item.mixer.muted,
     });
   });
 });
@@ -520,12 +521,86 @@ export const updateBatchMuteAtom = atom(null, (get, set) => {
 
   set(blockListAtom, (draft) => {
     draft.forEach((item) => {
-      const forceMute = soloBlockId !== null && soloBlockId !== item.id;
-      item.player.muted = forceMute ? true : item.mixer.muted;
+      item.player.muted = item.mixer.muted;
 
+      const forceMute = soloBlockId !== null && soloBlockId !== item.id;
       sendPlayerControl(item.id, {
-        muted: item.player.muted,
+        muted: forceMute ? true : item.mixer.muted,
       });
     });
   });
 });
+
+/*===========================*
+ * On Message
+ *===========================*/
+
+export const applyPlayerControlAtom = atom(
+  null,
+  async (get, _set, id: number) => {
+    const blockList = get(blockListAtom);
+    const block = blockList.find((item) => item.id === id);
+    if (block === undefined) return;
+
+    const soloBlockId = get(soloBlockIdAtom);
+
+    const { volume, quality, muted } = block.player;
+
+    const forceMute = soloBlockId !== null && soloBlockId !== id;
+
+    await sendPlayerControl(id, {
+      volume,
+      quality,
+      muted: forceMute ? true : muted,
+    });
+  }
+);
+
+export const updatePlayerControlAtom = atom(
+  null,
+  (get, set, id: number, data: PlayerControlMessageData) => {
+    const soloBlockId = get(soloBlockIdAtom);
+
+    const blockList = get(blockListAtom);
+    const index = blockList.findIndex((item) => item.id === id);
+
+    if (index === -1) return;
+
+    const block = blockList[index];
+
+    const forceMute = soloBlockId !== null && soloBlockId !== id;
+
+    const isVolumeChanged =
+      data.volume !== block.player.volume ||
+      data.muted !== (forceMute ? true : block.mixer.muted);
+    const isDeactived = soloBlockId !== null && soloBlockId !== id;
+
+    // Solo가 설정된 상태에서 볼륨을 조절하는 경우 Solo 해제
+    if (isVolumeChanged && isDeactived) {
+      set(soloBlockIdAtom, null);
+    }
+
+    set(blockListAtom, (draft) => {
+      const item = draft[index];
+
+      if (data.quality !== undefined && item.mixer.quality !== data.quality) {
+        item.mixer.quality = data.quality;
+        item.player.quality = data.quality;
+      }
+
+      if (data.volume !== undefined && item.mixer.volume !== data.volume) {
+        item.mixer.volume = data.volume;
+        item.player.volume = data.volume;
+      }
+
+      if (data.muted !== undefined && item.mixer.muted !== data.muted) {
+        item.mixer.muted = data.muted;
+        item.player.muted = data.muted;
+      }
+    });
+
+    if (isVolumeChanged && isDeactived) {
+      set(updateMuteAtom, 0);
+    }
+  }
+);

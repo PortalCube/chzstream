@@ -8,6 +8,12 @@ const MINIFIED_PLAYER_WIDTH = 360;
 
 const QUALITY_ARRAY = [360, 480, 720, 1080];
 
+let lockPlayerEventDate: number | null = null;
+
+let loaded = false;
+
+const debouncedPlayerChange = debounce(onPlayerChange, 100);
+
 type EmbedEvent = {
   load: () => void;
   change: (data: PlayerControlMessageData) => void;
@@ -62,7 +68,15 @@ export function makeEmbedPlayer() {
       if (item.classList.contains("pzp-ui-setting-quality-item") === false)
         return;
 
-      onPlayerChange();
+      if (loaded === false) {
+        return;
+      }
+
+      if (isPlayerEventLocked()) {
+        return;
+      }
+
+      debouncedPlayerChange();
     };
 
     const isSmallMode = (layout: Node) => {
@@ -112,21 +126,74 @@ function onLargeModeActivated() {
   // 볼륨 변경 이벤트 등록
   registerVolumeChangeEvent();
 
-  // load 이벤트 emit
-  embedEvent.emit("load");
+  // 비디오 로드 체크
+  registerVideoLoadedEvent();
+}
+
+function registerVideoLoadedEvent() {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) {
+    throw new Error("Video element not found");
+  }
+
+  const emit = () => {
+    embedEvent.emit("load");
+    loaded = true;
+  };
+
+  if (videoElement.readyState === 4) {
+    emit();
+  } else {
+    videoElement.addEventListener("loadeddata", emit, { once: true });
+  }
 }
 
 function registerVolumeChangeEvent() {
   const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
   if (videoElement === null) return;
 
-  videoElement.addEventListener("volumechange", onPlayerChange);
+  videoElement.addEventListener("volumechange", () => {
+    if (loaded === false) {
+      if (videoElement.volume !== 0) {
+        videoElement.volume = 0;
+      }
+      return;
+    }
+
+    if (isPlayerEventLocked()) {
+      return;
+    }
+    debouncedPlayerChange();
+  });
+}
+
+function isPlayerEventLocked() {
+  if (lockPlayerEventDate === null) return false;
+
+  const now = Date.now();
+  return now < lockPlayerEventDate + 100;
+}
+
+function debounce(func: () => void, delay: number) {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return () => {
+    if (timer !== null) {
+      clearTimeout(timer);
+    }
+
+    timer = setTimeout(() => {
+      timer = null;
+      func();
+    }, delay);
+  };
 }
 
 function onPlayerChange() {
+  if (loaded === false) return;
+
+  const quality = getQuality();
   const volume = getVolume();
   const muted = getMuted();
-  const quality = getQuality();
 
   const data: PlayerControlMessageData = {};
 
@@ -239,11 +306,11 @@ export async function setPlayerControl(data: PlayerControlMessageData) {
   const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
   if (videoElement === null) return;
 
-  if (videoElement.readyState !== 4) {
-    await waitForPlayerControl(videoElement);
-  }
+  // if (videoElement.readyState !== 4) {
+  //   await waitForPlayerControl(videoElement);
+  // }
 
-  console.log(data);
+  lockPlayerEventDate = Date.now();
 
   if (data.quality !== undefined) {
     setQuality(data.quality);
