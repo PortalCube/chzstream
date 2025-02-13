@@ -2,6 +2,8 @@
   "name": "@chzstream/extension",
   "version": "0.21.0",
   "type": "module",
+  "author": "PortalCube",
+  "license": "MIT",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",

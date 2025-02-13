@@ -3,7 +3,8 @@
   "description": "치지직 스트리밍을 하나의 화면으로 편하게 시청하세요.",
   "version": "0.21.0",
   "type": "module",
-  "main": "index.js",
+  "author": "PortalCube",
+  "license": "MIT",
   "scripts": {
     "web": "pnpm -F @chzstream/website",
     "ext": "pnpm -F @chzstream/extension",
@@ -13,9 +14,6 @@
     "lint": "eslint .",
     "prettier": "prettier --write ."
   },
-  "keywords": [],
-  "author": "Cube",
-  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/node": "^22.10.5",
