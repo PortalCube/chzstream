@@ -1,26 +1,27 @@
 {
-  "name": "@chzstream/message",
-  "version": "0.21.0",
+  "name": "@chzstream/api",
+  "version": "0.0.0",
   "type": "module",
   "author": "PortalCube",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b && vite build"
+    "dev": "vite build --watch",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "exports": {
     "types": "./dist/index.d.ts",
     "default": "./dist/index.js"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.280",
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
     "vite-plugin-dts": "^4.4.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
-    "nanoevents": "^9.1.0",
-    "typescript-event-target": "^1.1.1",
-    "uuid": "^11.0.4"
+    "axios": "^1.7.9",
+    "keyv": "^5.2.3",
+    "zod": "^3.24.2"
   }
 }

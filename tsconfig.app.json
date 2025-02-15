@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "useDefineForClassFields": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -17,9 +16,15 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+
+    /* Paths */
+    "paths": {
+      "src*": ["src/*"],
+
+      /* Packages */
+      "@chzstream/api": ["node_modules/@chzstream/api/src/index.ts"],
+      "@chzstream/message": ["node_modules/@chzstream/message/src/index.ts"],
+      "@chzstream/url": ["node_modules/@chzstream/url/src/index.ts"]
+    }
   }
 }

@@ -1,8 +1,7 @@
 {
-  "extends": "../../tsconfig.app.json",
-  "include": ["src"],
-  "compilerOptions": {
-    "rootDir": "../../",
-    "baseUrl": "."
-  }
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }

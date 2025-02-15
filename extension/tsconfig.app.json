@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.app.json",
-  "include": ["src"],
+  "include": ["src", ".wxt/wxt.d.ts"],
   "compilerOptions": {
     "baseUrl": ".",
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"

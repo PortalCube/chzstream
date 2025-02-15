@@ -1,19 +1,20 @@
 {
   "name": "@chzstream/url",
-  "version": "0.0.0",
+  "version": "0.21.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "author": "PortalCube",
   "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "tsc -b && vite build"
+  },
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
-    "vite-plugin-dts": "^4.4.0"
+    "vite-plugin-dts": "^4.4.0",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

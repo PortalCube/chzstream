@@ -1,6 +1,7 @@
 import { makeUrls } from "./src/utils/make-url.ts";
 import { defineConfig, UserManifest, UserManifestFn } from "wxt";
 import path from "path";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 const makeManifest: UserManifestFn = ({ browser, mode }) => {
   const manifest: UserManifest = {
@@ -58,17 +59,13 @@ export default defineConfig({
   manifest: makeManifest,
   runner: {
     disabled: true,
-    startUrls: ["http://localhost:5286/"],
   },
   dev: {
     server: {
       port: 5287,
     },
   },
-  alias: {
-    "@chzstream/message": path.resolve(
-      __dirname,
-      "../packages/message/src/index.ts"
-    ),
-  },
+  vite: () => ({
+    plugins: [tsconfigPaths()],
+  }),
 });
