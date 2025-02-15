@@ -1,11 +1,14 @@
-export { WebsiteClient } from "./website-client.ts";
-export { IframeClient } from "./iframe-client.ts";
-export { WindowClient } from "./window-client.ts";
-export { WindowRelay } from "./window-relay.ts";
+export { WebsiteClient } from "@message/clients/website-client.ts";
+export { IframeClient } from "@message/clients/iframe-client.ts";
+export { WindowClient } from "@message/clients/window-client.ts";
+export { WindowRelay } from "@message/clients/window-relay.ts";
 export {
   ExtensionServer,
   ExtensionServerEventTarget,
-} from "./extension-server.ts";
+} from "@message/clients/extension-server.ts";
 
-export { WebsiteClientEventTarget } from "./base.ts";
-export type { ClientMessageEvent, ServerMessageEvent } from "./base.ts";
+export { WebsiteClientEventTarget } from "@message/clients/base.ts";
+export type {
+  ClientMessageEvent,
+  ServerMessageEvent,
+} from "@message/clients/base.ts";

@@ -1,7 +1,11 @@
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
-import { Block, PreviewBlock, PreviewBlockStatus } from "./block.ts";
-import { LayoutMode } from "./layout.ts";
+import {
+  Block,
+  PreviewBlock,
+  PreviewBlockStatus,
+} from "@web/librarys/block.ts";
+import { LayoutMode } from "@web/librarys/layout.ts";
 
 export const favoriteChannelsAtom = atom<string[]>([]);
 export const restrictedModeAtom = atom<boolean>(false);

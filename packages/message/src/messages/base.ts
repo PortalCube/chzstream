@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { isTypedObject } from "../util.ts";
+import { isTypedObject } from "@message/util.ts";
 
 export enum ReceiverType {
   All = "all",

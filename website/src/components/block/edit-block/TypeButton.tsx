@@ -5,10 +5,10 @@ import {
   BlockType,
   getBlockTypeIcon,
   getBlockTypeName,
-} from "src/librarys/block.ts";
-import { BlockContext } from "src/librarys/context";
-import { modifyBlockAtom } from "src/librarys/layout.ts";
-import { Mixin } from "src/scripts/styled.ts";
+} from "@web/librarys/block.ts";
+import { BlockContext } from "@web/librarys/context";
+import { modifyBlockAtom } from "@web/librarys/layout.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
 const Container = styled.button`

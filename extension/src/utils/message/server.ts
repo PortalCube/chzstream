@@ -1,22 +1,25 @@
-import {
+import type {
   ChzzkChannelInfoRequestMessage,
   ChzzkChannelSearchRequestMessage,
   ChzzkLiveInfoRequestMessage,
   ChzzkLiveListRequestMessage,
   ChzzkLiveSearchRequestMessage,
+  ServerMessageEvent,
+} from "@chzstream/message";
+
+import {
   createChzzkChannelInfoResponseMessage,
   createChzzkChannelSearchResponseMessage,
   createChzzkLiveInfoResponseMessage,
   createChzzkLiveListResponseMessage,
   createChzzkLiveSearchResponseMessage,
   ExtensionServer,
-  ServerMessageEvent,
 } from "@chzstream/message";
-import { getChannelInfo } from "../api/chzzk/channel-info.ts";
-import { getLiveInfo } from "../api/chzzk/live-info.ts";
-import { getChannelSearch } from "../api/chzzk/channel-search.ts";
-import { getLiveSearch } from "../api/chzzk/live-search.ts";
-import { getLiveList } from "../api/chzzk/live-list.ts";
+import { getChannelInfo } from "@extension/utils/api/chzzk/channel-info.ts";
+import { getLiveInfo } from "@extension/utils/api/chzzk/live-info.ts";
+import { getChannelSearch } from "@extension/utils/api/chzzk/channel-search.ts";
+import { getLiveSearch } from "@extension/utils/api/chzzk/live-search.ts";
+import { getLiveList } from "@extension/utils/api/chzzk/live-list.ts";
 
 const server = new ExtensionServer([
   "https://chzstream.vercel.app",

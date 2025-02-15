@@ -1,13 +1,13 @@
 import { useAtom, useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { MdAdd, MdRefresh } from "react-icons/md";
-import { favoriteChannelsAtom } from "src/librarys/app.ts";
-import { openSearchModalAtom } from "src/librarys/modal.ts";
-import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "src/scripts/storage.ts";
-import { Mixin } from "src/scripts/styled.ts";
+import { favoriteChannelsAtom } from "@web/librarys/app.ts";
+import { openSearchModalAtom } from "@web/librarys/modal.ts";
+import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "@web/scripts/storage.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
-import Channel from "./Channel.tsx";
-import ChannelButton from "./ChannelButton.tsx";
+import Channel from "@web/components/topbar/Channel.tsx";
+import ChannelButton from "@web/components/topbar/ChannelButton.tsx";
 
 const Container = styled.div`
   display: flex;

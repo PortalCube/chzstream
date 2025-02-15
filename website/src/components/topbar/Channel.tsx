@@ -1,11 +1,11 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
-import { requestChzzkChannelInfo } from "src/scripts/message.ts";
+import { requestChzzkChannelInfo } from "@web/scripts/message.ts";
 import styled from "styled-components";
-import DragImage from "src/components/drag/DragImage.tsx";
+import DragImage from "@web/components/drag/DragImage.tsx";
 import { useAtom } from "jotai";
-import { favoriteChannelsAtom } from "src/librarys/app";
-import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
+import { favoriteChannelsAtom } from "@web/librarys/app";
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 
 const Container = styled.div<{ $index: number; $gap: number }>`
   width: 42px;

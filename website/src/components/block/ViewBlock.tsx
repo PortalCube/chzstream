@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import { useContext, useMemo } from "react";
-import { layoutModeAtom } from "src/librarys/app.ts";
-import { BlockType } from "src/librarys/block.ts";
-import { BlockContext } from "src/librarys/context";
-import { LayoutMode } from "src/librarys/layout.ts";
-import { MessageClient } from "src/scripts/message.ts";
-import { Mixin } from "src/scripts/styled.ts";
+import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockType } from "@web/librarys/block.ts";
+import { BlockContext } from "@web/librarys/context";
+import { LayoutMode } from "@web/librarys/layout.ts";
+import { MessageClient } from "@web/scripts/message.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
 const resizeMixin = (scale: number) => {

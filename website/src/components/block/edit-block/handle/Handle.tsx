@@ -1,6 +1,6 @@
-import CornerHandle from "./CornerHandle.tsx";
-import LineHandle from "./LineHandle.tsx";
-import { PreviewBlockHandle } from "src/librarys/block.ts";
+import CornerHandle from "@web/components/block/edit-block/handle/CornerHandle.tsx";
+import LineHandle from "@web/components/block/edit-block/handle/LineHandle.tsx";
+import { PreviewBlockHandle } from "@web/librarys/block.ts";
 
 function Handle({}: HandleProps) {
   return (

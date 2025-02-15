@@ -1,16 +1,19 @@
-import { initializeIframeEventCapture } from "@/utils/iframe-event.ts";
+import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
 import { PlayerEventType } from "@chzstream/message";
-import { isEmbedChat, makeEmbedChat } from "../utils/chzzk-embed-chat.ts";
+import {
+  isEmbedChat,
+  makeEmbedChat,
+} from "@extension/utils/chzzk-embed-chat.ts";
 import {
   embedEvent,
   isEmbedPlayer,
   makeEmbedPlayer,
-} from "../utils/chzzk-embed-player.ts";
+} from "@extension/utils/chzzk-embed-player.ts";
 import {
   initializeClientMessage,
   sendPlayerControl,
   sendPlayerEvent,
-} from "../utils/message/iframe-client.ts";
+} from "@extension/utils/message/iframe-client.ts";
 
 export default defineContentScript({
   // runAt: "document_idle",

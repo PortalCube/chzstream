@@ -2,10 +2,10 @@ import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { MdVerified } from "react-icons/md";
-import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
-import { closeModalAtom, modalAtom } from "src/librarys/modal.ts";
-import { SearchItemType } from "src/librarys/search";
-import { formatFollowerCount } from "src/scripts/format.ts";
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
+import { SearchItemType } from "@web/librarys/search";
+import { formatFollowerCount } from "@web/scripts/format.ts";
 import styled from "styled-components";
 
 const Container = styled.div`

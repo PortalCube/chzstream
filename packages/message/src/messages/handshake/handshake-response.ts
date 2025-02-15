@@ -1,10 +1,10 @@
-import { isTypedObject } from "../../util.ts";
+import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
   isMessage,
   Message,
-} from "../base.ts";
+} from "@message/messages/base.ts";
 
 const MESSAGE_KEY = "_isHandshakeResponseMessage";
 

@@ -1,11 +1,11 @@
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
-import { LayoutMode } from "src/librarys/layout.ts";
+import { LayoutMode } from "@web/librarys/layout.ts";
 import styled, { keyframes } from "styled-components";
 
-import { layoutModeAtom } from "src/librarys/app.ts";
-import Spinner from "./Spinner.tsx";
+import { layoutModeAtom } from "@web/librarys/app.ts";
+import Spinner from "@web/components/block/Spinner.tsx";
 
 const randomRange = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);

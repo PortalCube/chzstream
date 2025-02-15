@@ -1,4 +1,4 @@
-import { Chzzk } from "./chzzk.ts";
+import { Chzzk } from "@extension/utils/api/chzzk/chzzk.ts";
 
 export type ChzzkLiveSearch = {
   size: number;

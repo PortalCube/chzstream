@@ -1,4 +1,4 @@
-import { CHZZK_EMPTY_PROFILE_IMAGE } from "src/scripts/constants.ts";
+import { CHZZK_EMPTY_PROFILE_IMAGE } from "@web/scripts/constants.ts";
 
 export function getProfileImageUrl(imageUrl?: unknown): string {
   if (typeof imageUrl !== "string") {

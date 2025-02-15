@@ -5,8 +5,8 @@ import {
   requestChzzkChannelSearch,
   requestChzzkLiveList,
   requestChzzkLiveSearch,
-} from "src/scripts/message.ts";
-import { getChzzkUuid } from "./chzzk-util.ts";
+} from "@web/scripts/message.ts";
+import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
 
 export enum SearchCategory {
   Summary = "summary",

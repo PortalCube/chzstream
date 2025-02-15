@@ -5,30 +5,30 @@ import {
 } from "@chzstream/message";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
-import { layoutSizeAtom, mouseIsTopAtom } from "src/librarys/app.ts";
-import type { Block } from "src/librarys/block.ts";
-import { BlockType } from "src/librarys/block.ts";
-import { BlockContext } from "src/librarys/context.ts";
+import { layoutSizeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
+import type { Block } from "@web/librarys/block.ts";
+import { BlockType } from "@web/librarys/block.ts";
+import { BlockContext } from "@web/librarys/context.ts";
 import {
   activateBlockAtom,
   fetchChzzkChannelAtom,
   modifyBlockAtom,
   swapBlockAtom,
-} from "src/librarys/layout.ts";
-import { applyPlayerControlAtom } from "src/librarys/mixer.ts";
-import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
-import { getGridStyle } from "src/scripts/grid-layout.ts";
+} from "@web/librarys/layout.ts";
+import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
+import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
+import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import {
   getIframeId,
   MessageClient,
   PlayerEvent,
-} from "src/scripts/message.ts";
+} from "@web/scripts/message.ts";
 import styled, { keyframes } from "styled-components";
-import EditBlock from "./edit-block/EditBlock.tsx";
-import LoadingOverlay from "./LoadingOverlay.tsx";
-import { InfoType } from "./overlay/InfoOverlay.ts";
-import InfoOverlay from "./overlay/InfoOverlay.tsx";
-import ViewBlock from "./ViewBlock.tsx";
+import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
+import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
+import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
+import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
+import ViewBlock from "@web/components/block/ViewBlock.tsx";
 
 const popinAnimation = keyframes`
   0% {

@@ -1,34 +1,34 @@
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import React, { useEffect, useRef } from "react";
-import Block from "src/components/block/Block.tsx";
+import Block from "@web/components/block/Block.tsx";
 import {
   blockListAtom,
   layoutModeAtom,
   layoutSizeAtom,
   previewBlockAtom,
-} from "src/librarys/app.ts";
-import { PreviewBlockStatus } from "src/librarys/block.ts";
+} from "@web/librarys/app.ts";
+import { PreviewBlockStatus } from "@web/librarys/block.ts";
 import {
   beginPreviewAtom,
   endPreviewAtom,
   moveModifyPreviewAtom,
   movePreviewAtom,
-} from "src/librarys/layout-preview.ts";
+} from "@web/librarys/layout-preview.ts";
 import {
   LayoutMode,
   modifyBlockAtom,
   pushBlockAtom,
-} from "src/librarys/layout.ts";
+} from "@web/librarys/layout.ts";
 import {
   GRID_SIZE_HEIGHT,
   GRID_SIZE_WIDTH,
   MIN_BLOCK_HEIGHT,
   MIN_BLOCK_WIDTH,
-} from "src/scripts/constants.ts";
+} from "@web/scripts/constants.ts";
 import styled from "styled-components";
-import BlockPreview from "./BlockPreview.tsx";
-import GridBackground from "./GridBackground.tsx";
+import BlockPreview from "@web/components/grid/BlockPreview.tsx";
+import GridBackground from "@web/components/grid/GridBackground.tsx";
 
 const Container = styled.div`
   width: 100%;

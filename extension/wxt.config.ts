@@ -1,7 +1,6 @@
 import { makeUrls } from "./src/utils/make-url.ts";
 import { defineConfig, UserManifest, UserManifestFn } from "wxt";
-import path from "path";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { resolve } from "path";
 
 const makeManifest: UserManifestFn = ({ browser, mode }) => {
   const manifest: UserManifest = {
@@ -57,6 +56,14 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   srcDir: "src",
   manifest: makeManifest,
+  alias: {
+    "@extension": resolve(__dirname, "./src"),
+    "@message": resolve(__dirname, "../packages/message/src"),
+    "@chzstream/message": resolve(
+      __dirname,
+      "../packages/message/src/index.ts"
+    ),
+  },
   runner: {
     disabled: true,
   },
@@ -65,7 +72,4 @@ export default defineConfig({
       port: 5287,
     },
   },
-  vite: () => ({
-    plugins: [tsconfigPaths()],
-  }),
 });

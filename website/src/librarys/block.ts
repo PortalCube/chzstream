@@ -2,7 +2,7 @@ import { createStore } from "jotai";
 import {
   BLOCK_TYPE_CHAT_NAME,
   BLOCK_TYPE_STREAM_NAME,
-} from "src/scripts/constants.ts";
+} from "@web/scripts/constants.ts";
 import { MdForum, MdSmartDisplay } from "react-icons/md";
 
 export type Store = ReturnType<typeof createStore>;

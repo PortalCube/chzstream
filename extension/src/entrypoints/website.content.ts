@@ -1,5 +1,5 @@
-import { makeUrls } from "@/utils/make-url.ts";
-import { initializeRelayMessage } from "@/utils/message/website-relay.ts";
+import { makeUrls } from "@extension/utils/make-url.ts";
+import { initializeRelayMessage } from "@extension/utils/message/website-relay.ts";
 
 export default defineContentScript({
   runAt: "document_start",

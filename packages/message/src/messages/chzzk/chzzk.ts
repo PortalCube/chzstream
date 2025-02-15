@@ -1,5 +1,5 @@
-import { isTypedObject } from "../../util.ts";
-import { isMessage, Message } from "../base.ts";
+import { isTypedObject } from "@message/util.ts";
+import { isMessage, Message } from "@message/messages/base.ts";
 
 const MESSAGE_KEY = "_isChzzkServiceMessage";
 

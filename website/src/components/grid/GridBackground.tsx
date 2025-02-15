@@ -1,13 +1,13 @@
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
-import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import { LayoutMode } from "src/librarys/layout.ts";
-import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "src/scripts/constants.ts";
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { LayoutMode } from "@web/librarys/layout.ts";
+import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "@web/scripts/constants.ts";
 import styled from "styled-components";
 
-import LogoImage from "src/assets/logo.png";
-import { layoutModeAtom, nextBlockIdAtom } from "src/librarys/app.ts";
+import LogoImage from "@web/assets/logo.png";
+import { layoutModeAtom, nextBlockIdAtom } from "@web/librarys/app.ts";
 
 const Container = styled.div`
   width: 100%;

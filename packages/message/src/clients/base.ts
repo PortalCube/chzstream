@@ -7,7 +7,7 @@ import {
   Message,
   PlayerControlMessage,
   PlayerEventMessage,
-} from "../messages/index.ts";
+} from "@message/messages/index.ts";
 
 function getBrowser(): typeof chrome {
   if (globalThis === null || globalThis === undefined) {

@@ -1,12 +1,12 @@
 import { atom } from "jotai";
-import { MIN_BLOCK_HEIGHT, MIN_BLOCK_WIDTH } from "src/scripts/constants.ts";
-import { blockListAtom, previewBlockAtom } from "./app.ts";
+import { MIN_BLOCK_HEIGHT, MIN_BLOCK_WIDTH } from "@web/scripts/constants.ts";
+import { blockListAtom, previewBlockAtom } from "@web/librarys/app.ts";
 import {
   Block,
   BlockPosition,
   PreviewBlockHandle,
   PreviewBlockStatus,
-} from "./block.ts";
+} from "@web/librarys/block.ts";
 
 export const beginPreviewAtom = atom(null, (get, set, x: number, y: number) => {
   const blockList = get(blockListAtom);

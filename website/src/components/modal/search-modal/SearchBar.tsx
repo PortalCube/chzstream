@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useRef, useState } from "react";
 import { MdClose, MdSearch } from "react-icons/md";
-import { useSearchModal } from "src/librarys/search";
+import { useSearchModal } from "@web/librarys/search";
 import styled from "styled-components";
 
 const Container = styled.div`

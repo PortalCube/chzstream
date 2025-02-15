@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
-import { closeModalAtom, modalAtom, ModalType } from "src/librarys/modal.ts";
+import { closeModalAtom, modalAtom, ModalType } from "@web/librarys/modal.ts";
 import styled from "styled-components";
-import MixerModal from "./mixer/MixerModal.tsx";
-import SearchModal from "./search-modal/SearchModal.tsx";
-import SettingModal from "./SettingModal.tsx";
+import MixerModal from "@web/components/modal/mixer/MixerModal.tsx";
+import SearchModal from "@web/components/modal/search-modal/SearchModal.tsx";
+import SettingModal from "@web/components/modal/SettingModal.tsx";
 
 const Container = styled.div`
   position: fixed;

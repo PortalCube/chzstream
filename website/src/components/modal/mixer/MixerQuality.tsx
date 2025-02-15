@@ -1,9 +1,9 @@
 import { useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
 import { MdSmartDisplay } from "react-icons/md";
-import { MixerContext } from "src/librarys/context.ts";
-import { setQualityAtom } from "src/librarys/mixer.ts";
-import MixerSlider from "./MixerSlider.tsx";
+import { MixerContext } from "@web/librarys/context.ts";
+import { setQualityAtom } from "@web/librarys/mixer.ts";
+import MixerSlider from "@web/components/modal/mixer/MixerSlider.tsx";
 
 const STEP_VALUE = [360, 480, 720, 1080];
 const STEP_MIN = 0;

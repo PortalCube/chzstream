@@ -2,9 +2,8 @@ import { PlayerEventType } from "@chzstream/message";
 import {
   ChzzkChannelInfoResponse,
   ChzzkLiveInfoResponse,
-  ChzzkLiveStatusResponse,
-} from "./api/chzzk/chzzk.ts";
-import { sendPlayerEvent } from "./message/iframe-client.ts";
+} from "@chzstream/message";
+import { sendPlayerEvent } from "@extension/utils/message/iframe-client.ts";
 
 export async function initializePlayerStatus(isChat: boolean) {
   InterceptEmitter.on("live-info", (response: ChzzkLiveInfoResponse) => {
@@ -30,7 +29,7 @@ export async function initializePlayerStatus(isChat: boolean) {
     }
   });
 
-  InterceptEmitter.on("live-status", (response: ChzzkLiveStatusResponse) => {
+  InterceptEmitter.on("live-status", (response: Record<string, unknown>) => {
     console.log("[라이브 상태]", response);
 
     if (response === null) {

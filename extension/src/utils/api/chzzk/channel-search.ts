@@ -1,5 +1,5 @@
-import { convertToVaildString } from "@/utils/util.ts";
-import { Chzzk } from "./chzzk.ts";
+import { convertToVaildString } from "@extension/utils/util.ts";
+import { Chzzk } from "@extension/utils/api/chzzk/chzzk.ts";
 
 export type ChzzkChannelSearch = {
   size: number;

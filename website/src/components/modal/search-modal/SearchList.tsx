@@ -1,11 +1,11 @@
 import classNames from "classnames";
 import { useEffect, useMemo, useState } from "react";
-import { ModalType, useModalListener } from "src/librarys/modal.ts";
-import { SearchItemType, useSearchModal } from "src/librarys/search.ts";
+import { ModalType, useModalListener } from "@web/librarys/modal.ts";
+import { SearchItemType, useSearchModal } from "@web/librarys/search.ts";
 import styled from "styled-components";
-import Pagination from "./Pagination.tsx";
-import SearchItem from "./SearchItem.tsx";
-import SearchMessage from "./SearchMessage.tsx";
+import Pagination from "@web/components/modal/search-modal/Pagination.tsx";
+import SearchItem from "@web/components/modal/search-modal/SearchItem.tsx";
+import SearchMessage from "@web/components/modal/search-modal/SearchMessage.tsx";
 
 const Container = styled.div`
   width: 100%;

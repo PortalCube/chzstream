@@ -1,6 +1,6 @@
 import { atom } from "jotai";
-import { atomWithListeners } from "src/hooks/atomWithListeners.tsx";
-import { SearchItemType } from "./search.ts";
+import { atomWithListeners } from "@web/hooks/atomWithListeners.tsx";
+import { SearchItemType } from "@web/librarys/search.ts";
 
 export enum ModalType {
   None = "none",

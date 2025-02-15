@@ -7,15 +7,15 @@ import {
   mixerItemsAtom,
   setupMixerAtom,
   updateBatchQualityAtom,
-} from "src/librarys/mixer.ts";
+} from "@web/librarys/mixer.ts";
 import {
   closeModalAtom,
   modalAtom,
   ModalType,
   useModalListener,
-} from "src/librarys/modal.ts";
+} from "@web/librarys/modal.ts";
 import styled from "styled-components";
-import MixerItem from "./MixerItem.tsx";
+import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
 
 const Container = styled.div`
   padding: 24px;

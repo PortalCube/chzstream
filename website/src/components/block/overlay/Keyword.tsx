@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 
-import { Mixin } from "src/scripts/styled.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 
 type ContainerProps = {
   $background: string;

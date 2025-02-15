@@ -4,8 +4,8 @@ import {
   isHandshakeResponseMessage,
   isMessage,
   MessageType,
-} from "../messages/index.ts";
-import { browser } from "./base.ts";
+} from "@message/messages/index.ts";
+import { browser } from "@message/clients/base.ts";
 
 type RelayEventMap = {
   disconnect: CustomEvent<void>;

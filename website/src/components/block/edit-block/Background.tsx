@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import { useContext } from "react";
 
-import LogoImage from "src/assets/logo.png";
-import { BlockContext } from "src/librarys/context";
+import LogoImage from "@web/assets/logo.png";
+import { BlockContext } from "@web/librarys/context";
 
-import { BlockType } from "src/librarys/block.ts";
+import { BlockType } from "@web/librarys/block.ts";
 import styled from "styled-components";
 
 const Container = styled.div`

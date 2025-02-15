@@ -4,16 +4,25 @@ import {
   MessageClient,
   requestChzzkChannelInfo,
   requestChzzkLiveInfo,
-} from "src/scripts/message.ts";
-import { blockListAtom, layoutModeAtom, nextBlockIdAtom } from "./app.ts";
-import { Block, BlockChannel, BlockPosition, BlockType } from "./block.ts";
-import { getProfileImageUrl } from "./chzzk-util.ts";
+} from "@web/scripts/message.ts";
+import {
+  blockListAtom,
+  layoutModeAtom,
+  nextBlockIdAtom,
+} from "@web/librarys/app.ts";
+import {
+  Block,
+  BlockChannel,
+  BlockPosition,
+  BlockType,
+} from "@web/librarys/block.ts";
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import {
   defaultMixerItemAtom,
   setSoloAtom,
   soloBlockIdAtom,
   updateMuteAtom,
-} from "./mixer.ts";
+} from "@web/librarys/mixer.ts";
 
 export enum LayoutMode {
   View = "view",

@@ -1,11 +1,11 @@
 import { useSetAtom } from "jotai";
 import { useContext, useMemo, useRef } from "react";
-import DragImage from "src/components/drag/DragImage.tsx";
-import { getProfileImageUrl } from "src/librarys/chzzk-util.ts";
-import { BlockContext } from "src/librarys/context";
-import { fetchChzzkChannelAtom } from "src/librarys/layout.ts";
-import { openSearchModalAtom } from "src/librarys/modal.ts";
-import { Mixin } from "src/scripts/styled.ts";
+import DragImage from "@web/components/drag/DragImage.tsx";
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { BlockContext } from "@web/librarys/context";
+import { fetchChzzkChannelAtom } from "@web/librarys/layout.ts";
+import { openSearchModalAtom } from "@web/librarys/modal.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
 const Container = styled.div`

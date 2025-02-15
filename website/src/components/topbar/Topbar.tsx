@@ -12,24 +12,24 @@ import {
   MdSettings,
   MdVolumeUp,
 } from "react-icons/md";
-import { isFullscreenAtom } from "src/hooks/useFullscreenDetect.tsx";
+import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
 import {
   clearBlockAtom,
   LayoutMode,
   switchLayoutModeAtom,
-} from "src/librarys/layout.ts";
-import { GRID_SIZE_HEIGHT } from "src/scripts/constants.ts";
+} from "@web/librarys/layout.ts";
+import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import styled, { css } from "styled-components";
-import ChannelGroup from "./ChannelGroup.tsx";
-import MenuButton from "./MenuButton.tsx";
+import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
+import MenuButton from "@web/components/topbar/MenuButton.tsx";
 
-import LogoImage from "src/assets/logo.png";
-import { layoutModeAtom, mouseIsTopAtom } from "src/librarys/app.ts";
+import LogoImage from "@web/assets/logo.png";
+import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import {
   openMixerModalAtom,
   openSettingModalAtom,
-} from "src/librarys/modal.ts";
-import { Mixin } from "src/scripts/styled.ts";
+} from "@web/librarys/modal.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 
 const Container = styled.div`
   width: 100%;

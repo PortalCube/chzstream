@@ -1,8 +1,8 @@
 import { createNanoEvents } from "nanoevents";
-import { ChzzkResponse } from "./api/chzzk/chzzk.js";
-import { convertLiveInfo } from "./api/chzzk/live-info.js";
-import { convertLiveStatus } from "./api/chzzk/live-status.js";
-import { convertChannelInfo } from "./api/chzzk/channel-info.js";
+import { ChzzkResponse } from "@extension/utils/api/chzzk/chzzk.js";
+import { convertLiveInfo } from "@extension/utils/api/chzzk/live-info.js";
+import { convertLiveStatus } from "@extension/utils/api/chzzk/live-status.js";
+import { convertChannelInfo } from "@extension/utils/api/chzzk/channel-info.js";
 
 type Intercept = {
   event: string;

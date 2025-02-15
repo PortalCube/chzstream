@@ -1,15 +1,15 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
 import { MdVolumeDown, MdVolumeOff, MdVolumeUp } from "react-icons/md";
-import { MixerContext } from "src/librarys/context.ts";
+import { MixerContext } from "@web/librarys/context.ts";
 import {
   setMuteAtom,
   setVolumeAtom,
   soloBlockIdAtom,
   updateMuteAtom,
   updateVolumeAtom,
-} from "src/librarys/mixer.ts";
-import MixerSlider from "./MixerSlider.tsx";
+} from "@web/librarys/mixer.ts";
+import MixerSlider from "@web/components/modal/mixer/MixerSlider.tsx";
 
 function MixerVolume({}: MixerVolumeProps) {
   const { id, mixer } = useContext(MixerContext);

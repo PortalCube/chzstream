@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
 import styled from "styled-components";
 
 const ratioMixin = (value: number) => {

@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import { ModalType, useModalListener } from "src/librarys/modal.ts";
-import { useSearchModal } from "src/librarys/search.ts";
+import { ModalType, useModalListener } from "@web/librarys/modal.ts";
+import { useSearchModal } from "@web/librarys/search.ts";
 import styled from "styled-components";
-import SearchDetail from "./SearchDetail.tsx";
-import SearchSummary from "./SearchSummary.tsx";
+import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
+import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
 
 const Container = styled.div`
   width: 100%;

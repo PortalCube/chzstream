@@ -1,10 +1,10 @@
 import { useAtom } from "jotai";
 import { useEffect } from "react";
-import { favoriteChannelsAtom } from "src/librarys/app";
+import { favoriteChannelsAtom } from "@web/librarys/app";
 import {
   getStorageFavoriteChannels,
   setStorageFavoriteChannels,
-} from "src/scripts/storage.ts";
+} from "@web/scripts/storage.ts";
 
 export function useStorage() {
   const [favoriteChannels, setFavoriteChannels] =

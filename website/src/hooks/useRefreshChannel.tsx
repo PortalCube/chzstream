@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { refreshChannelAtom } from "src/librarys/layout.ts";
+import { refreshChannelAtom } from "@web/librarys/layout.ts";
 
 export function useRefreshChannel() {
   const refreshChannel = useSetAtom(refreshChannelAtom);

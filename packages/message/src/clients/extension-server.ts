@@ -15,15 +15,15 @@ import {
   isHandshakeRequestMessage,
   isMessage,
   Message,
-} from "../messages/index.ts";
-import { ReceiverType } from "../messages/base.ts";
+} from "@message/messages/index.ts";
+import { ReceiverType } from "@message/messages/base.ts";
 import {
   browser,
   ClientType,
   MESSAGE_VERSION,
   ServerMessageEvent,
   WEB_EXTENSION_ID,
-} from "./base.ts";
+} from "@message/clients/base.ts";
 
 export type ExtensionServerEventMap = {
   message: CustomEvent<{

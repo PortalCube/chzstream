@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { switchLayoutModeAtom } from "src/librarys/layout.ts";
+import { switchLayoutModeAtom } from "@web/librarys/layout.ts";
 
 export function useShortcutKey() {
   const switchLayoutMode = useSetAtom(switchLayoutModeAtom);

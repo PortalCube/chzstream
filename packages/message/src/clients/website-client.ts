@@ -1,4 +1,4 @@
-import { isMessage, ReceiverType } from "../messages/base.ts";
+import { isMessage, ReceiverType } from "@message/messages/base.ts";
 import {
   createHandshakeRequestMessage,
   createHeartbeatMessage,
@@ -10,7 +10,7 @@ import {
   isPlayerControlMessage,
   isPlayerEventMessage,
   Message,
-} from "../messages/index.ts";
+} from "@message/messages/index.ts";
 import {
   browser,
   ClientMessageEvent,
@@ -19,7 +19,7 @@ import {
   WebsiteClientEventMap,
   WebsiteClientEventTarget,
   WebsiteClientInterface,
-} from "./base.ts";
+} from "@message/clients/base.ts";
 
 export class WebsiteClient
   extends WebsiteClientEventTarget

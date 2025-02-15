@@ -1,19 +1,22 @@
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
-import Grid from "src/components/grid/Grid.tsx";
-import Modal from "src/components/modal/Modal.tsx";
-import Topbar from "src/components/topbar/Topbar.tsx";
-import { useDisplayPixelRatio } from "src/hooks/useDisplayPixelRatio.tsx";
-import { useFullscreenDetect } from "src/hooks/useFullscreenDetect.tsx";
-import { useRefreshChannel } from "src/hooks/useRefreshChannel.tsx";
-import { useShortcutKey } from "src/hooks/useShortcutKey.tsx";
-import { useStorage } from "src/hooks/useStorage.tsx";
-import { restrictedModeAtom } from "src/librarys/app.ts";
-import { loadDefaultMixerAtom } from "src/librarys/mixer.ts";
-import { initializeClientMessage, MessageClient } from "src/scripts/message.ts";
-import { theme } from "src/scripts/styled.ts";
+import Grid from "@web/components/grid/Grid.tsx";
+import Modal from "@web/components/modal/Modal.tsx";
+import Topbar from "@web/components/topbar/Topbar.tsx";
+import { useDisplayPixelRatio } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { useFullscreenDetect } from "@web/hooks/useFullscreenDetect.tsx";
+import { useRefreshChannel } from "@web/hooks/useRefreshChannel.tsx";
+import { useShortcutKey } from "@web/hooks/useShortcutKey.tsx";
+import { useStorage } from "@web/hooks/useStorage.tsx";
+import { usePlayerControlListener } from "@web/hooks/usePlayerControlListener.tsx";
+import { restrictedModeAtom } from "@web/librarys/app.ts";
+import { loadDefaultMixerAtom } from "@web/librarys/mixer.ts";
+import {
+  initializeClientMessage,
+  MessageClient,
+} from "@web/scripts/message.ts";
+import { theme } from "@web/scripts/styled.ts";
 import styled, { ThemeProvider } from "styled-components";
-import { usePlayerControlListener } from "./hooks/usePlayerControlListener.tsx";
 
 const Container = styled.div`
   width: 100%;

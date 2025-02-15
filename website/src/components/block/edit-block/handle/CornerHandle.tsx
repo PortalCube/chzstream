@@ -1,8 +1,8 @@
 import { useSetAtom } from "jotai";
 import { useContext } from "react";
-import { PreviewBlockHandle } from "src/librarys/block.ts";
-import { BlockContext } from "src/librarys/context";
-import { beginModifyPreviewAtom } from "src/librarys/layout-preview.ts";
+import { PreviewBlockHandle } from "@web/librarys/block.ts";
+import { BlockContext } from "@web/librarys/context";
+import { beginModifyPreviewAtom } from "@web/librarys/layout-preview.ts";
 import styled from "styled-components";
 
 const Container = styled.div`

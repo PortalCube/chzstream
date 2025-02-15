@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import { useMemo } from "react";
-import { SearchCategory, useSearchModal } from "src/librarys/search.ts";
+import { SearchCategory, useSearchModal } from "@web/librarys/search.ts";
 import styled from "styled-components";
-import Category from "./Category.tsx";
-import SearchList from "./SearchList.tsx";
+import Category from "@web/components/modal/search-modal/Category.tsx";
+import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
 
 const Container = styled.div`
   width: 100%;

@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { BlockContext } from "src/librarys/context";
-import { Mixin } from "src/scripts/styled.ts";
+import { BlockContext } from "@web/librarys/context";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
 const Container = styled.div`

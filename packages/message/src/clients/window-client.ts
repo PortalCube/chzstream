@@ -1,4 +1,8 @@
-import { isMessage, MessageType, ReceiverType } from "../messages/base.ts";
+import {
+  isMessage,
+  MessageType,
+  ReceiverType,
+} from "@message/messages/base.ts";
 import {
   createHandshakeRequestMessage,
   createHeartbeatMessage,
@@ -9,14 +13,14 @@ import {
   isIframePointerMoveMessage,
   isPlayerEventMessage,
   Message,
-} from "../messages/index.ts";
+} from "@message/messages/index.ts";
 import {
   ClientMessageEvent,
   ClientType,
   WebsiteClientEventMap,
   WebsiteClientEventTarget,
   WebsiteClientInterface,
-} from "./base.ts";
+} from "@message/clients/base.ts";
 
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1319168
 

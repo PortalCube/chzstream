@@ -1,10 +1,10 @@
-import { createMessage, CreateMessageOptions } from "../base.ts";
+import { createMessage, CreateMessageOptions } from "@message/messages/base.ts";
 import {
   ChzzkServiceMessage,
   ChzzkServiceMessageType,
   ChzzkServiceType,
   isChzzkServiceMessage,
-} from "./chzzk.ts";
+} from "@message/messages/chzzk/chzzk.ts";
 
 export type ChzzkLiveInfoResponse = {
   liveId: number;

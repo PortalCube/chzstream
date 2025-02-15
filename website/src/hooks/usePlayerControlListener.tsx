@@ -1,8 +1,8 @@
 import { ClientMessageEvent, PlayerControlMessage } from "@chzstream/message";
 import { useSetAtom } from "jotai";
 import { useCallback, useEffect } from "react";
-import { updatePlayerControlAtom } from "src/librarys/mixer.ts";
-import { getIframeId, MessageClient } from "src/scripts/message.ts";
+import { updatePlayerControlAtom } from "@web/librarys/mixer.ts";
+import { getIframeId, MessageClient } from "@web/scripts/message.ts";
 
 export function usePlayerControlListener() {
   const updatePlayerControl = useSetAtom(updatePlayerControlAtom);

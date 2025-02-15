@@ -2,16 +2,16 @@ import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext } from "react";
 import { MdClose } from "react-icons/md";
-import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import { layoutModeAtom } from "src/librarys/app.ts";
-import { BlockContext } from "src/librarys/context.ts";
-import { LayoutMode, removeBlockAtom } from "src/librarys/layout.ts";
-import { Mixin } from "src/scripts/styled.ts";
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockContext } from "@web/librarys/context.ts";
+import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
-import Background from "./Background.tsx";
-import Channel from "./Channel.tsx";
-import TypeButton from "./TypeButton.tsx";
-import Handle from "./handle/Handle.tsx";
+import Background from "@web/components/block/edit-block/Background.tsx";
+import Channel from "@web/components/block/edit-block/Channel.tsx";
+import TypeButton from "@web/components/block/edit-block/TypeButton.tsx";
+import Handle from "@web/components/block/edit-block/handle/Handle.tsx";
 
 const Container = styled.div<{ $dpr: number }>`
   /* margin: ${(props) => 4 / props.$dpr + "px"}; */

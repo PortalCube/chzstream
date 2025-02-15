@@ -8,7 +8,7 @@ import {
   PlayerControlMessageData,
   PlayerEventType,
 } from "@chzstream/message";
-import { getNumberParam } from "../url.ts";
+import { getNumberParam } from "@extension/utils/url.ts";
 
 const client = new IframeClient();
 

@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { modalAtom, ModalType } from "src/librarys/modal.ts";
+import { modalAtom, ModalType } from "@web/librarys/modal.ts";
 import styled from "styled-components";
-import SearchBar from "./SearchBar.tsx";
-import SearchResult from "./SearchResult.tsx";
+import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
+import SearchResult from "@web/components/modal/search-modal/SearchResult.tsx";
 
 const Container = styled.div`
   max-width: 600px;

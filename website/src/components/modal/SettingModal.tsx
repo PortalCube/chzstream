@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { modalAtom, ModalType } from "src/librarys/modal.ts";
+import { modalAtom, ModalType } from "@web/librarys/modal.ts";
 import styled from "styled-components";
 
 const Container = styled.div`

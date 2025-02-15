@@ -1,18 +1,20 @@
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
-import { LayoutMode, removeBlockAtom } from "src/librarys/layout.ts";
+import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
 import styled, { css } from "styled-components";
 
 import { MdClose, MdLock } from "react-icons/md";
-import { displayPixelRatioAtom } from "src/hooks/useDisplayPixelRatio.tsx";
-import { layoutModeAtom } from "src/librarys/app.ts";
-import { BlockContext } from "src/librarys/context.ts";
-import { Mixin } from "src/scripts/styled.ts";
-import Channel from "./Channel.tsx";
-import { InfoType } from "./InfoOverlay.ts";
-import Keyword, { KeywordProps } from "./Keyword.tsx";
-import OfflineIcon from "./OfflineIcon.tsx";
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockContext } from "@web/librarys/context.ts";
+import { Mixin } from "@web/scripts/styled.ts";
+import Channel from "@web/components/block/overlay/Channel.tsx";
+import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
+import Keyword, {
+  KeywordProps,
+} from "@web/components/block/overlay/Keyword.tsx";
+import OfflineIcon from "@web/components/block/overlay/OfflineIcon.tsx";
 
 const Container = styled.div<{ $dpr: number }>`
   overflow: hidden;

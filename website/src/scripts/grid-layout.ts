@@ -1,4 +1,4 @@
-import { BlockPosition } from "src/librarys/block.ts";
+import { BlockPosition } from "@web/librarys/block.ts";
 
 export function getGridStyle(
   position: BlockPosition | null,

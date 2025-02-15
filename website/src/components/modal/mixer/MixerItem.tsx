@@ -1,17 +1,17 @@
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import React, { useMemo } from "react";
-import { MixerContext } from "src/librarys/context.ts";
+import { MixerContext } from "@web/librarys/context.ts";
 import {
   type MixerItem,
   setLockAtom,
   setSoloAtom,
   soloBlockIdAtom,
   updateMuteAtom,
-} from "src/librarys/mixer.ts";
+} from "@web/librarys/mixer.ts";
 import styled from "styled-components";
-import MixerQuality from "./MixerQuality.tsx";
-import MixerVolume from "./MixerVolume.tsx";
+import MixerQuality from "@web/components/modal/mixer/MixerQuality.tsx";
+import MixerVolume from "@web/components/modal/mixer/MixerVolume.tsx";
 
 const Container = styled.div`
   padding: 8px;

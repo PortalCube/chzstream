@@ -1,5 +1,5 @@
 import { IconType } from "react-icons";
-import { Mixin } from "src/scripts/styled.ts";
+import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
 
 const Container = styled.button`
