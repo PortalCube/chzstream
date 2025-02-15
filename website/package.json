@@ -9,8 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --max-warnings 0",
     "lintfix": "eslint . --fix --max-warnings 0",
-    "preview": "vite preview",
-    "vercel": "vercel build --prod && vercel --prebuilt --prod"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@chzstream/message": "workspace:^",
