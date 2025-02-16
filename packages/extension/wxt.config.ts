@@ -1,6 +1,13 @@
 import { makeUrls } from "./src/utils/make-url.js";
-import { defineConfig, UserManifest, UserManifestFn } from "wxt";
-import { resolve } from "path";
+import {
+  defineConfig,
+  UserManifest,
+  UserManifestFn,
+  Wxt,
+  WxtDirEntry,
+  WxtDirFileEntry,
+} from "wxt";
+import tsConfigPaths from "vite-tsconfig-paths";
 
 const makeManifest: UserManifestFn = ({ browser, mode }) => {
   const manifest: UserManifest = {
@@ -56,11 +63,8 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   srcDir: "src",
   manifest: makeManifest,
-  alias: {
-    "@extension": resolve(__dirname, "../extension/src"),
-    "@message": resolve(__dirname, "../message/src"),
-
-    "@chzstream/message": resolve(__dirname, "../message/src/index.ts"),
+  hooks: {
+    "prepare:types": modifyTsConfig,
   },
   runner: {
     disabled: true,
@@ -70,4 +74,28 @@ export default defineConfig({
       port: 5287,
     },
   },
+  vite: () => ({
+    plugins: [tsConfigPaths()],
+  }),
 });
+
+function modifyTsConfig(_wxt: Wxt, entries: WxtDirEntry[]) {
+  const file = entries.find(
+    (entry) => "path" in entry && entry.path.endsWith("tsconfig.json")
+  ) as WxtDirFileEntry | undefined;
+
+  if (file === undefined) {
+    throw new Error("tsconfig.json not found");
+  }
+
+  const tsConfig = JSON.parse(file.text);
+
+  // monorepo의 tsconfig.app.json을 확장하도록 수정
+  tsConfig.extends = "../../tsconfig.app.json";
+
+  // 강제로 정의된 path alias 제거
+  delete tsConfig.compilerOptions.paths;
+
+  // 수정된 내용 저장
+  file.text = JSON.stringify(tsConfig, null, 2);
+}
