@@ -31,9 +31,9 @@ export const browser: typeof chrome = getBrowser();
 export const MESSAGE_VERSION = "0.0.0";
 
 export const WEB_EXTENSION_ID = [
-  "adgphdaoifgcfdokkgkpghphpfhgcejh", // chrome
-  "lcnimkhbfiilllfoilbbjgcobkamaijj", // edge
-  "odealpamnmkbkicjcfbakaminlifjpad", // whale
+  "nahmkfhfajjagbojgphgabbfococgpjh", // chrome
+  "hobcccbcgppegnohgbofkemmdigoloon", // edge
+  "kjdhnpejpbcmnpngmkilgjkkbnihfmgp", // whale
   "{c0a25716-f499-47e7-8ebc-f0c688bba0c0}", // firefox
 ];
 
