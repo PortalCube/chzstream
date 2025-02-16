@@ -21,18 +21,16 @@ const schema = z.object({
 });
 
 export type GetChannelResponse = {
-  id: string;
-  name: string;
-  imageUrl: string | null;
-  description: string;
+  channelId: string;
+  channelName: string;
+  channelImageUrl: string | null;
+  channelDescription: string;
   verifiedMark: boolean;
   followerCount: number;
   openLive: boolean;
 } | null;
 
-export async function getChannelInfo(
-  uuid: string
-): Promise<GetChannelResponse> {
+export async function getChannel(uuid: string): Promise<GetChannelResponse> {
   const response = await Client.get(`/service/v1/channels/${uuid}`);
   const body = schema.parse(response.content);
 
@@ -41,10 +39,10 @@ export async function getChannelInfo(
   }
 
   return {
-    id: body.channelId,
-    name: body.channelName,
-    imageUrl: normalizeString(body.channelImageUrl),
-    description: body.channelDescription,
+    channelId: body.channelId,
+    channelName: body.channelName,
+    channelImageUrl: normalizeString(body.channelImageUrl),
+    channelDescription: body.channelDescription,
     verifiedMark: body.verifiedMark,
     followerCount: body.followerCount,
     openLive: body.openLive,
