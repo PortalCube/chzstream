@@ -8,8 +8,10 @@
   "scripts": {
     "web": "pnpm -F @chzstream/website",
     "ext": "pnpm -F @chzstream/extension",
-    "lib:url": "pnpm -F @chzstream/url",
-    "lib:msg": "pnpm -F @chzstream/message",
+    "api": "pnpm -F @chzstream/api",
+    "url": "pnpm -F @chzstream/url",
+    "msg": "pnpm -F @chzstream/message",
+    "dev": "pnpm -r dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "prettier": "prettier --write ."

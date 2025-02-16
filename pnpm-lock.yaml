@@ -45,11 +45,36 @@ importers:
         specifier: ^8.19.0
         version: 8.19.0(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2)
 
-  extension:
+  packages/api:
+    dependencies:
+      axios:
+        specifier: ^1.7.9
+        version: 1.7.9
+      keyv:
+        specifier: ^5.2.3
+        version: 5.2.3
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
+      vite:
+        specifier: ^6.0.5
+        version: 6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0)
+      vite-plugin-dts:
+        specifier: ^4.4.0
+        version: 4.4.0(@types/node@22.10.5)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0))
+      vite-tsconfig-paths:
+        specifier: ^5.1.4
+        version: 5.1.4(typescript@5.7.2)(vite@6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0))
+
+  packages/extension:
     dependencies:
       '@chzstream/message':
         specifier: workspace:^
-        version: link:../packages/message
+        version: link:../message
       axios:
         specifier: ^1.7.9
         version: 1.7.9
@@ -84,31 +109,6 @@ importers:
       wxt:
         specifier: ^0.19.23
         version: 0.19.23(@types/node@22.10.5)(rollup@4.29.1)(sass-embedded@1.83.0)
-
-  packages/api:
-    dependencies:
-      axios:
-        specifier: ^1.7.9
-        version: 1.7.9
-      keyv:
-        specifier: ^5.2.3
-        version: 5.2.3
-      zod:
-        specifier: ^3.24.2
-        version: 3.24.2
-    devDependencies:
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.2
-      vite:
-        specifier: ^6.0.5
-        version: 6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0)
-      vite-plugin-dts:
-        specifier: ^4.4.0
-        version: 4.4.0(@types/node@22.10.5)(rollup@4.29.1)(typescript@5.7.2)(vite@6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0))
-      vite-tsconfig-paths:
-        specifier: ^5.1.4
-        version: 5.1.4(typescript@5.7.2)(vite@6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0))
 
   packages/message:
     dependencies:
@@ -153,14 +153,14 @@ importers:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.7.2)(vite@6.0.7(@types/node@22.10.5)(jiti@1.21.7)(sass-embedded@1.83.0))
 
-  website:
+  packages/website:
     dependencies:
       '@chzstream/message':
         specifier: workspace:^
-        version: link:../packages/message
+        version: link:../message
       '@chzstream/url':
         specifier: workspace:^
-        version: link:../packages/url
+        version: link:../url
       axios:
         specifier: ^1.7.9
         version: 1.7.9

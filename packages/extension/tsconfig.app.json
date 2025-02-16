@@ -1,0 +1,21 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "include": ["src", ".wxt/wxt.d.ts"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "tsBuildInfoFile": "node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@web*": ["../website/src/*"],
+      "@extension*": ["../extension/src/*"],
+      "@message*": ["../message/src/*"],
+      "@url*": ["../url/src/*"],
+      "@api*": ["../api/src/*"],
+
+      "@chzstream/api": ["../api/src/index.ts"],
+      "@chzstream/message": ["../message/src/index.ts"],
+      "@chzstream/url": ["../url/src/index.ts"]
+    }
+  }
+}

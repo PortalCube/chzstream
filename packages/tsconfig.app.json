@@ -19,11 +19,15 @@
 
     /* Paths */
     "paths": {
-      "@web*": ["./src/*"],
-      "@extension*": ["./src/*"],
-      "@message*": ["./src/*"],
-      "@url*": ["./src/*"],
-      "@api*": ["./src/*"]
+      "@web*": ["../website/src/*"],
+      "@extension*": ["../extension/src/*"],
+      "@message*": ["../message/src/*"],
+      "@url*": ["../url/src/*"],
+      "@api*": ["../api/src/*"],
+
+      "@chzstream/api": ["../api/src/index.ts"],
+      "@chzstream/message": ["../message/src/index.ts"],
+      "@chzstream/url": ["../url/src/index.ts"]
     }
   }
 }

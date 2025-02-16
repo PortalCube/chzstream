@@ -1,4 +1,4 @@
-import { makeUrls } from "./src/utils/make-url.ts";
+import { makeUrls } from "./src/utils/make-url.js";
 import { defineConfig, UserManifest, UserManifestFn } from "wxt";
 import { resolve } from "path";
 
@@ -57,12 +57,10 @@ export default defineConfig({
   srcDir: "src",
   manifest: makeManifest,
   alias: {
-    "@extension": resolve(__dirname, "./src"),
-    "@message": resolve(__dirname, "../packages/message/src"),
-    "@chzstream/message": resolve(
-      __dirname,
-      "../packages/message/src/index.ts"
-    ),
+    "@extension": resolve(__dirname, "../extension/src"),
+    "@message": resolve(__dirname, "../message/src"),
+
+    "@chzstream/message": resolve(__dirname, "../message/src/index.ts"),
   },
   runner: {
     disabled: true,
