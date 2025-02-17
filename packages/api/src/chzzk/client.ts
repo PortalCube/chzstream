@@ -8,7 +8,7 @@ import { getChannel } from "@api/chzzk/get-channel.ts";
 import { searchLive } from "@api/chzzk/search-live.ts";
 import { searchChannel } from "@api/chzzk/search-channel.ts";
 
-export type ChzzkClientOptions = Omit<APIClientOptions, "baseUrl">;
+export type ChzzkClientOptions = Omit<APIClientOptions, "baseUrl"> | null;
 
 export class ChzzkClient extends APIClient {
   constructor(options: ChzzkClientOptions) {

@@ -3,11 +3,10 @@ import Keyv from "keyv";
 
 const DEFAULT_CACHE_TTL = 1000 * 5;
 
-export type APIClientOptions = {
-  baseUrl: string;
+export type APIClientOptions = Partial<{
   headers: AxiosRequestConfig["headers"];
-  ttl?: number;
-};
+  ttl: number;
+}> & { baseUrl: string };
 
 export type APIClientRequestOptions = {
   url: string;
