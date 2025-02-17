@@ -12,7 +12,7 @@ export type ChzzkClientOptions = Omit<APIClientOptions, "baseUrl"> | null;
 
 export class ChzzkClient extends APIClient {
   constructor(options?: ChzzkClientOptions) {
-    super({ ...options, baseUrl: "http://api.chzzk.naver.com" });
+    super({ ...options, baseUrl: "https://api.chzzk.naver.com" });
   }
 
   getLive = getLive;
