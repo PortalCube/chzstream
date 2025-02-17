@@ -1,22 +1,27 @@
-import { APIClient } from "@api/client.ts";
+import { APIClient, APIClientOptions } from "@api/client.ts";
 import { z } from "zod";
 
-export const Client = new APIClient<Response>(
-  "https://api.chzzk.naver.com",
-  handler
-);
+import { getLive } from "@api/chzzk/get-live.ts";
+import { getLiveList } from "@api/chzzk/get-live-list.ts";
+import { getLiveStatus } from "@api/chzzk/get-live-status.ts";
+import { getChannel } from "@api/chzzk/get-channel.ts";
+import { searchLive } from "@api/chzzk/search-live.ts";
+import { searchChannel } from "@api/chzzk/search-channel.ts";
 
-function handler(response: unknown): Response {
-  const res = responseSchema.parse(response);
+export type ChzzkClientOptions = Omit<APIClientOptions, "baseUrl">;
 
-  return res;
+export class ChzzkClient extends APIClient {
+  constructor(options: ChzzkClientOptions) {
+    super({ ...options, baseUrl: "http://api.chzzk.naver.com" });
+  }
+
+  getLive = getLive;
+  getLiveList = getLiveList;
+  getLiveStatus = getLiveStatus;
+  getChannel = getChannel;
+  searchLive = searchLive;
+  searchChannel = searchChannel;
 }
-
-export type Response = {
-  code: number;
-  message: string | null;
-  content?: unknown;
-};
 
 export const responseSchema = z.object({
   code: z.number(),

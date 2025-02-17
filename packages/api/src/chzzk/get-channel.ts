@@ -1,6 +1,6 @@
 import { normalizeString } from "@api/util.ts";
 import { z } from "zod";
-import { Client } from "@api/chzzk/client.ts";
+import { ChzzkClient, responseSchema } from "@api/chzzk/client.ts";
 
 const schema = z.object({
   channelId: z.string().nullable(),
@@ -30,9 +30,16 @@ export type GetChannelResponse = {
   openLive: boolean;
 } | null;
 
-export async function getChannel(uuid: string): Promise<GetChannelResponse> {
-  const response = await Client.get(`/service/v1/channels/${uuid}`);
-  const body = schema.parse(response.content);
+export async function getChannel(
+  this: ChzzkClient,
+  uuid: string
+): Promise<GetChannelResponse> {
+  const response = await this.get({
+    url: `/service/v1/channels/${uuid}`,
+  });
+
+  const { content } = responseSchema.parse(response);
+  const body = schema.parse(content);
 
   if (body.channelId === null) {
     return null;

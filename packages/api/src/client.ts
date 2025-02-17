@@ -1,65 +1,88 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import Keyv from "keyv";
 
 const DEFAULT_CACHE_TTL = 1000 * 5;
 
-function getUrlString(baseUrl: string, params: Record<string, unknown>) {
-  const url = new URL(baseUrl);
+export type APIClientOptions = {
+  baseUrl: string;
+  headers: AxiosRequestConfig["headers"];
+  ttl?: number;
+};
 
-  Object.entries(params).forEach(([key, value]) => {
-    url.searchParams.set(key, value as string);
-  });
+export type APIClientRequestOptions = {
+  url: string;
+  params?: Record<string, unknown>;
+  body?: unknown;
+  ttl?: number;
+};
 
-  return url.toString();
-}
-
-export class APIClient<T extends Record<string, unknown>> {
+export class APIClient {
   #baseUrl: string;
   #client: ReturnType<typeof axios.create>;
-  #cache: Keyv<T>;
-  #handler: (response: unknown) => T;
+  #cache: Keyv;
 
-  constructor(
-    baseUrl: string,
-    responseHandler: (response: unknown) => T,
-    ttl: number = DEFAULT_CACHE_TTL
-  ) {
-    this.#baseUrl = baseUrl;
-    this.#handler = responseHandler;
-    this.#cache = new Keyv<T>({ ttl });
-    this.#client = axios.create({ baseURL: baseUrl });
+  constructor(options: APIClientOptions) {
+    this.#baseUrl = options.baseUrl;
+    this.#cache = new Keyv({ ttl: options.ttl ?? DEFAULT_CACHE_TTL });
+    this.#client = axios.create({
+      baseURL: options.baseUrl,
+      headers: options.headers,
+    });
   }
 
-  async get(
-    url: string,
-    params: Record<string, unknown> = {},
-    ttl: number | null = null
-  ): Promise<T> {
-    const key = getUrlString(this.#baseUrl + url, params);
-    const cache = await this.#cache.get(key);
+  async get(options: APIClientRequestOptions): Promise<unknown> {
+    const cache = await this.getCacheValue(options);
+    if (cache !== undefined) return cache;
 
-    if (cache !== undefined) {
-      return cache;
-    }
-
-    const response = await this.#client.get<unknown>(url, {
-      params,
+    const response = await this.#client.get<unknown>(options.url, {
+      params: options.params,
     });
 
-    const data = this.#handler(response.data);
+    await this.setCacheValue(options, response.data);
 
-    if (ttl !== null && ttl >= 0) {
-      await this.#cache.set(key, data, ttl);
-    }
-
-    return data;
+    return response.data;
   }
 
-  async post(url: string, body: unknown): Promise<T> {
-    const response = await this.#client.post<unknown>(url, body);
+  async post(options: APIClientRequestOptions): Promise<unknown> {
+    const response = await this.#client.post<unknown>(
+      options.url,
+      options.body,
+      {
+        params: options.params,
+      }
+    );
 
-    const data = this.#handler(response.data);
+    return response.data;
+  }
 
-    return data;
+  getCacheKey(options: APIClientRequestOptions): string {
+    const url = new URL(this.#baseUrl + options.url);
+
+    if (options.params) {
+      Object.entries(options.params).forEach(([key, value]) => {
+        url.searchParams.set(key, value as string);
+      });
+    }
+
+    return url.toString();
+  }
+
+  async getCacheValue(
+    options: APIClientRequestOptions
+  ): Promise<unknown | undefined> {
+    const key = this.getCacheKey(options);
+    return await this.#cache.get(key);
+  }
+
+  async setCacheValue(
+    options: APIClientRequestOptions,
+    value: unknown
+  ): Promise<void> {
+    const key = this.getCacheKey(options);
+    const ttl = options.ttl === undefined ? this.#cache.ttl : options.ttl;
+
+    if (ttl !== undefined && ttl >= 0) {
+      await this.#cache.set(key, value, ttl);
+    }
   }
 }

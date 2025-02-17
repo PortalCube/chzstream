@@ -1,5 +1,8 @@
-import { Client } from "@api/chzzk/client.ts";
-import { paginationSchema } from "@api/chzzk/client.ts";
+import {
+  ChzzkClient,
+  paginationSchema,
+  responseSchema,
+} from "@api/chzzk/client.ts";
 import { normalizeString } from "@api/util.ts";
 import { z } from "zod";
 
@@ -15,15 +18,15 @@ const schema = z.array(
       liveId: z.number(),
       adult: z.boolean(),
       tags: z.string().array(),
-      chatChannelId: z.string(),
-      categoryType: z.string(),
-      liveCategory: z.string(),
+      chatChannelId: z.string().nullable(),
+      categoryType: z.string().nullable(),
+      liveCategory: z.string().nullable(),
       liveCategoryValue: z.string(),
       dropsCampaignNo: z.unknown(),
       watchPartyNo: z.unknown(),
       watchPartyTag: z.unknown(),
       channelId: z.string(),
-      livePlaybackJson: z.string(),
+      livePlaybackJson: z.string().nullable(),
       blindType: z.unknown(),
     }),
     channel: z.object({
@@ -31,53 +34,66 @@ const schema = z.array(
       channelName: z.string(),
       channelImageUrl: z.string().nullable(),
       verifiedMark: z.boolean(),
-      activatedChannelBadgeIds: z.string().array(),
-      personalData: z.object({
-        privateUserBlock: z.boolean(),
-      }),
+      activatedChannelBadgeIds: z.string().array().optional(),
+      personalData: z
+        .object({
+          privateUserBlock: z.boolean(),
+        })
+        .optional(),
     }),
   })
 );
 
 export type SearchLiveResponse = {
-  live: {
-    liveTitle: string;
-    concurrentUserCount: number;
-    adult: boolean;
-  };
-  channel: {
-    channelId: string;
-    channelName: string;
-    channelImageUrl: string | null;
-    verifiedMark: boolean;
-  };
-}[];
+  next: number | null;
+  data: {
+    live: {
+      liveTitle: string;
+      concurrentUserCount: number;
+      adult: boolean;
+    };
+    channel: {
+      channelId: string;
+      channelName: string;
+      channelImageUrl: string | null;
+      verifiedMark: boolean;
+    };
+  }[];
+};
 
 export async function searchLive(
+  this: ChzzkClient,
   query: string,
-  offset: number = 0,
+  offset: number | null = 0,
   size: number = 50
 ): Promise<SearchLiveResponse> {
-  const response = await Client.get(`/service/v1/search/lives`, {
-    keyword: query,
-    offset,
-    size,
+  const response = await this.get({
+    url: `/service/v1/search/lives`,
+    params: {
+      keyword: query,
+      offset,
+      size,
+    },
   });
 
-  const pageResult = paginationSchema.parse(response.content);
-  const list = schema.parse(pageResult.data);
+  const { content } = responseSchema.parse(response);
+  const { data, page } = paginationSchema.parse(content);
+  const list = schema.parse(data);
 
-  return list.map((item) => ({
-    live: {
-      liveTitle: item.live.liveTitle,
-      concurrentUserCount: item.live.concurrentUserCount,
-      adult: item.live.adult,
-    },
-    channel: {
-      channelId: item.channel.channelId,
-      channelName: item.channel.channelName,
-      channelImageUrl: normalizeString(item.channel.channelImageUrl),
-      verifiedMark: item.channel.verifiedMark,
-    },
-  }));
+  return {
+    next: page?.next.offset ?? null,
+    data: list.map((item) => ({
+      live: {
+        liveTitle: item.live.liveTitle,
+        concurrentUserCount: item.live.concurrentUserCount,
+        adult: item.live.adult,
+      },
+      channel: {
+        channelId: item.channel.channelId,
+        channelName: item.channel.channelName,
+        channelImageUrl: normalizeString(item.channel.channelImageUrl),
+        verifiedMark: item.channel.verifiedMark,
+      },
+    })),
+  };
 }
