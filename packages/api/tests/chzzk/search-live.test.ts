@@ -22,10 +22,10 @@ describe("search live", () => {
   });
 
   it("pagination", async () => {
-    const { next } = await chzzk.searchLive("치지직", null, 5);
+    const { next } = await chzzk.searchLive("talk", null, 5);
     await sleep(TEST_DELAY);
 
-    const res = await chzzk.searchLive("치지직", next);
+    const res = await chzzk.searchLive("talk", next);
     expect(res.data.length).not.toBe(0);
   });
 });

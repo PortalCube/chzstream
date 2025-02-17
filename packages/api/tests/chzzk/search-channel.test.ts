@@ -22,7 +22,7 @@ describe("search channel", () => {
   });
 
   it("pagination", async () => {
-    const { next } = await chzzk.searchChannel("치지직");
+    const { next } = await chzzk.searchChannel("치지직", null, 5);
     await sleep(TEST_DELAY);
 
     const res = await chzzk.searchChannel("치지직", next);
