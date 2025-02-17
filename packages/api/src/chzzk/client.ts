@@ -11,7 +11,7 @@ import { searchChannel } from "@api/chzzk/search-channel.ts";
 export type ChzzkClientOptions = Omit<APIClientOptions, "baseUrl"> | null;
 
 export class ChzzkClient extends APIClient {
-  constructor(options: ChzzkClientOptions) {
+  constructor(options?: ChzzkClientOptions) {
     super({ ...options, baseUrl: "http://api.chzzk.naver.com" });
   }
 
