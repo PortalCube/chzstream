@@ -1,5 +1,5 @@
 import { createNanoEvents } from "nanoevents";
-import "./chzzk-embed-player.scss";
+import "@extension/utils/chzzk-embed-player.scss";
 import { PlayerControlMessageData } from "@chzstream/message";
 
 const EMBED_CLASS_NAME = "chzzk-embed-player";

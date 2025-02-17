@@ -1,4 +1,4 @@
-import "./App.css";
+import "@extension/entrypoints/popup/App.css";
 
 function App() {
   const style = {

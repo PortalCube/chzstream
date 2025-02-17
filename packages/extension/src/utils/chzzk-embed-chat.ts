@@ -1,4 +1,4 @@
-import "./chzzk-embed-chat.scss";
+import "@extension/utils/chzzk-embed-chat.scss";
 
 const EMBED_CLASS_NAME = "chzzk-embed-chat";
 
