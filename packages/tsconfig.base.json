@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+
+    /* Paths */
+    "paths": {
+      "@web/*": ["../website/src/*"],
+      "@extension/*": ["../extension/src/*"],
+      "@message/*": ["../message/src/*"],
+      "@url/*": ["../url/src/*"],
+      "@api/*": ["../api/src/*"],
+
+      "@chzstream/api": ["../api/src/index.ts"],
+      "@chzstream/message": ["../message/src/index.ts"],
+      "@chzstream/url": ["../url/src/index.ts"]
+    }
+  }
+}
