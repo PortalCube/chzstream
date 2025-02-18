@@ -1,11 +1,11 @@
 import { APIClient, APIClientOptions } from "@api/client.ts";
 
-import { getChannel } from "@api/chzzk/endpoints/get-channel";
-import { getLiveList } from "@api/chzzk/endpoints/get-live-list";
-import { getLiveStatus } from "@api/chzzk/endpoints/get-live-status";
-import { getLive } from "@api/chzzk/endpoints/get-live";
-import { searchChannel } from "@api/chzzk/endpoints/search-channel";
-import { searchLive } from "@api/chzzk/endpoints/search-live";
+import { getChannel } from "@api/chzzk/endpoints/get-channel.ts";
+import { getLiveList } from "@api/chzzk/endpoints/get-live-list.ts";
+import { getLiveStatus } from "@api/chzzk/endpoints/get-live-status.ts";
+import { getLive } from "@api/chzzk/endpoints/get-live.ts";
+import { searchChannel } from "@api/chzzk/endpoints/search-channel.ts";
+import { searchLive } from "@api/chzzk/endpoints/search-live.ts";
 
 export type ChzzkClientOptions = Omit<APIClientOptions, "baseUrl"> | null;
 export class ChzzkClient extends APIClient {
@@ -13,10 +13,10 @@ export class ChzzkClient extends APIClient {
     super({ ...options, baseUrl: "https://api.chzzk.naver.com" });
   }
 
-  getLive = getLive;
+  getChannel = getChannel;
   getLiveList = getLiveList;
   getLiveStatus = getLiveStatus;
-  getChannel = getChannel;
+  getLive = getLive;
   searchLive = searchLive;
   searchChannel = searchChannel;
 }

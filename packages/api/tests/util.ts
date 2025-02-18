@@ -1,4 +1,5 @@
 import { ChzzkClient } from "@api/chzzk/client.ts";
+import { StreamClient } from "@api/stream/client.ts";
 
 export const TEST_CHANNELS = [
   {
@@ -21,9 +22,12 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export const chzzk = new ChzzkClient({
+const CLIENT_OPTIONS = {
   headers: {
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
   },
-});
+};
+
+export const chzzkClient = new ChzzkClient(CLIENT_OPTIONS);
+export const streamClient = new StreamClient(CLIENT_OPTIONS);
