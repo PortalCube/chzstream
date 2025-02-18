@@ -28,10 +28,10 @@ export async function getChannel(
   this: ChzzkClient,
   uuid: string
 ): Promise<ChzzkGetChannelResponse> {
-  const options = {
+  const params = {
     url: `/service/v1/channels/${uuid}`,
   };
 
-  const response = await this.get(options);
+  const response = await this.get(params);
   return schema.parse(response);
 }

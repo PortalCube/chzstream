@@ -33,21 +33,27 @@ const schema = createPaginationSchema(
 
 export type ChzzkSearchChannelResponse = z.infer<typeof schema>;
 
+export type ChzzkSearchChannelOptions = {
+  query: string;
+  next?: z.infer<typeof nextSchema> | null;
+  size?: number;
+};
+
 export async function searchChannel(
   this: ChzzkClient,
-  query: string,
-  next: z.infer<typeof nextSchema> | null = null,
-  size: number = 10
+  options: ChzzkSearchChannelOptions
 ): Promise<ChzzkSearchChannelResponse> {
-  const options = {
+  const { query, next, size = 10 } = options;
+
+  const params = {
     url: `/service/v1/search/channels`,
     params: {
       ...next,
       keyword: query,
-      size,
+      size: size,
     },
   };
 
-  const response = await this.get(options);
+  const response = await this.get(params);
   return schema.parse(response);
 }

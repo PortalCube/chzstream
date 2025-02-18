@@ -43,12 +43,18 @@ const schema = createPaginationSchema(
 
 export type ChzzkGetLiveListResponse = z.infer<typeof schema>;
 
+export type ChzzkGetLiveListOptions = {
+  next?: z.infer<typeof nextSchema> | null;
+  size?: number;
+};
+
 export async function getLiveList(
   this: ChzzkClient,
-  next: z.infer<typeof nextSchema> | null = null,
-  size: number = 10
+  options?: ChzzkGetLiveListOptions | null
 ): Promise<ChzzkGetLiveListResponse> {
-  const options = {
+  const { next = null, size = 10 } = options ?? {};
+
+  const params = {
     url: `/service/v1/lives`,
     params: {
       ...next,
@@ -57,6 +63,6 @@ export async function getLiveList(
     },
   };
 
-  const response = await this.get(options);
+  const response = await this.get(params);
   return schema.parse(response);
 }

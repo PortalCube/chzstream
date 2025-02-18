@@ -59,10 +59,10 @@ export async function getLive(
   this: ChzzkClient,
   uuid: string
 ): Promise<ChzzkGetLiveResponse> {
-  const options = {
+  const params = {
     url: `/service/v3/channels/${uuid}/live-detail`,
   };
 
-  const response = await this.get(options);
+  const response = await this.get(params);
   return schema.parse(response);
 }

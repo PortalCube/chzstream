@@ -8,7 +8,7 @@ describe("get live list", () => {
   });
 
   it("must return live list", async () => {
-    const res = await chzzk.getLiveList(null, 5);
+    const res = await chzzk.getLiveList({ size: 5 });
 
     expect(res.code).toBe(200);
     expect(res.content.page).not.toBeNull();
@@ -16,7 +16,7 @@ describe("get live list", () => {
   });
 
   it("pagination", async () => {
-    const res1 = await chzzk.getLiveList(null, 5);
+    const res1 = await chzzk.getLiveList({ size: 5 });
     expect(res1.code).toBe(200);
     expect(res1.content.page).not.toBeNull();
     expect(res1.content.data.length).not.toBe(0);
@@ -25,7 +25,7 @@ describe("get live list", () => {
 
     const next = res1.content.page?.next;
 
-    const res2 = await chzzk.getLiveList(next, 5);
+    const res2 = await chzzk.getLiveList({ next, size: 5 });
     expect(res2.code).toBe(200);
     expect(res2.content.page).not.toBeNull();
     expect(res2.content.data.length).not.toBe(0);

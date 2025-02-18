@@ -9,7 +9,10 @@ describe("search live", () => {
 
   ["talk", "리그 오브 레전드"].forEach((query, index) => {
     it(`common query ${index + 1}`, async () => {
-      const res = await chzzk.searchLive(query, null, 5);
+      const res = await chzzk.searchLive({
+        query,
+        size: 5,
+      });
 
       expect(res.code).toBe(200);
       expect(res.content.page).not.toBeNull();
@@ -18,11 +21,16 @@ describe("search live", () => {
   });
 
   it("empty query", async () => {
-    await expect(() => chzzk.searchLive("")).rejects.toThrowError("400");
+    await expect(() => chzzk.searchLive({ query: "" })).rejects.toThrowError(
+      "400"
+    );
   });
 
   it("pagination", async () => {
-    const res1 = await chzzk.searchLive("talk", null, 5);
+    const res1 = await chzzk.searchLive({
+      query: "talk",
+      size: 5,
+    });
     expect(res1.code).toBe(200);
     expect(res1.content.page).not.toBeNull();
     expect(res1.content.data.length).not.toBe(0);
@@ -31,7 +39,11 @@ describe("search live", () => {
 
     const next = res1.content.page?.next;
 
-    const res2 = await chzzk.searchLive("talk", next, 5);
+    const res2 = await chzzk.searchLive({
+      query: "talk",
+      size: 5,
+      next,
+    });
     expect(res2.code).toBe(200);
     expect(res2.content.page).not.toBeNull();
     expect(res2.content.data.length).not.toBe(0);

@@ -47,13 +47,19 @@ const schema = createPaginationSchema(
 
 export type ChzzkSearchLiveResponse = z.infer<typeof schema>;
 
+export type ChzzkSearchLiveOptions = {
+  query: string;
+  next?: z.infer<typeof nextSchema> | null;
+  size?: number;
+};
+
 export async function searchLive(
   this: ChzzkClient,
-  query: string,
-  next: z.infer<typeof nextSchema> | null = null,
-  size: number = 10
+  options: ChzzkSearchLiveOptions
 ): Promise<ChzzkSearchLiveResponse> {
-  const options = {
+  const { query, next, size = 10 } = options;
+
+  const params = {
     url: `/service/v1/search/lives`,
     params: {
       ...next,
@@ -62,6 +68,6 @@ export async function searchLive(
     },
   };
 
-  const response = await this.get(options);
+  const response = await this.get(params);
   return schema.parse(response);
 }

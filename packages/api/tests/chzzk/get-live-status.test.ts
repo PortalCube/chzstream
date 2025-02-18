@@ -15,14 +15,15 @@ describe("get live status", () => {
   });
 
   it("must return live status", async () => {
-    const listResponse = await chzzk.getLiveList();
+    const listResponse = await chzzk.getLiveList({ size: 5 });
     const target = listResponse.content.data[0];
 
     await sleep(TEST_DELAY);
     const res = await chzzk.getLiveStatus(target.channel.channelId);
 
     expect(res.code).toBe(200);
-    expect(res.content.liveTitle).toBe(target.liveTitle);
+    expect(res.content).not.toBeNull();
+    expect(res.content!.liveTitle).toBe(target.liveTitle);
   });
 
   it("blank id", async () => {

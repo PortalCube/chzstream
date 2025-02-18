@@ -50,10 +50,10 @@ export async function getLiveStatus(
   this: ChzzkClient,
   uuid: string
 ): Promise<ChzzkGetLiveStatusResponse> {
-  const options = {
+  const params = {
     url: `/polling/v3/channels/${uuid}/live-status`,
   };
 
-  const response = await this.get(options);
+  const response = await this.get(params);
   return schema.parse(response);
 }
