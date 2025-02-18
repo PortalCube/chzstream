@@ -10,26 +10,19 @@ describe("get live", () => {
   TEST_CHANNELS.forEach(({ id }, index) => {
     it(`common id ${index + 1}`, async () => {
       const res = await chzzk.getLive(id);
-
-      // 최근에 방송을 킨 적이 없음
-      if (res === null) {
-        return;
-      }
-
-      expect(res?.channel.channelId).toBe(id);
+      expect(res.code).toBe(200);
     });
   });
 
   it("must return live", async () => {
-    const { data } = await chzzk.getLiveList();
-    const id = data[0].channel.channelId;
+    const listResponse = await chzzk.getLiveList();
+    const target = listResponse.content.data[0];
 
     await sleep(TEST_DELAY);
-    const res = await chzzk.getLive(id);
+    const res = await chzzk.getLive(target.channel.channelId);
 
-    expect(res).not.toBeNull();
-    expect(res?.channel.channelId).toBe(id);
-    expect(res?.channel.channelName).not.toBe("");
+    expect(res.code).toBe(200);
+    expect(res.content.liveTitle).toBe(target.liveTitle);
   });
 
   it("blank id", async () => {

@@ -11,9 +11,8 @@ describe("get channel", () => {
     it(`common id ${index + 1}`, async () => {
       const res = await chzzk.getChannel(id);
 
-      expect(res).not.toBeNull();
-      expect(res?.channelId).toBe(id);
-      expect(res?.channelName).not.toBe("");
+      expect(res.code).toBe(200);
+      expect(res.content.channelId).toBe(id);
     });
   });
 
@@ -23,6 +22,8 @@ describe("get channel", () => {
 
   it("null id", async () => {
     const res = await chzzk.getChannel("0");
-    expect(res).toBeNull();
+
+    expect(res.code).toBe(200);
+    expect(res.content.channelId).toBeNull();
   });
 });

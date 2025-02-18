@@ -9,15 +9,20 @@ describe("get live status", () => {
 
   TEST_CHANNELS.forEach(({ id }, index) => {
     it(`common id ${index + 1}`, async () => {
-      // expect no error
-      await chzzk.getLiveStatus(id);
+      const res = await chzzk.getLiveStatus(id);
+      expect(res.code).toBe(200);
     });
   });
 
   it("must return live status", async () => {
-    const { data } = await chzzk.getLiveList();
-    const res = await chzzk.getLiveStatus(data[0].channel.channelId);
-    expect(res).not.toBeNull();
+    const listResponse = await chzzk.getLiveList();
+    const target = listResponse.content.data[0];
+
+    await sleep(TEST_DELAY);
+    const res = await chzzk.getLiveStatus(target.channel.channelId);
+
+    expect(res.code).toBe(200);
+    expect(res.content.liveTitle).toBe(target.liveTitle);
   });
 
   it("blank id", async () => {

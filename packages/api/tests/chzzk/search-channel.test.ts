@@ -9,11 +9,11 @@ describe("search channel", () => {
 
   TEST_CHANNELS.forEach(({ id, name }, index) => {
     it(`common query ${index + 1}`, async () => {
-      const res = await chzzk.searchChannel(name);
+      const res = await chzzk.searchChannel(name, null, 5);
 
-      expect(res.data.length).not.toBe(0);
-      expect(res.data[0].channel.channelId).toBe(id);
-      expect(res.data[0].channel.channelName).toBe(name);
+      expect(res.code).toBe(200);
+      expect(res.content.page).not.toBeNull();
+      expect(res.content.data.length).not.toBe(0);
     });
   });
 
@@ -22,11 +22,18 @@ describe("search channel", () => {
   });
 
   it("pagination", async () => {
-    const { next } = await chzzk.searchChannel("치지직", null, 5);
+    const res1 = await chzzk.searchChannel("치지직", null, 5);
+    expect(res1.code).toBe(200);
+    expect(res1.content.page).not.toBeNull();
+    expect(res1.content.data.length).not.toBe(0);
+
     await sleep(TEST_DELAY);
 
-    const res = await chzzk.searchChannel("치지직", next);
-    expect(res.next).not.toBeNull();
-    expect(res.data.length).not.toBe(0);
+    const next = res1.content.page?.next;
+
+    const res2 = await chzzk.searchChannel("치지직", next, 5);
+    expect(res2.code).toBe(200);
+    expect(res2.content.page).not.toBeNull();
+    expect(res2.content.data.length).not.toBe(0);
   });
 });

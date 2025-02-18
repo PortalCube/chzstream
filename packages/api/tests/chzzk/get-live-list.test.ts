@@ -8,17 +8,26 @@ describe("get live list", () => {
   });
 
   it("must return live list", async () => {
-    const res = await chzzk.getLiveList();
-    expect(res.next).not.toBeNull();
-    expect(res.data.length).not.toBe(0);
+    const res = await chzzk.getLiveList(null, 5);
+
+    expect(res.code).toBe(200);
+    expect(res.content.page).not.toBeNull();
+    expect(res.content.data.length).not.toBe(0);
   });
 
   it("pagination", async () => {
-    const { next } = await chzzk.getLiveList();
+    const res1 = await chzzk.getLiveList(null, 5);
+    expect(res1.code).toBe(200);
+    expect(res1.content.page).not.toBeNull();
+    expect(res1.content.data.length).not.toBe(0);
+
     await sleep(TEST_DELAY);
 
-    const res = await chzzk.getLiveList(next);
-    expect(res.next).not.toBeNull();
-    expect(res.data.length).not.toBe(0);
+    const next = res1.content.page?.next;
+
+    const res2 = await chzzk.getLiveList(next, 5);
+    expect(res2.code).toBe(200);
+    expect(res2.content.page).not.toBeNull();
+    expect(res2.content.data.length).not.toBe(0);
   });
 });

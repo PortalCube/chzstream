@@ -7,14 +7,14 @@ describe("search live", () => {
     await sleep(TEST_DELAY);
   });
 
-  it(`common query 1`, async () => {
-    const res = await chzzk.searchLive("talk");
-    expect(res.data.length).not.toBe(0);
-  });
+  ["talk", "리그 오브 레전드"].forEach((query, index) => {
+    it(`common query ${index + 1}`, async () => {
+      const res = await chzzk.searchLive(query, null, 5);
 
-  it(`common query 2`, async () => {
-    const res = await chzzk.searchLive("리그 오브 레전드");
-    expect(res.data.length).not.toBe(0);
+      expect(res.code).toBe(200);
+      expect(res.content.page).not.toBeNull();
+      expect(res.content.data.length).not.toBe(0);
+    });
   });
 
   it("empty query", async () => {
@@ -22,10 +22,18 @@ describe("search live", () => {
   });
 
   it("pagination", async () => {
-    const { next } = await chzzk.searchLive("talk", null, 5);
+    const res1 = await chzzk.searchLive("talk", null, 5);
+    expect(res1.code).toBe(200);
+    expect(res1.content.page).not.toBeNull();
+    expect(res1.content.data.length).not.toBe(0);
+
     await sleep(TEST_DELAY);
 
-    const res = await chzzk.searchLive("talk", next);
-    expect(res.data.length).not.toBe(0);
+    const next = res1.content.page?.next;
+
+    const res2 = await chzzk.searchLive("talk", next, 5);
+    expect(res2.code).toBe(200);
+    expect(res2.content.page).not.toBeNull();
+    expect(res2.content.data.length).not.toBe(0);
   });
 });

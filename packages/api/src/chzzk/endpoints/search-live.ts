@@ -1,12 +1,12 @@
-import {
-  ChzzkClient,
-  paginationSchema,
-  responseSchema,
-} from "@api/chzzk/client.ts";
-import { normalizeString } from "@api/util.ts";
+import { ChzzkClient } from "@api/chzzk/client.ts";
+import { createPaginationSchema } from "@api/chzzk/schema.ts";
 import { z } from "zod";
 
-const schema = z.array(
+const nextSchema = z.object({
+  offset: z.number(),
+});
+
+const schema = createPaginationSchema(
   z.object({
     live: z.object({
       liveTitle: z.string(),
@@ -41,59 +41,27 @@ const schema = z.array(
         })
         .optional(),
     }),
-  })
+  }),
+  nextSchema
 );
 
-export type SearchLiveResponse = {
-  next: number | null;
-  data: {
-    live: {
-      liveTitle: string;
-      concurrentUserCount: number;
-      adult: boolean;
-    };
-    channel: {
-      channelId: string;
-      channelName: string;
-      channelImageUrl: string | null;
-      verifiedMark: boolean;
-    };
-  }[];
-};
+export type ChzzkSearchLiveResponse = z.infer<typeof schema>;
 
 export async function searchLive(
   this: ChzzkClient,
   query: string,
-  offset: number | null = 0,
-  size: number = 50
-): Promise<SearchLiveResponse> {
-  const response = await this.get({
+  next: z.infer<typeof nextSchema> | null = null,
+  size: number = 10
+): Promise<ChzzkSearchLiveResponse> {
+  const options = {
     url: `/service/v1/search/lives`,
     params: {
+      ...next,
       keyword: query,
-      offset,
       size,
     },
-  });
-
-  const { content } = responseSchema.parse(response);
-  const { data, page } = paginationSchema.parse(content);
-  const list = schema.parse(data);
-
-  return {
-    next: page?.next.offset ?? null,
-    data: list.map((item) => ({
-      live: {
-        liveTitle: item.live.liveTitle,
-        concurrentUserCount: item.live.concurrentUserCount,
-        adult: item.live.adult,
-      },
-      channel: {
-        channelId: item.channel.channelId,
-        channelName: item.channel.channelName,
-        channelImageUrl: normalizeString(item.channel.channelImageUrl),
-        verifiedMark: item.channel.verifiedMark,
-      },
-    })),
   };
+
+  const response = await this.get(options);
+  return schema.parse(response);
 }
