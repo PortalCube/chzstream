@@ -64,6 +64,9 @@ function Channel({ uuid, index, gap }: ChannelProps) {
       const data = await requestChzzkChannelInfo(uuid);
 
       if (data === null) {
+        setName("알 수 없음");
+        setIconUrl(getProfileImageUrl());
+        setActive(false);
         return;
       }
 

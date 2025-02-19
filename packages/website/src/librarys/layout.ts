@@ -9,6 +9,7 @@ import {
   blockListAtom,
   layoutModeAtom,
   nextBlockIdAtom,
+  restrictedModeAtom,
 } from "@web/librarys/app.ts";
 import {
   Block,
@@ -179,6 +180,23 @@ export const fetchChzzkChannelAtom = atom(
 
     if (block === undefined) {
       throw new Error(`Block not found: ${id}`);
+    }
+
+    const restrictedMode = get(restrictedModeAtom);
+
+    if (restrictedMode === true) {
+      set(modifyBlockAtom, {
+        id,
+        channel: {
+          uuid: uuid,
+          name: "알 수 없음",
+          title: "제한 모드에서는 채널 정보를 불러올 수 없습니다",
+          thumbnailUrl: "",
+          iconUrl: getProfileImageUrl(),
+          lastUpdate: null,
+        },
+      });
+      return;
     }
 
     const channel: BlockChannel = {
