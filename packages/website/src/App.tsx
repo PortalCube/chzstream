@@ -58,9 +58,7 @@ function App() {
   useEffect(() => {
     loadDefaultMixer();
 
-    if (MessageClient.active === false) {
-      setRestrictedMode(true);
-    }
+    setRestrictedMode(MessageClient.active === false);
   });
 
   return (
