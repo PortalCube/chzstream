@@ -75,9 +75,6 @@ importers:
 
   packages/extension:
     dependencies:
-      '@chzstream/api':
-        specifier: workspace:^
-        version: link:../api
       '@chzstream/message':
         specifier: workspace:^
         version: link:../message

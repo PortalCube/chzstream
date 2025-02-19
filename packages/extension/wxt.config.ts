@@ -90,8 +90,8 @@ function modifyTsConfig(_wxt: Wxt, entries: WxtDirEntry[]) {
 
   const tsConfig = JSON.parse(file.text);
 
-  // monorepo의 tsconfig.app.json을 확장하도록 수정
-  tsConfig.extends = "../../tsconfig.app.json";
+  // extension repo의 tsconfig.app.json을 확장하도록 수정
+  tsConfig.extends = "../tsconfig.app.json";
 
   // 강제로 정의된 path alias 제거
   delete tsConfig.compilerOptions.paths;
