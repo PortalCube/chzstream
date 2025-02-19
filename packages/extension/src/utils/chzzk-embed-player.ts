@@ -278,7 +278,8 @@ function setQuality(value: number) {
   }
 
   if (selectedElement === null) return;
-  selectedElement.click();
+  selectedElement.dispatchEvent(new Event("focus"));
+  selectedElement.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
 }
 
 function sleep(ms: number) {
