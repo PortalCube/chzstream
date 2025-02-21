@@ -8,12 +8,8 @@ import {
   PlayerControlMessageData,
   PlayerEventType,
 } from "@chzstream/message";
-import { getNumberParam } from "@extension/utils/url.ts";
 
 const client = new IframeClient();
-
-const parentId: number | null = getNumberParam("_csp");
-const iframeId: number | null = getNumberParam("_csi");
 
 function isNumber(value: number | null): value is number {
   return value !== null;
