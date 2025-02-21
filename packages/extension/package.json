@@ -21,6 +21,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@chzstream/api": "workspace:^",
     "@chzstream/message": "workspace:^",
     "axios": "^1.7.9",
     "keyv": "^5.2.3",
