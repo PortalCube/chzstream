@@ -4,7 +4,7 @@ import {
   CreateMessageOptions,
   isMessage,
   Message,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
 const MESSAGE_KEY = "_isHeartbeatMessage";
 

@@ -4,24 +4,24 @@ import {
   CreateMessageOptions,
   isMessage,
   Message,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
-const MESSAGE_KEY = "_isIframePointerMoveMessage";
+const MESSAGE_KEY = "_isHandshakeResponseMessage";
 
-export type IframePointerMoveMessageData = {
-  clientX: number;
-  clientY: number;
+export type HandshakeResponseMessageData = {
+  version: string;
+  id: number;
 };
 
-export type IframePointerMoveMessage = Message & {
+export type HandshakeResponseMessage = Message & {
   data: {
     [MESSAGE_KEY]: true;
-  } & IframePointerMoveMessageData;
+  } & HandshakeResponseMessageData;
 };
 
-export function isIframePointerMoveMessage(
+export function isHandshakeResponseMessage(
   message: unknown
-): message is IframePointerMoveMessage {
+): message is HandshakeResponseMessage {
   if (isMessage(message) === false) {
     return false;
   }
@@ -33,10 +33,10 @@ export function isIframePointerMoveMessage(
   return true;
 }
 
-export function createIframePointerMoveMessage(
+export function createHandshakeResponseMessage(
   options: CreateMessageOptions,
-  data: IframePointerMoveMessageData
-): IframePointerMoveMessage {
+  data: HandshakeResponseMessageData
+): HandshakeResponseMessage {
   return {
     ...createMessage(options),
     data: {

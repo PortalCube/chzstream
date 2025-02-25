@@ -1,13 +1,13 @@
 import { createNanoEvents } from "nanoevents";
-import { isMessage, ReceiverType } from "@message/messages/base.ts";
+import { isMessage, ReceiverType } from "@message/old/messages/base";
 import {
   createHandshakeRequestMessage,
   isHandshakeResponseMessage,
   isPlayerControlMessage,
   Message,
   PlayerControlMessage,
-} from "@message/messages/index.ts";
-import { browser, ClientType } from "@message/clients/base.ts";
+} from "@message/old/messages";
+import { browser, ClientType } from "@message/old/clients/base";
 
 export type IframeClientEvent = {
   message: (message: Message) => void;

@@ -1,11 +1,11 @@
-import { ClientType, MESSAGE_VERSION } from "@message/clients/base.ts";
+import { ClientType, MESSAGE_VERSION } from "@message/old/clients/base";
 import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
   isMessage,
   Message,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
 const MESSAGE_KEY = "_isHandshakeRequestMessage";
 

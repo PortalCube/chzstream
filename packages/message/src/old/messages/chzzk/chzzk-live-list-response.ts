@@ -1,17 +1,19 @@
-import { createMessage, CreateMessageOptions } from "@message/messages/base.ts";
+import {
+  createMessage,
+  CreateMessageOptions,
+} from "@message/old/messages/base";
 import {
   ChzzkServiceMessage,
   ChzzkServiceMessageType,
   ChzzkServiceType,
   isChzzkServiceMessage,
-} from "@message/messages/chzzk/chzzk.ts";
+} from "@message/old/messages/chzzk/chzzk";
 
-export type ChzzkLiveSearchResponse = {
-  live: {
-    liveTitle: string;
-    concurrentUserCount: number;
-    adult: boolean;
-  };
+export type ChzzkLiveListResponse = {
+  liveId: number;
+  liveTitle: string;
+  concurrentUserCount: number;
+  adult: boolean;
   channel: {
     channelId: string;
     channelName: string;
@@ -20,22 +22,22 @@ export type ChzzkLiveSearchResponse = {
   };
 }[];
 
-export type ChzzkLiveSearchResponseMessage = ChzzkServiceMessage & {
+export type ChzzkLiveListResponseMessage = ChzzkServiceMessage & {
   data: {
-    serviceType: ChzzkServiceType.LiveSearch;
+    serviceType: ChzzkServiceType.LiveList;
     messageType: ChzzkServiceMessageType.Response;
-    body: ChzzkLiveSearchResponse;
+    body: ChzzkLiveListResponse;
   };
 };
 
-export function isChzzkLiveSearchResponseMessage(
+export function isChzzkLiveListResponseMessage(
   message: unknown
-): message is ChzzkLiveSearchResponseMessage {
+): message is ChzzkLiveListResponseMessage {
   if (isChzzkServiceMessage(message) === false) {
     return false;
   }
 
-  if (message.data.serviceType !== ChzzkServiceType.LiveSearch) {
+  if (message.data.serviceType !== ChzzkServiceType.LiveList) {
     return false;
   }
 
@@ -46,15 +48,15 @@ export function isChzzkLiveSearchResponseMessage(
   return true;
 }
 
-export function createChzzkLiveSearchResponseMessage(
+export function createChzzkLiveListResponseMessage(
   options: CreateMessageOptions,
-  body: ChzzkLiveSearchResponse
-): ChzzkLiveSearchResponseMessage {
+  body: ChzzkLiveListResponse
+): ChzzkLiveListResponseMessage {
   return {
     ...createMessage(options),
     data: {
       _isChzzkServiceMessage: true,
-      serviceType: ChzzkServiceType.LiveSearch,
+      serviceType: ChzzkServiceType.LiveList,
       messageType: ChzzkServiceMessageType.Response,
       body,
     },

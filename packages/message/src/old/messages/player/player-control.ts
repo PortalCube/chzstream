@@ -4,23 +4,25 @@ import {
   CreateMessageOptions,
   isMessage,
   Message,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
-const MESSAGE_KEY = "_isHandshakeIframeMessage";
+const MESSAGE_KEY = "_isPlayerControlMessage";
 
-export type HandshakeIframeMessageData = {
-  iframeId: number;
+export type PlayerControlMessageData = {
+  quality?: number;
+  volume?: number;
+  muted?: boolean;
 };
 
-export type HandshakeIframeMessage = Message & {
+export type PlayerControlMessage = Message & {
   data: {
     [MESSAGE_KEY]: true;
-  } & HandshakeIframeMessageData;
+  } & PlayerControlMessageData;
 };
 
-export function isHandshakeIframeMessage(
+export function isPlayerControlMessage(
   message: unknown
-): message is HandshakeIframeMessage {
+): message is PlayerControlMessage {
   if (isMessage(message) === false) {
     return false;
   }
@@ -32,10 +34,10 @@ export function isHandshakeIframeMessage(
   return true;
 }
 
-export function createHandshakeIframeMessage(
+export function createPlayerControlMessage(
   options: CreateMessageOptions,
-  data: HandshakeIframeMessageData
-): HandshakeIframeMessage {
+  data: PlayerControlMessageData
+): PlayerControlMessage {
   return {
     ...createMessage(options),
     data: {

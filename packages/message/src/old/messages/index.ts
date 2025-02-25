@@ -3,177 +3,177 @@ export {
   ReceiverType,
   MessageType,
   isMessage,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 export type {
   Message,
   Receiver,
   CreateMessageOptions,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
 // HandshakeRequest
 export {
   isHandshakeRequestMessage,
   createHandshakeRequestMessage,
-} from "@message/messages/handshake/handshake-request.ts";
+} from "@message/old/messages/handshake/handshake-request";
 export type {
   HandshakeRequestMessage,
   HandshakeRequestMessageData,
-} from "@message/messages/handshake/handshake-request.ts";
+} from "@message/old/messages/handshake/handshake-request";
 
 // HandshakeResponse
 export {
   isHandshakeResponseMessage,
   createHandshakeResponseMessage,
-} from "@message/messages/handshake/handshake-response.ts";
+} from "@message/old/messages/handshake/handshake-response";
 export type {
   HandshakeResponseMessage,
   HandshakeResponseMessageData,
-} from "@message/messages/handshake/handshake-response.ts";
+} from "@message/old/messages/handshake/handshake-response";
 
 // HandshakeIframe
 export {
   isHandshakeIframeMessage,
   createHandshakeIframeMessage,
-} from "@message/messages/handshake/handshake-iframe.ts";
+} from "@message/old/messages/handshake/handshake-iframe";
 export type {
   HandshakeIframeMessage,
   HandshakeIframeMessageData,
-} from "@message/messages/handshake/handshake-iframe.ts";
+} from "@message/old/messages/handshake/handshake-iframe";
 
 // Heartbeat
 export {
   isHeartbeatMessage,
   createHeartbeatMessage,
-} from "@message/messages/heartbeat/heartbeat.ts";
-export type { HeartbeatMessage } from "@message/messages/heartbeat/heartbeat.ts";
+} from "@message/old/messages/heartbeat/heartbeat";
+export type { HeartbeatMessage } from "@message/old/messages/heartbeat/heartbeat";
 
 // ChzzkChannelInfoRequest
 export {
   isChzzkChannelInfoRequestMessage,
   createChzzkChannelInfoRequestMessage,
-} from "@message/messages/chzzk/chzzk-channel-info-request.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-info-request";
 export type {
   ChzzkChannelInfoRequest,
   ChzzkChannelInfoRequestMessage,
-} from "@message/messages/chzzk/chzzk-channel-info-request.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-info-request";
 
 // ChzzkChannelInfoResponse
 export {
   isChzzkChannelInfoResponseMessage,
   createChzzkChannelInfoResponseMessage,
-} from "@message/messages/chzzk/chzzk-channel-info-response.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-info-response";
 export type {
   ChzzkChannelInfoResponse,
   ChzzkChannelInfoResponseMessage,
-} from "@message/messages/chzzk/chzzk-channel-info-response.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-info-response";
 
 // ChzzkLiveInfoRequest
 export {
   isChzzkLiveInfoRequestMessage,
   createChzzkLiveInfoRequestMessage,
-} from "@message/messages/chzzk/chzzk-live-info-request.ts";
+} from "@message/old/messages/chzzk/chzzk-live-info-request";
 export type {
   ChzzkLiveInfoRequest,
   ChzzkLiveInfoRequestMessage,
-} from "@message/messages/chzzk/chzzk-live-info-request.ts";
+} from "@message/old/messages/chzzk/chzzk-live-info-request";
 
 // ChzzkLiveInfoResponse
 export {
   isChzzkLiveInfoResponseMessage,
   createChzzkLiveInfoResponseMessage,
-} from "@message/messages/chzzk/chzzk-live-info-response.ts";
+} from "@message/old/messages/chzzk/chzzk-live-info-response";
 export type {
   ChzzkLiveInfoResponse,
   ChzzkLiveInfoResponseMessage,
-} from "@message/messages/chzzk/chzzk-live-info-response.ts";
+} from "@message/old/messages/chzzk/chzzk-live-info-response";
 
 // ChzzkLiveSearchRequest
 export {
   isChzzkLiveSearchRequestMessage,
   createChzzkLiveSearchRequestMessage,
-} from "@message/messages/chzzk/chzzk-live-search-request.ts";
+} from "@message/old/messages/chzzk/chzzk-live-search-request";
 export type {
   ChzzkLiveSearchRequest,
   ChzzkLiveSearchRequestMessage,
-} from "@message/messages/chzzk/chzzk-live-search-request.ts";
+} from "@message/old/messages/chzzk/chzzk-live-search-request";
 
 // ChzzkLiveSearchResponse
 export {
   isChzzkLiveSearchResponseMessage,
   createChzzkLiveSearchResponseMessage,
-} from "@message/messages/chzzk/chzzk-live-search-response.ts";
+} from "@message/old/messages/chzzk/chzzk-live-search-response";
 export type {
   ChzzkLiveSearchResponse,
   ChzzkLiveSearchResponseMessage,
-} from "@message/messages/chzzk/chzzk-live-search-response.ts";
+} from "@message/old/messages/chzzk/chzzk-live-search-response";
 
 // ChzzkLiveListRequest
 export {
   isChzzkLiveListRequestMessage,
   createChzzkLiveListRequestMessage,
-} from "@message/messages/chzzk/chzzk-live-list-request.ts";
+} from "@message/old/messages/chzzk/chzzk-live-list-request";
 export type {
   ChzzkLiveListRequest,
   ChzzkLiveListRequestMessage,
-} from "@message/messages/chzzk/chzzk-live-list-request.ts";
+} from "@message/old/messages/chzzk/chzzk-live-list-request";
 
 // ChzzkLiveListResponse
 export {
   isChzzkLiveListResponseMessage,
   createChzzkLiveListResponseMessage,
-} from "@message/messages/chzzk/chzzk-live-list-response.ts";
+} from "@message/old/messages/chzzk/chzzk-live-list-response";
 export type {
   ChzzkLiveListResponse,
   ChzzkLiveListResponseMessage,
-} from "@message/messages/chzzk/chzzk-live-list-response.ts";
+} from "@message/old/messages/chzzk/chzzk-live-list-response";
 
 // ChzzkChannelSearchRequest
 export {
   isChzzkChannelSearchRequestMessage,
   createChzzkChannelSearchRequestMessage,
-} from "@message/messages/chzzk/chzzk-channel-search-request.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-search-request";
 export type {
   ChzzkChannelSearchRequest,
   ChzzkChannelSearchRequestMessage,
-} from "@message/messages/chzzk/chzzk-channel-search-request.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-search-request";
 
 // ChzzkChannelSearchResponse
 export {
   isChzzkChannelSearchResponseMessage,
   createChzzkChannelSearchResponseMessage,
-} from "@message/messages/chzzk/chzzk-channel-search-response.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-search-response";
 export type {
   ChzzkChannelSearchResponse,
   ChzzkChannelSearchResponseMessage,
-} from "@message/messages/chzzk/chzzk-channel-search-response.ts";
+} from "@message/old/messages/chzzk/chzzk-channel-search-response";
 
 // PlayerEvent
 export {
   isPlayerEventMessage,
   createPlayerEventMessage,
   PlayerEventType,
-} from "@message/messages/player/player.ts";
+} from "@message/old/messages/player/player";
 export type {
   PlayerEventMessage,
   PlayerEventMessageData,
-} from "@message/messages/player/player.ts";
+} from "@message/old/messages/player/player";
 
 // IframePointerMove
 export {
   isIframePointerMoveMessage,
   createIframePointerMoveMessage,
-} from "@message/messages/player/iframe-pointer-move.ts";
+} from "@message/old/messages/player/iframe-pointer-move";
 export type {
   IframePointerMoveMessage,
   IframePointerMoveMessageData,
-} from "@message/messages/player/iframe-pointer-move.ts";
+} from "@message/old/messages/player/iframe-pointer-move";
 
 // PlayerControl
 export {
   isPlayerControlMessage,
   createPlayerControlMessage,
-} from "@message/messages/player/player-control.ts";
+} from "@message/old/messages/player/player-control";
 export type {
   PlayerControlMessage,
   PlayerControlMessageData,
-} from "@message/messages/player/player-control.ts";
+} from "@message/old/messages/player/player-control";

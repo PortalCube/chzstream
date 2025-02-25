@@ -1,10 +1,13 @@
-import { createMessage, CreateMessageOptions } from "@message/messages/base.ts";
+import {
+  createMessage,
+  CreateMessageOptions,
+} from "@message/old/messages/base";
 import {
   ChzzkServiceMessage,
   ChzzkServiceMessageType,
   ChzzkServiceType,
   isChzzkServiceMessage,
-} from "@message/messages/chzzk/chzzk.ts";
+} from "@message/old/messages/chzzk/chzzk";
 
 export type ChzzkChannelSearchRequest = {
   size?: number;

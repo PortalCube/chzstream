@@ -1,8 +1,4 @@
-import {
-  isMessage,
-  MessageType,
-  ReceiverType,
-} from "@message/messages/base.ts";
+import { isMessage, ReceiverType } from "@message/old/messages/base";
 import {
   createHandshakeRequestMessage,
   createHeartbeatMessage,
@@ -11,20 +7,21 @@ import {
   isHandshakeIframeMessage,
   isHandshakeResponseMessage,
   isIframePointerMoveMessage,
+  isPlayerControlMessage,
   isPlayerEventMessage,
   Message,
-} from "@message/messages/index.ts";
+} from "@message/old/messages";
 import {
+  browser,
   ClientMessageEvent,
   ClientType,
+  WEB_EXTENSION_ID,
   WebsiteClientEventMap,
   WebsiteClientEventTarget,
   WebsiteClientInterface,
-} from "@message/clients/base.ts";
+} from "@message/old/clients/base";
 
-// https://bugzilla.mozilla.org/show_bug.cgi?id=1319168
-
-export class WindowClient
+export class WebsiteClient
   extends WebsiteClientEventTarget
   implements WebsiteClientInterface
 {
@@ -37,13 +34,12 @@ export class WindowClient
   }
 
   get active() {
-    return this.#active === true;
+    return this.#port !== null;
   }
 
-  #name: string = "window-client";
+  #name: string = "website-client";
   #id: number | null = null;
-  #active: boolean = false;
-  #origin: string = "";
+  #port: chrome.runtime.Port | null = null;
   #heartbeatInterval: number | null = null;
 
   constructor() {
@@ -51,14 +47,43 @@ export class WindowClient
   }
 
   async connect() {
-    if (this.#active === true) {
+    if (this.#port !== null) {
       return;
     }
 
-    const url = new URL(window.location.href);
-    this.#origin = url.origin;
+    for (const id of WEB_EXTENSION_ID) {
+      try {
+        await browser.runtime.sendMessage(id, "");
 
-    window.addEventListener("message", this.#onMessage.bind(this));
+        this.#port = browser.runtime.connect(id, {
+          name: this.#name,
+        });
+
+        break;
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e.message);
+
+          if (e.message.includes("Invalid extension id")) {
+            continue;
+          }
+
+          if (e.message.includes("Could not establish connection")) {
+            continue;
+          }
+        }
+
+        throw e;
+      }
+    }
+
+    if (this.#port === null) {
+      console.error("[website-client] 확장프로그램에 연결하지 못했습니다");
+      return;
+    }
+
+    this.#port.onMessage.addListener(this.#onMessage.bind(this));
+    this.#port.onDisconnect.addListener(this.#onDisconnect.bind(this));
 
     const handshakeMessage = createHandshakeRequestMessage(
       {
@@ -68,43 +93,30 @@ export class WindowClient
       ClientType.Website
     );
 
-    try {
-      const response = await this.request(
-        handshakeMessage,
-        isHandshakeResponseMessage,
-        1000,
-        true
-      );
-
-      this.#id = response.data.id;
-    } catch (_e) {
-      return;
-    }
+    const response = await this.request(
+      handshakeMessage,
+      isHandshakeResponseMessage
+    );
+    this.#id = response.data.id;
 
     this.#heartbeatInterval = window.setInterval(
       this.#heartbeat.bind(this),
       25000
     );
 
-    this.#active = true;
-
     return;
   }
 
   disconnect() {
-    if (this.#active === false) {
+    if (this.#port === null) {
       return;
     }
-
-    this.#active = false;
 
     if (this.#heartbeatInterval) {
       window.clearInterval(this.#heartbeatInterval as number);
     }
 
-    window.removeEventListener("message", this.#onMessage.bind(this));
-
-    this.dispatchTypedEvent("disconnect", new CustomEvent("disconnect"));
+    this.#port.disconnect();
   }
 
   async #heartbeat() {
@@ -116,24 +128,20 @@ export class WindowClient
     this.send(heartbeatMessage);
   }
 
-  send(message: Message, force: boolean = false) {
-    if (force === false && this.#active === false) {
+  send(message: Message) {
+    if (this.#port === null) {
       return;
     }
 
-    message.type = MessageType.Request;
-
-    window.postMessage(message, this.#origin);
+    this.#port.postMessage(message);
   }
 
   request<T extends Message, K extends Message>(
     message: T,
-    isMessage: (message: Message) => message is K,
-    timeout: number = 10000,
-    force: boolean = false
+    isMessage: (message: Message) => message is K
   ): Promise<K> {
     return new Promise((resolve, reject) => {
-      if (force === false && this.#active === false) {
+      if (this.#port === null) {
         reject(new Error("Client is not connected"));
         return;
       }
@@ -152,31 +160,21 @@ export class WindowClient
       };
 
       this.addEventListener("message", onMessage);
-      this.send(message, force);
+      this.send(message);
 
       setTimeout(() => {
         this.removeEventListener("message", onMessage);
         reject("요청을 처리하는데 너무 오래걸립니다.");
-      }, timeout);
+      }, 10000);
     });
   }
 
-  #onMessage(event: MessageEvent) {
+  #onMessage(message: unknown) {
     const dispatch = (key: keyof WebsiteClientEventMap, message: Message) => {
       this.dispatchTypedEvent(key, new CustomEvent(key, { detail: message }));
     };
 
-    if (event.origin !== this.#origin) {
-      return;
-    }
-
-    const message = event.data;
-
     if (isMessage(message) === false) {
-      return;
-    }
-
-    if (message.type === MessageType.Request) {
       return;
     }
 
@@ -197,6 +195,11 @@ export class WindowClient
       return;
     }
 
+    if (isPlayerControlMessage(message)) {
+      dispatch("player-control", message);
+      return;
+    }
+
     if (isIframePointerMoveMessage(message)) {
       dispatch("iframe-pointer-move", message);
       return;
@@ -205,5 +208,14 @@ export class WindowClient
     if (isHandshakeIframeMessage(message)) {
       dispatch("iframe-handshake", message);
     }
+  }
+
+  #onDisconnect() {
+    this.#port = null;
+    this.dispatchTypedEvent("disconnect", new CustomEvent("disconnect"));
+  }
+
+  static isAvailable(): boolean {
+    return browser?.runtime?.connect !== undefined;
   }
 }

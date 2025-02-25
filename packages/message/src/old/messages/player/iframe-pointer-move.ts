@@ -4,25 +4,24 @@ import {
   CreateMessageOptions,
   isMessage,
   Message,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
-const MESSAGE_KEY = "_isPlayerControlMessage";
+const MESSAGE_KEY = "_isIframePointerMoveMessage";
 
-export type PlayerControlMessageData = {
-  quality?: number;
-  volume?: number;
-  muted?: boolean;
+export type IframePointerMoveMessageData = {
+  clientX: number;
+  clientY: number;
 };
 
-export type PlayerControlMessage = Message & {
+export type IframePointerMoveMessage = Message & {
   data: {
     [MESSAGE_KEY]: true;
-  } & PlayerControlMessageData;
+  } & IframePointerMoveMessageData;
 };
 
-export function isPlayerControlMessage(
+export function isIframePointerMoveMessage(
   message: unknown
-): message is PlayerControlMessage {
+): message is IframePointerMoveMessage {
   if (isMessage(message) === false) {
     return false;
   }
@@ -34,10 +33,10 @@ export function isPlayerControlMessage(
   return true;
 }
 
-export function createPlayerControlMessage(
+export function createIframePointerMoveMessage(
   options: CreateMessageOptions,
-  data: PlayerControlMessageData
-): PlayerControlMessage {
+  data: IframePointerMoveMessageData
+): IframePointerMoveMessage {
   return {
     ...createMessage(options),
     data: {

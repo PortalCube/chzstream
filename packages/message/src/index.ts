@@ -1,2 +1,2 @@
-export * from "@message/messages/index.ts";
-export * from "@message/clients/index.ts";
+export * from "@message/old/messages";
+export * from "@message/old/clients";

@@ -4,24 +4,23 @@ import {
   CreateMessageOptions,
   isMessage,
   Message,
-} from "@message/messages/base.ts";
+} from "@message/old/messages/base";
 
-const MESSAGE_KEY = "_isHandshakeResponseMessage";
+const MESSAGE_KEY = "_isHandshakeIframeMessage";
 
-export type HandshakeResponseMessageData = {
-  version: string;
-  id: number;
+export type HandshakeIframeMessageData = {
+  iframeId: number;
 };
 
-export type HandshakeResponseMessage = Message & {
+export type HandshakeIframeMessage = Message & {
   data: {
     [MESSAGE_KEY]: true;
-  } & HandshakeResponseMessageData;
+  } & HandshakeIframeMessageData;
 };
 
-export function isHandshakeResponseMessage(
+export function isHandshakeIframeMessage(
   message: unknown
-): message is HandshakeResponseMessage {
+): message is HandshakeIframeMessage {
   if (isMessage(message) === false) {
     return false;
   }
@@ -33,10 +32,10 @@ export function isHandshakeResponseMessage(
   return true;
 }
 
-export function createHandshakeResponseMessage(
+export function createHandshakeIframeMessage(
   options: CreateMessageOptions,
-  data: HandshakeResponseMessageData
-): HandshakeResponseMessage {
+  data: HandshakeIframeMessageData
+): HandshakeIframeMessage {
   return {
     ...createMessage(options),
     data: {
