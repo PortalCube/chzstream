@@ -1,8 +1,11 @@
 import {
-  isMessage,
-  MessageType,
-  RecipientType,
-} from "@message/messages/base.ts";
+  ClientMessageEvent,
+  ClientType,
+  WebsiteClientEventMap,
+  WebsiteClientEventTarget,
+  WebsiteClientInterface,
+} from "@message/clients/base.ts";
+import { isMessage, RecipientType } from "@message/messages/base.ts";
 import {
   createHandshakeRequestMessage,
   createHeartbeatMessage,
@@ -12,15 +15,8 @@ import {
   isHandshakeResponseMessage,
   isIframePointerMoveMessage,
   isPlayerEventMessage,
-  Message,
+  MessageBase,
 } from "@message/messages/index.ts";
-import {
-  ClientMessageEvent,
-  ClientType,
-  WebsiteClientEventMap,
-  WebsiteClientEventTarget,
-  WebsiteClientInterface,
-} from "@message/clients/base.ts";
 
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1319168
 
@@ -116,19 +112,17 @@ export class WebsiteClient
     this.send(heartbeatMessage);
   }
 
-  send(message: Message, force: boolean = false) {
+  send(message: MessageBase, force: boolean = false) {
     if (force === false && this.#active === false) {
       return;
     }
 
-    message.type = MessageType.Request;
-
     window.postMessage(message, this.#origin);
   }
 
-  request<T extends Message, K extends Message>(
+  request<T extends MessageBase, K extends MessageBase>(
     message: T,
-    isMessage: (message: Message) => message is K,
+    isMessage: (message: MessageBase) => message is K,
     timeout: number = 10000,
     force: boolean = false
   ): Promise<K> {
@@ -138,7 +132,7 @@ export class WebsiteClient
         return;
       }
 
-      const onMessage = (event: ClientMessageEvent<Message>) => {
+      const onMessage = (event: ClientMessageEvent<MessageBase>) => {
         if (isMessage(event.detail) === false) {
           return;
         }
@@ -162,7 +156,10 @@ export class WebsiteClient
   }
 
   #onMessage(event: MessageEvent) {
-    const dispatch = (key: keyof WebsiteClientEventMap, message: Message) => {
+    const dispatch = (
+      key: keyof WebsiteClientEventMap,
+      message: MessageBase
+    ) => {
       this.dispatchTypedEvent(key, new CustomEvent(key, { detail: message }));
     };
 
@@ -173,10 +170,6 @@ export class WebsiteClient
     const message = event.data;
 
     if (isMessage(message) === false) {
-      return;
-    }
-
-    if (message.type === MessageType.Request) {
       return;
     }
 

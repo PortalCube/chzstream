@@ -1,10 +1,10 @@
-import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
   isMessage,
   Message,
 } from "@message/messages/base.ts";
+import { isTypedObject } from "@message/util.ts";
 
 const MESSAGE_KEY = "_isHandshakeResponseMessage";
 
@@ -13,11 +13,10 @@ export type HandshakeResponseMessageData = {
   id: number;
 };
 
-export type HandshakeResponseMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & HandshakeResponseMessageData;
-};
+export type HandshakeResponseMessage = Message<
+  typeof MESSAGE_KEY,
+  HandshakeResponseMessageData
+>;
 
 export function isHandshakeResponseMessage(
   message: unknown

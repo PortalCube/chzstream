@@ -14,7 +14,7 @@ import {
   isChzzkLiveSearchRequestMessage,
   isHandshakeRequestMessage,
   isMessage,
-  Message,
+  MessageBase,
 } from "@message/messages/index.ts";
 import { RecipientType } from "@message/messages/base.ts";
 import {
@@ -126,7 +126,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
     return this.#connections.find((connection) => connection.id === id);
   }
 
-  #relayMessage(message: Message) {
+  #relayMessage(message: MessageBase) {
     if (message.recipient === RecipientType.All) {
       for (const connection of this.#connections) {
         connection.port.postMessage(message);
@@ -185,7 +185,10 @@ export class ExtensionServer extends ExtensionServerEventTarget {
   }
 
   #onMessage(id: number, message: unknown, port: chrome.runtime.Port) {
-    const dispatch = (key: keyof ExtensionServerEventMap, message: Message) => {
+    const dispatch = (
+      key: keyof ExtensionServerEventMap,
+      message: MessageBase
+    ) => {
       this.dispatchTypedEvent(
         key,
         new CustomEvent(key, { detail: { message, port } })

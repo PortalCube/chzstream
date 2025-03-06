@@ -1,10 +1,10 @@
-import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
   isMessage,
   Message,
 } from "@message/messages/base.ts";
+import { isTypedObject } from "@message/util.ts";
 
 const MESSAGE_KEY = "_isPlayerControlMessage";
 
@@ -14,11 +14,10 @@ export type PlayerControlMessageData = {
   muted?: boolean;
 };
 
-export type PlayerControlMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & PlayerControlMessageData;
-};
+export type PlayerControlMessage = Message<
+  typeof MESSAGE_KEY,
+  PlayerControlMessageData
+>;
 
 export function isPlayerControlMessage(
   message: unknown

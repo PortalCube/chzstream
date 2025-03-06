@@ -2,7 +2,6 @@ import {
   isHandshakeRequestMessage,
   isHandshakeResponseMessage,
   isMessage,
-  MessageType,
 } from "@message/messages/index.ts";
 import { browser } from "@message/clients/base.ts";
 
@@ -73,10 +72,6 @@ export class WebsiteRelay {
       return;
     }
 
-    if (message.type === MessageType.Response) {
-      return;
-    }
-
     if (isHandshakeRequestMessage(message) === true) {
       this.#connect();
     }
@@ -92,8 +87,6 @@ export class WebsiteRelay {
     if (isMessage(message) === false) {
       return;
     }
-
-    message.type = MessageType.Response;
 
     if (isHandshakeResponseMessage(message) === true) {
       this.#id = message.data.id;

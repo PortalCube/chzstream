@@ -1,10 +1,10 @@
-import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
   isMessage,
   Message,
 } from "@message/messages/base.ts";
+import { isTypedObject } from "@message/util.ts";
 
 const MESSAGE_KEY = "_isIframePointerMoveMessage";
 
@@ -13,11 +13,10 @@ export type IframePointerMoveMessageData = {
   clientY: number;
 };
 
-export type IframePointerMoveMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & IframePointerMoveMessageData;
-};
+export type IframePointerMoveMessage = Message<
+  typeof MESSAGE_KEY,
+  IframePointerMoveMessageData
+>;
 
 export function isIframePointerMoveMessage(
   message: unknown

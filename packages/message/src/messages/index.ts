@@ -5,7 +5,7 @@ export {
   isMessage,
 } from "@message/messages/base.ts";
 export type {
-  Message,
+  MessageBase,
   Recipient,
   CreateMessageOptions,
 } from "@message/messages/base.ts";

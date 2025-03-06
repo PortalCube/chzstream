@@ -1,5 +1,5 @@
-import { isTypedObject } from "@message/util.ts";
 import { isMessage, Message } from "@message/messages/base.ts";
+import { isTypedObject } from "@message/util.ts";
 
 const MESSAGE_KEY = "_isChzzkServiceMessage";
 
@@ -21,11 +21,10 @@ export type ChzzkServiceMessageData = {
   messageType: ChzzkServiceMessageType;
 };
 
-export type ChzzkServiceMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & ChzzkServiceMessageData;
-};
+export type ChzzkServiceMessage = Message<
+  typeof MESSAGE_KEY,
+  ChzzkServiceMessageData
+>;
 
 export function isChzzkServiceMessage(
   message: unknown

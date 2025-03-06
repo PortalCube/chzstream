@@ -4,7 +4,7 @@ import {
   ChzzkLiveInfoResponseMessage,
   HandshakeIframeMessage,
   IframePointerMoveMessage,
-  Message,
+  MessageBase,
   PlayerControlMessage,
   PlayerEventMessage,
 } from "@message/messages/index.ts";
@@ -35,15 +35,15 @@ export enum ClientType {
   Iframe = "iframe",
 }
 
-export type ClientMessageEvent<T extends Message> = CustomEvent<T>;
+export type ClientMessageEvent<T extends MessageBase> = CustomEvent<T>;
 
-export type ServerMessageEvent<T extends Message> = CustomEvent<{
+export type ServerMessageEvent<T extends MessageBase> = CustomEvent<{
   message: T;
   port: chrome.runtime.Port;
 }>;
 
 export type WebsiteClientEventMap = {
-  message: ClientMessageEvent<Message>;
+  message: ClientMessageEvent<MessageBase>;
   disconnect: CustomEvent<void>;
   "player-event": ClientMessageEvent<PlayerEventMessage>;
   "player-control": ClientMessageEvent<PlayerControlMessage>;
@@ -64,9 +64,9 @@ export interface WebsiteClientInterface {
 
   connect(): Promise<void>;
   disconnect(): void;
-  send(message: Message): void;
-  request<T extends Message>(
-    message: Message,
-    isResponse: (message: Message) => message is T
+  send(message: MessageBase): void;
+  request<T extends MessageBase>(
+    message: MessageBase,
+    isResponse: (message: MessageBase) => message is T
   ): Promise<T>;
 }

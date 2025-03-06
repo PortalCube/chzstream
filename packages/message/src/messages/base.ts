@@ -10,30 +10,29 @@ export enum RecipientType {
 
 export type Recipient = RecipientType | number | number[];
 
-export enum MessageType {
-  Request = "request",
-  Response = "response",
-}
-
 const MESSAGE_KEY = "_isChzstreamMessage";
 
-export type Message = {
+export type MessageBase = {
   [MESSAGE_KEY]: true;
   id: string;
   sender: number | null;
   recipient: Recipient;
-  type?: MessageType;
   data: unknown;
+};
+
+export type Message<Key extends string, Body> = MessageBase & {
+  data: {
+    [key in Key]: true;
+  } & Body;
 };
 
 export type CreateMessageOptions = {
   id?: string;
   sender: number | null;
   recipient: Recipient;
-  type?: MessageType;
 };
 
-export function isMessage(message: unknown): message is Message {
+export function isMessage(message: unknown): message is MessageBase {
   if (isTypedObject(message, MESSAGE_KEY) === false) {
     return false;
   }
@@ -41,7 +40,7 @@ export function isMessage(message: unknown): message is Message {
   return true;
 }
 
-export function createMessage(options: CreateMessageOptions): Message {
+export function createMessage(options: CreateMessageOptions): MessageBase {
   return {
     [MESSAGE_KEY]: true,
     id: options.id ?? uuid(),
