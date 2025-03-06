@@ -1,4 +1,3 @@
-import { TypedEventTarget } from "typescript-event-target";
 import {
   isHandshakeRequestMessage,
   isHandshakeResponseMessage,
@@ -7,14 +6,7 @@ import {
 } from "@message/messages/index.ts";
 import { browser } from "@message/clients/base.ts";
 
-type RelayEventMap = {
-  disconnect: CustomEvent<void>;
-};
-
-// https://bugzilla.mozilla.org/show_bug.cgi?id=1896267
-// https://bugzilla.mozilla.org/show_bug.cgi?id=1820521
-
-export class WindowRelay extends TypedEventTarget<RelayEventMap> {
+export class WebsiteRelay {
   get name() {
     return this.#name;
   }
@@ -33,9 +25,7 @@ export class WindowRelay extends TypedEventTarget<RelayEventMap> {
   #active: boolean = false;
   #origin: string = "";
 
-  constructor() {
-    super();
-  }
+  constructor() {}
 
   listen() {
     if (this.#active === true) {
@@ -70,8 +60,6 @@ export class WindowRelay extends TypedEventTarget<RelayEventMap> {
     this.#active = false;
 
     window.removeEventListener("message", this.#onWindowMessage.bind(this));
-
-    this.dispatchTypedEvent("disconnect", new CustomEvent("disconnect"));
   }
 
   #onWindowMessage(event: MessageEvent) {
@@ -118,8 +106,6 @@ export class WindowRelay extends TypedEventTarget<RelayEventMap> {
     this.#active = false;
     this.#port = null;
 
-    console.log(`[window-relay] disconnected!!`);
-
-    this.dispatchTypedEvent("disconnect", new CustomEvent("disconnect"));
+    console.log(`[window-relay] disconnected`);
   }
 }

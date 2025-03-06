@@ -21,14 +21,11 @@ import {
   PlayerEventMessage,
   ReceiverType,
   WebsiteClient,
-  WindowClient,
 } from "@chzstream/message";
 
 const iframeClientMap = new Map<number, number>();
 
-export const MessageClient = WebsiteClient.isAvailable()
-  ? new WebsiteClient()
-  : new WindowClient();
+export const MessageClient = new WebsiteClient();
 
 export async function initializeClientMessage() {
   console.log("[website-client] initialize");
