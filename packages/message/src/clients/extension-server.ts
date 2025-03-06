@@ -22,7 +22,6 @@ import {
   ClientType,
   MESSAGE_VERSION,
   ServerMessageEvent,
-  WEB_EXTENSION_ID,
 } from "@message/clients/base.ts";
 
 export type ExtensionServerEventMap = {
@@ -77,8 +76,6 @@ export class ExtensionServer extends ExtensionServerEventTarget {
 
     this.#active = true;
     browser.runtime.onConnect.addListener(this.#onConnect.bind(this));
-    browser.runtime.onConnectExternal.addListener(this.#onConnect.bind(this));
-
     browser.runtime.onMessageExternal.addListener(
       (_message, _sender, sendResponse) => {
         sendResponse();
@@ -107,17 +104,9 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return;
     }
 
-    if (port.sender.id) {
-      if (WEB_EXTENSION_ID.includes(port.sender.id) === false) {
-        return;
-      }
-    } else {
-      if (
-        port.sender.origin === undefined ||
-        this.allowOrigins.includes(port.sender.origin) === false
-      ) {
-        return;
-      }
+    if (port.sender.id === undefined) {
+      if (port.sender.origin === undefined) return;
+      if (this.allowOrigins.includes(port.sender.origin) === false) return;
     }
 
     console.log(`[extension-server] connection established`, port);
