@@ -1,14 +1,14 @@
 import { v4 as uuid } from "uuid";
 import { isTypedObject } from "@message/util.ts";
 
-export enum ReceiverType {
+export enum RecipientType {
   All = "all",
   Extension = "extension",
   AllWebsite = "all_website",
   AllIframe = "all_iframe",
 }
 
-export type Receiver = ReceiverType | number | number[];
+export type Recipient = RecipientType | number | number[];
 
 export enum MessageType {
   Request = "request",
@@ -21,7 +21,7 @@ export type Message = {
   [MESSAGE_KEY]: true;
   id: string;
   sender: number | null;
-  receiver: Receiver;
+  recipient: Recipient;
   type?: MessageType;
   data: unknown;
 };
@@ -29,7 +29,7 @@ export type Message = {
 export type CreateMessageOptions = {
   id?: string;
   sender: number | null;
-  receiver: Receiver;
+  recipient: Recipient;
   type?: MessageType;
 };
 
@@ -46,7 +46,7 @@ export function createMessage(options: CreateMessageOptions): Message {
     [MESSAGE_KEY]: true,
     id: options.id ?? uuid(),
     sender: options.sender,
-    receiver: options.receiver,
+    recipient: options.recipient,
     data: null,
   };
 }

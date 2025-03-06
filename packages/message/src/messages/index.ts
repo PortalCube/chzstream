@@ -1,12 +1,12 @@
 // Base
 export {
-  ReceiverType,
+  RecipientType,
   MessageType,
   isMessage,
 } from "@message/messages/base.ts";
 export type {
   Message,
-  Receiver,
+  Recipient,
   CreateMessageOptions,
 } from "@message/messages/base.ts";
 

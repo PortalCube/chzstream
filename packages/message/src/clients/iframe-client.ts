@@ -1,5 +1,5 @@
 import { createNanoEvents } from "nanoevents";
-import { isMessage, ReceiverType } from "@message/messages/base.ts";
+import { isMessage, RecipientType } from "@message/messages/base.ts";
 import {
   createHandshakeRequestMessage,
   isHandshakeResponseMessage,
@@ -81,7 +81,7 @@ export class IframeClient {
     const handshakeMessage = createHandshakeRequestMessage(
       {
         sender: null,
-        receiver: ReceiverType.Extension,
+        recipient: RecipientType.Extension,
       },
       ClientType.Iframe
     );

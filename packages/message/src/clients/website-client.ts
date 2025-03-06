@@ -1,7 +1,7 @@
 import {
   isMessage,
   MessageType,
-  ReceiverType,
+  RecipientType,
 } from "@message/messages/base.ts";
 import {
   createHandshakeRequestMessage,
@@ -63,7 +63,7 @@ export class WebsiteClient
     const handshakeMessage = createHandshakeRequestMessage(
       {
         sender: null,
-        receiver: ReceiverType.Extension,
+        recipient: RecipientType.Extension,
       },
       ClientType.Website
     );
@@ -110,7 +110,7 @@ export class WebsiteClient
   async #heartbeat() {
     const heartbeatMessage = createHeartbeatMessage({
       sender: this.#id,
-      receiver: ReceiverType.Extension,
+      recipient: RecipientType.Extension,
     });
 
     this.send(heartbeatMessage);

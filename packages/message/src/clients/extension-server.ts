@@ -16,7 +16,7 @@ import {
   isMessage,
   Message,
 } from "@message/messages/index.ts";
-import { ReceiverType } from "@message/messages/base.ts";
+import { RecipientType } from "@message/messages/base.ts";
 import {
   browser,
   ClientType,
@@ -127,7 +127,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
   }
 
   #relayMessage(message: Message) {
-    if (message.receiver === ReceiverType.All) {
+    if (message.recipient === RecipientType.All) {
       for (const connection of this.#connections) {
         connection.port.postMessage(message);
       }
@@ -135,7 +135,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return false;
     }
 
-    if (message.receiver === ReceiverType.AllWebsite) {
+    if (message.recipient === RecipientType.AllWebsite) {
       for (const connection of this.#connections) {
         if (connection.type === ClientType.Website) {
           connection.port.postMessage(message);
@@ -145,7 +145,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return true;
     }
 
-    if (message.receiver === ReceiverType.AllIframe) {
+    if (message.recipient === RecipientType.AllIframe) {
       for (const connection of this.#connections) {
         if (connection.type === ClientType.Iframe) {
           connection.port.postMessage(message);
@@ -155,12 +155,12 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return true;
     }
 
-    if (message.receiver === ReceiverType.Extension) {
+    if (message.recipient === RecipientType.Extension) {
       return false;
     }
 
-    if (Array.isArray(message.receiver)) {
-      for (const id of message.receiver) {
+    if (Array.isArray(message.recipient)) {
+      for (const id of message.recipient) {
         const connection = this.#findConnection(id);
 
         if (connection !== undefined) {
@@ -171,8 +171,8 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return true;
     }
 
-    if (typeof message.receiver === "number") {
-      const connection = this.#findConnection(message.receiver);
+    if (typeof message.recipient === "number") {
+      const connection = this.#findConnection(message.recipient);
 
       if (connection !== undefined) {
         connection.port.postMessage(message);
@@ -264,7 +264,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
     const responseMessage = createHandshakeResponseMessage(
       {
         id: message.id,
-        receiver: id,
+        recipient: id,
         sender: 0,
       },
       {
