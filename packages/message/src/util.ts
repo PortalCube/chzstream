@@ -1,21 +1,26 @@
-function _isObject(value: unknown): value is object {
-  return typeof value === "object" && value !== null;
-}
-
 export function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray(value) === false
+  );
 }
 
-function hasProperty<T extends string>(
-  obj: Record<string, unknown>,
-  key: T
-): obj is Record<string, unknown> & Record<T, true> {
-  return key in obj && obj[key] === true;
+export function hasProperty<K extends string, V>(
+  item: unknown,
+  key: K,
+  value: V
+): item is Record<string, unknown> & {
+  [key in K]: V;
+} {
+  return isObject(item) && key in item && item[key] === value;
 }
 
-export function isTypedObject<T extends string>(
-  value: unknown,
-  key: T
-): value is Record<string, unknown> & Record<T, true> {
-  return isObject(value) && hasProperty(value, key);
+export function isTypedObject<K extends string>(
+  item: unknown,
+  key: K
+): item is Record<string, unknown> & {
+  [key in K]: true;
+} {
+  return hasProperty(item, key, true);
 }

@@ -1,10 +1,9 @@
+import { RequestMessage, ResponseMessage } from "@message/messages/base.ts";
 import {
-  HasResponse,
-  MessageType,
-  RequestMessage,
-  ResponseMessage,
-} from "@message/messages/index.ts";
-
+  PayloadType,
+  RequestPayload,
+  ResponsePayload,
+} from "@message/messages/payload/payload.ts";
 export type ClientId =
   | {
       type: "background";
@@ -28,30 +27,54 @@ export type MessageClientId =
   | { type: "website"; websiteId: string }
   | { type: "content"; websiteId: string; blockId: string };
 
-export type MessageListener<T extends MessageType> = (
-  message: RequestMessage<T>,
-  sender: MessageClientId,
-  reply: HasResponse<T> extends true
-    ? (data: ResponseMessage<T>) => void
-    : undefined
-) => unknown;
+export type MessageListener<T extends PayloadType> = (
+  message: RequestMessage<T>
+) => void;
 
 export interface ClientBase {
   readonly id: ClientId;
 
-  on<T extends MessageType>(type: T, listener: MessageListener<T>): void;
+  on<T extends PayloadType>(type: T, listener: MessageListener<T>): void;
 
-  remove<T extends MessageType>(type: T, listener: MessageListener<T>): void;
+  remove<T extends PayloadType>(type: T, listener: MessageListener<T>): void;
 
-  send<T extends MessageType>(
+  send<T extends PayloadType>(
     type: T,
-    data: RequestMessage<T>,
+    data: RequestPayload<T>,
     recipient?: MessageClientId
   ): void;
 
-  request<T extends MessageType>(
+  reply<T extends PayloadType>(
+    reply: string,
     type: T,
-    data: RequestMessage<T>,
+    data: ResponsePayload<T>,
+    recipient: MessageClientId
+  ): void;
+
+  request<T extends PayloadType>(
+    type: T,
+    data: RequestPayload<T>,
     recipient?: MessageClientId
-  ): HasResponse<T> extends true ? Promise<ResponseMessage<T>> : never;
+  ): Promise<ResponseMessage<T>>;
 }
+
+export const browser: typeof chrome = (() => {
+  if (globalThis === null || globalThis === undefined) {
+    throw new Error(
+      "globalThis is not defined. This browser may not be supported."
+    );
+  }
+
+  // @ts-expect-error Whale Only
+  if (globalThis.whale !== undefined) return globalThis.whale;
+
+  // @ts-expect-error Firefox, Safari Only
+  if (globalThis.browser !== undefined) return globalThis.browser;
+
+  // Chromium Only
+  if (globalThis.chrome === undefined) return globalThis.chrome;
+
+  throw new Error(
+    "Browser API is not available. This browser may not be supported."
+  );
+})();

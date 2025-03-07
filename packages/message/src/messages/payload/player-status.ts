@@ -1,7 +1,6 @@
-import { MessageData } from "./base.ts";
+import { PayloadSchema } from "./payload.ts";
 
-export interface PlayerStatusMessage extends MessageData {
-  type: "player-status";
+interface PlayerStatusMessage extends PayloadSchema {
   request:
     | {
         type: "loading";
@@ -23,4 +22,10 @@ export interface PlayerStatusMessage extends MessageData {
         type: "error";
         message: string;
       };
+  response: null;
 }
+
+export const PlayerStatusMessage: PlayerStatusMessage = {
+  request: {} as PlayerStatusMessage["request"],
+  response: null,
+};
