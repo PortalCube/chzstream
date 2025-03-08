@@ -22,7 +22,7 @@ export async function getChannel(
   this: StreamClient,
   options: StreamGetChannelOptions
 ): Promise<StreamGetChannelResponse> {
-  if (options.platform === Platform.Chzzk) {
+  if (options.platform === "chzzk") {
     return getChannelChzzk.call(this, options);
   }
 
@@ -40,7 +40,7 @@ async function getChannelChzzk(
   }
 
   const response: StreamGetChannelResponse = {
-    platform: Platform.Chzzk,
+    platform: "chzzk",
     channelId: data.content.channelId,
     channelName: data.content.channelName,
     channelDescription: data.content.channelDescription,

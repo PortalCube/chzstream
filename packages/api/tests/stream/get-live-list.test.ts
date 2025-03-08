@@ -11,7 +11,7 @@ describe("StreamClient", () => {
 
     it("chzzk must return live list", async () => {
       const res = await streamClient.getLiveList({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         size: 5,
       });
 
@@ -21,7 +21,7 @@ describe("StreamClient", () => {
 
     it("chzzk pagination", async () => {
       const res1 = await streamClient.getLiveList({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         size: 5,
       });
       expect(res1.next).not.toBeNull();
@@ -32,7 +32,7 @@ describe("StreamClient", () => {
       const next = res1.next;
 
       const res2 = await streamClient.getLiveList({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         next,
         size: 5,
       });

@@ -1,5 +1,5 @@
 export {
-  Platform,
+  type Platform,
   StreamClient,
   type StreamClientOptions,
 } from "@api/stream/client.ts";

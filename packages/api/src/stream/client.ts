@@ -23,9 +23,4 @@ export class StreamClient {
   searchLive = searchLive;
 }
 
-export enum Platform {
-  Chzzk = "chzzk",
-  // SOOP = "soop",
-  // Youtube = "youtube",
-  // Twitch = "twitch",
-}
+export type Platform = "chzzk"; // | "soop" | "youtube" | "twitch";

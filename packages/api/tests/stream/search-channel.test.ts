@@ -12,7 +12,7 @@ describe("StreamClient", () => {
     TEST_CHANNELS.forEach(({ id, name }, index) => {
       it(`chzzk common query ${index + 1}`, async () => {
         const res = await streamClient.searchChannel({
-          platform: Platform.Chzzk,
+          platform: "chzzk",
           query: name,
           size: 5,
         });
@@ -25,13 +25,13 @@ describe("StreamClient", () => {
 
     it("chzzk empty query", async () => {
       await expect(() =>
-        streamClient.searchChannel({ platform: Platform.Chzzk, query: "" })
+        streamClient.searchChannel({ platform: "chzzk", query: "" })
       ).rejects.toThrowError("400");
     });
 
     it("chzzk pagination", async () => {
       const res1 = await streamClient.searchChannel({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         query: "치지직",
         size: 5,
       });
@@ -43,7 +43,7 @@ describe("StreamClient", () => {
       const next = res1.next;
 
       const res2 = await streamClient.searchChannel({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         query: "치지직",
         size: 5,
         next,

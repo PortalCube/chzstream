@@ -12,7 +12,7 @@ describe("StreamClient", () => {
     TEST_CHANNELS.forEach(({ id }, index) => {
       it(`chzzk common id ${index + 1}`, async () => {
         const res = await streamClient.getChannel({
-          platform: Platform.Chzzk,
+          platform: "chzzk",
           id,
         });
 
@@ -24,7 +24,7 @@ describe("StreamClient", () => {
     it("chzzk blank id", async () => {
       await expect(() =>
         streamClient.getChannel({
-          platform: Platform.Chzzk,
+          platform: "chzzk",
           id: "",
         })
       ).rejects.toThrowError("404");
@@ -32,7 +32,7 @@ describe("StreamClient", () => {
 
     it("chzzk null id", async () => {
       const res = await streamClient.getChannel({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         id: "0",
       });
 

@@ -2,7 +2,7 @@ import { ChzzkGetLiveListOptions } from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
 
 export type StreamGetLiveListResponse = {
-  platform: Platform.Chzzk;
+  platform: "chzzk";
   next: Exclude<ChzzkGetLiveListOptions["next"], undefined>;
 } & {
   result: {
@@ -18,7 +18,7 @@ export type StreamGetLiveListResponse = {
 };
 
 export type StreamGetLiveListOptions = {
-  platform: Platform.Chzzk;
+  platform: "chzzk";
   next?: ChzzkGetLiveListOptions["next"];
 } & {
   size?: number;
@@ -28,7 +28,7 @@ export async function getLiveList(
   this: StreamClient,
   options: StreamGetLiveListOptions
 ): Promise<StreamGetLiveListResponse> {
-  if (options.platform === Platform.Chzzk) {
+  if (options.platform === "chzzk") {
     return getLiveListChzzk.call(this, options);
   }
 
@@ -42,10 +42,10 @@ async function getLiveListChzzk(
   const data = await this.chzzkClient.getLiveList(options);
 
   return {
-    platform: Platform.Chzzk,
+    platform: "chzzk",
     next: data.content.page?.next ?? null,
     result: data.content.data.map((item) => ({
-      platform: Platform.Chzzk,
+      platform: "chzzk",
       channelId: item.channel.channelId,
       channelName: item.channel.channelName,
       channelImageUrl: item.channel.channelImageUrl,

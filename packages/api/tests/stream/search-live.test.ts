@@ -12,7 +12,7 @@ describe("StreamClient", () => {
     ["talk", "리그 오브 레전드"].forEach((query, index) => {
       it(`common query ${index + 1}`, async () => {
         const res = await streamClient.searchLive({
-          platform: Platform.Chzzk,
+          platform: "chzzk",
           query,
           size: 5,
         });
@@ -24,13 +24,13 @@ describe("StreamClient", () => {
 
     it("empty query", async () => {
       await expect(() =>
-        streamClient.searchLive({ platform: Platform.Chzzk, query: "" })
+        streamClient.searchLive({ platform: "chzzk", query: "" })
       ).rejects.toThrowError("400");
     });
 
     it("pagination", async () => {
       const res1 = await streamClient.searchLive({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         query: "talk",
         size: 5,
       });
@@ -42,7 +42,7 @@ describe("StreamClient", () => {
       const next = res1.next;
 
       const res2 = await streamClient.searchLive({
-        platform: Platform.Chzzk,
+        platform: "chzzk",
         query: "talk",
         size: 5,
         next,

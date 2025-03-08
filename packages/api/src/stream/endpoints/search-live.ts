@@ -2,7 +2,7 @@ import { ChzzkSearchLiveOptions } from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
 
 export type StreamSearchLiveResponse = {
-  platform: Platform.Chzzk;
+  platform: "chzzk";
   next: Exclude<ChzzkSearchLiveOptions["next"], undefined>;
 } & {
   result: {
@@ -18,7 +18,7 @@ export type StreamSearchLiveResponse = {
 };
 
 export type StreamSearchLiveOptions = {
-  platform: Platform.Chzzk;
+  platform: "chzzk";
   next?: ChzzkSearchLiveOptions["next"];
 } & {
   query: string;
@@ -34,7 +34,7 @@ export async function searchLive(
     ...options,
   };
 
-  if (options.platform === Platform.Chzzk) {
+  if (options.platform === "chzzk") {
     return searchLiveChzzk.call(this, options);
   }
 
@@ -48,10 +48,10 @@ async function searchLiveChzzk(
   const data = await this.chzzkClient.searchLive(options);
 
   return {
-    platform: Platform.Chzzk,
+    platform: "chzzk",
     next: data.content.page?.next ?? null,
     result: data.content.data.map((item) => ({
-      platform: Platform.Chzzk,
+      platform: "chzzk",
       channelId: item.channel.channelId,
       channelName: item.channel.channelName,
       channelImageUrl: item.channel.channelImageUrl,
