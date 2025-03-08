@@ -1,5 +1,5 @@
 import { ClientId, MessageClientId } from "@message/clients/base.ts";
-import { hasProperty, isObject } from "@message/util.ts";
+import { hasProperty } from "@message/util.ts";
 import {
   PayloadType,
   RequestPayload,
@@ -15,7 +15,7 @@ export function isRawMessage<
   Type extends string,
   MessageType extends RawMessage<Type>,
 >(value: unknown, type: Type): value is MessageType {
-  return isObject(value) && value._CHZSTREAM === type;
+  return hasProperty(value, "_CHZSTREAM", type);
 }
 
 /** Message **/

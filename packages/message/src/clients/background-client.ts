@@ -275,6 +275,7 @@ class BackgroundClient implements ClientBase {
   }
 }
 
+// 새로운 Background Client를 생성합니다.
 export function createBackgroundClient(): BackgroundClient {
   return new BackgroundClient();
 }

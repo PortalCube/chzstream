@@ -154,6 +154,7 @@ class ContentClient implements ClientBase {
   }
 }
 
+// 새로운 Content Client를 등록하고 생성합니다.
 export async function createContentClient(
   websiteId: string,
   blockId: string

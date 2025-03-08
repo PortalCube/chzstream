@@ -2,10 +2,10 @@ import {
   BACKGROUND_CLIENT_ID,
   ClientBase,
   ClientId,
+  ListenerItem,
+  ListenerMap,
   MessageClientId,
   MessageListener,
-  ListenerMap,
-  ListenerItem,
 } from "@message/clients/base.ts";
 import {
   createRequestMessage,
@@ -165,9 +165,7 @@ class WebsiteClient implements ClientBase {
   }
 }
 
-/**
- * 새로운 Website Client를 등록하고 생성합니다.
- */
+// 새로운 Website Client를 등록하고 생성합니다.
 export function createWebsiteClient(): Promise<WebsiteClient> {
   return new Promise((resolve) => {
     // Handshake Response를 받았을 때 실행할 임시 이벤트 리스너

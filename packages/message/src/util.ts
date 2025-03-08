@@ -1,11 +1,3 @@
-export function isObject(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    Array.isArray(value) === false
-  );
-}
-
 export function hasProperty<K extends string, V>(
   item: unknown,
   key: K,
@@ -13,14 +5,13 @@ export function hasProperty<K extends string, V>(
 ): item is Record<string, unknown> & {
   [key in K]: V;
 } {
-  return isObject(item) && key in item && item[key] === value;
-}
+  if (typeof item !== "object") return false;
+  if (item === null) return false;
+  if (Array.isArray(item)) return false;
+  if (key in item === false) return false;
 
-export function isTypedObject<K extends string>(
-  item: unknown,
-  key: K
-): item is Record<string, unknown> & {
-  [key in K]: true;
-} {
-  return hasProperty(item, key, true);
+  const it = item as Record<string, unknown>;
+  if (it[key] !== value) return false;
+
+  return true;
 }

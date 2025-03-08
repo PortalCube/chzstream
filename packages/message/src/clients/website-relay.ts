@@ -17,10 +17,7 @@ class WebsiteRelay {
     port.onMessage.addListener(this.onReceive.bind(this));
   }
 
-  /**
-   * Website Client에서 Message를 수신하여 Background Client로 전달합니다.
-   * @param event Message가 담긴 Custom Event
-   */
+  // Website Client에서 Message를 수신하여 Background Client로 전달합니다.
   onSend(event: CustomEventInit<unknown>): void {
     const { detail: message } = event;
 
@@ -32,11 +29,7 @@ class WebsiteRelay {
     this.port.postMessage(message);
   }
 
-  /**
-   * Background Client에서 Message를 수신하여 Website Client로 전달합니다.
-   * @param message chrome.runtime.Port를 통해서 전달받은 Message
-   * @param port chrome.runtime.Port
-   */
+  // Background Client에서 Message를 수신하여 Website Client로 전달합니다.
   onReceive(message: unknown, port: chrome.runtime.Port): void {
     if (isMessage(message) === false) return;
 
@@ -48,9 +41,7 @@ class WebsiteRelay {
   }
 }
 
-/**
- * Content Script에 Website Relay를 등록합니다.
- */
+// Content Script에 Website Relay를 등록합니다.
 export async function createWebsiteRelay() {
   // Handshake를 받으면, 새로운 Website Relay를 생성합니다.
   window.addEventListener(
