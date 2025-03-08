@@ -5,6 +5,8 @@ import {
   ClientId,
   MessageClientId,
   MessageListener,
+  ListenerMap,
+  ListenerItem,
 } from "@message/clients/base.ts";
 import {
   createRequestMessage,
@@ -21,8 +23,6 @@ import {
   PayloadType,
   RequestPayload,
   ResponsePayload,
-  ListenerMap,
-  ListenerItem,
 } from "@message/messages/payload/payload.ts";
 import { hasProperty } from "@message/util.ts";
 

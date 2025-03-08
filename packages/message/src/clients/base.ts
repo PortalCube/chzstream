@@ -33,6 +33,15 @@ export type MessageListener<T extends PayloadType> = (
   message: RequestMessage<T>
 ) => void;
 
+export type ListenerItem<T extends PayloadType> = {
+  listener: MessageListener<T>;
+  once: boolean;
+};
+
+export type ListenerMap = Partial<{
+  [T in PayloadType]: ListenerItem<T>[];
+}>;
+
 export interface ClientBase {
   readonly id: ClientId;
 

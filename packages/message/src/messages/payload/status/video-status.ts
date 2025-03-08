@@ -1,4 +1,4 @@
-import { PayloadSchema } from "./payload.ts";
+import { PayloadSchema } from "../payload.ts";
 
 interface VideoStatusMessage extends PayloadSchema {
   request: {

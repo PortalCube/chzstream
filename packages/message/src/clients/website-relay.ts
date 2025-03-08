@@ -3,7 +3,7 @@ import {
   isHandshakeResponse,
   isMessage,
 } from "@message/messages/base.ts";
-import { browser, ClientId } from "./base.ts";
+import { browser, ClientId } from "@message/clients/base.ts";
 
 class WebsiteRelay {
   id: ClientId;

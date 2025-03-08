@@ -1,14 +1,13 @@
-import { MessageListener } from "@message/clients/base.ts";
 import { HeartbeatMessage } from "./heartbeat.ts";
-import { PlayerStatusMessage } from "./player-status.ts";
-import { VideoStatusMessage } from "./video-status.ts";
 import { IframePointerMoveMessage } from "./iframe-event/iframe-pointer-move.ts";
+import { PlayerStatusMessage } from "./status/player-status.ts";
 import { StreamGetChannelMessage } from "./stream/get-channel.ts";
 import { StreamGetLiveListMessage } from "./stream/get-live-list.ts";
 import { StreamSearchChannelMessage } from "./stream/search-channel.ts";
 import { StreamSearchLiveMessage } from "./stream/search-live.ts";
+import { VideoStatusMessage } from "./status/video-status.ts";
 
-const PAYLOAD_MAP = {
+export const PAYLOAD_MAP = {
   /* Heartbeat */
   heartbeat: HeartbeatMessage,
 
@@ -26,21 +25,7 @@ const PAYLOAD_MAP = {
   "stream-search-live": StreamSearchLiveMessage,
 };
 
-export function hasResponse(type: PayloadType) {
-  const response = PAYLOAD_MAP[type].response;
-  return response !== undefined && response !== null;
-}
-
-export type ListenerItem<T extends PayloadType> = {
-  listener: MessageListener<T>;
-  once: boolean;
-};
-
-export type ListenerMap = Partial<{
-  [T in PayloadType]: ListenerItem<T>[];
-}>;
-
-export type Payload<T extends PayloadType> = (typeof PAYLOAD_MAP)[T];
+type Payload<T extends PayloadType> = (typeof PAYLOAD_MAP)[T];
 export type RequestPayload<T extends PayloadType> = Payload<T>["request"];
 export type ResponsePayload<T extends PayloadType> = Payload<T>["response"];
 export type PayloadType = keyof typeof PAYLOAD_MAP;
