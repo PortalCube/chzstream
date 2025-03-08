@@ -25,7 +25,7 @@ import {
 } from "@message/messages/payload/payload.ts";
 import { hasProperty } from "@message/util.ts";
 
-class WebsiteClient implements ClientBase {
+export class WebsiteClient implements ClientBase {
   id: ClientId;
   #listeners: ListenerMap = {};
 

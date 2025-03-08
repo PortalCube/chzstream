@@ -1,16 +1,17 @@
-import { PlayerEventType } from "@chzstream/message";
 import {
   ChzzkChannelInfoResponse,
   ChzzkLiveInfoResponse,
 } from "@chzstream/message";
-import { sendPlayerEvent } from "@extension/utils/message/iframe-client.ts";
+import { contentClient } from "@extension/utils/message/iframe-client.ts";
 
 export async function initializePlayerStatus(isChat: boolean) {
   InterceptEmitter.on("live-info", (response: ChzzkLiveInfoResponse) => {
     console.log("[라이브 정보]", response);
 
     if (response === null) {
-      sendPlayerEvent(PlayerEventType.End);
+      contentClient.send("player-status", {
+        type: "end",
+      });
       return;
     }
 
@@ -19,12 +20,16 @@ export async function initializePlayerStatus(isChat: boolean) {
     }
 
     if (response.status === "CLOSE") {
-      sendPlayerEvent(PlayerEventType.End);
+      contentClient.send("player-status", {
+        type: "end",
+      });
       return;
     }
 
     if (response.adult && response.userAdultStatus !== "ADULT") {
-      sendPlayerEvent(PlayerEventType.Adult);
+      contentClient.send("player-status", {
+        type: "adult",
+      });
       return;
     }
   });
@@ -33,7 +38,9 @@ export async function initializePlayerStatus(isChat: boolean) {
     console.log("[라이브 상태]", response);
 
     if (response === null) {
-      sendPlayerEvent(PlayerEventType.End);
+      contentClient.send("player-status", {
+        type: "end",
+      });
       return;
     }
 
@@ -42,13 +49,17 @@ export async function initializePlayerStatus(isChat: boolean) {
     }
 
     if (response.status === "CLOSE") {
-      sendPlayerEvent(PlayerEventType.End);
+      contentClient.send("player-status", {
+        type: "end",
+      });
       removeEmbedPlayer();
       return;
     }
 
     if (response.adult && response.userAdultStatus !== "ADULT") {
-      sendPlayerEvent(PlayerEventType.Adult);
+      contentClient.send("player-status", {
+        type: "adult",
+      });
       return;
     }
   });
@@ -70,7 +81,10 @@ function checkPlayerError() {
       }
 
       if (element.classList.contains("pzp-pc--dialog-error") === true) {
-        sendPlayerEvent(PlayerEventType.Error);
+        contentClient.send("player-status", {
+          type: "error",
+          message: "플레이어에서 에러가 발생했습니다.",
+        });
         location.reload();
       }
     });

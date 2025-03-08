@@ -17,7 +17,7 @@ export type ClientId =
       id: string;
       type: "content";
       websiteId: string;
-      blockId: string;
+      blockId: number;
     };
 
 export const BACKGROUND_CLIENT_ID: string =

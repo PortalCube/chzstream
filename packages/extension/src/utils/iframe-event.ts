@@ -1,7 +1,10 @@
-import { sendPointerMove } from "@extension/utils/message/iframe-client.ts";
+import { contentClient } from "./message/iframe-client.ts";
 
 export function initializeIframeEventCapture() {
   window.addEventListener("pointermove", async (event) => {
-    await sendPointerMove(event.clientX, event.clientY);
+    contentClient.send("iframe-pointer-move", {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
   });
 }

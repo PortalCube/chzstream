@@ -28,7 +28,7 @@ import { hasProperty } from "@message/util.ts";
 
 type ClientInfo = ClientId & { port: chrome.runtime.Port | null };
 
-class BackgroundClient implements ClientBase {
+export class BackgroundClient implements ClientBase {
   id: ClientId = {
     type: "background",
     id: BACKGROUND_CLIENT_ID,

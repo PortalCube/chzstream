@@ -111,7 +111,7 @@ export type HandshakeRequest = RawMessage<"HANDSHAKE_REQUEST"> &
     | {
         type: "content";
         websiteId: string;
-        blockId: string;
+        blockId: number;
       }
   );
 

@@ -26,7 +26,7 @@ import {
 } from "@message/messages/payload/payload.ts";
 import { hasProperty } from "@message/util.ts";
 
-class ContentClient implements ClientBase {
+export class ContentClient implements ClientBase {
   id: ClientId;
   port: chrome.runtime.Port;
   #listeners: ListenerMap = {};
@@ -157,7 +157,7 @@ class ContentClient implements ClientBase {
 // 새로운 Content Client를 등록하고 생성합니다.
 export async function createContentClient(
   websiteId: string,
-  blockId: string
+  blockId: number
 ): Promise<ContentClient> {
   return new Promise((resolve) => {
     const request: HandshakeRequest = {

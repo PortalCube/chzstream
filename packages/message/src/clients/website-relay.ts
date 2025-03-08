@@ -5,7 +5,7 @@ import {
 } from "@message/messages/base.ts";
 import { browser, ClientId } from "@message/clients/base.ts";
 
-class WebsiteRelay {
+export class WebsiteRelay {
   id: ClientId;
   port: chrome.runtime.Port;
 
