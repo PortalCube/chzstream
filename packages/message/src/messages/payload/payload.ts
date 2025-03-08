@@ -1,10 +1,29 @@
 import { MessageListener } from "@message/clients/base.ts";
 import { HeartbeatMessage } from "./heartbeat.ts";
 import { PlayerStatusMessage } from "./player-status.ts";
+import { VideoStatusMessage } from "./video-status.ts";
+import { IframePointerMoveMessage } from "./iframe-event/iframe-pointer-move.ts";
+import { StreamGetChannelMessage } from "./stream/get-channel.ts";
+import { StreamGetLiveListMessage } from "./stream/get-live-list.ts";
+import { StreamSearchChannelMessage } from "./stream/search-channel.ts";
+import { StreamSearchLiveMessage } from "./stream/search-live.ts";
 
 const PAYLOAD_MAP = {
+  /* Heartbeat */
   heartbeat: HeartbeatMessage,
+
+  /* Status */
   "player-status": PlayerStatusMessage,
+  "video-status": VideoStatusMessage,
+
+  /* Iframe Event */
+  "iframe-pointer-move": IframePointerMoveMessage,
+
+  /* Stream */
+  "stream-get-channel": StreamGetChannelMessage,
+  "stream-get-live-list": StreamGetLiveListMessage,
+  "stream-search-channel": StreamSearchChannelMessage,
+  "stream-search-live": StreamSearchLiveMessage,
 };
 
 export function hasResponse(type: PayloadType) {
