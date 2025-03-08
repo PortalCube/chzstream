@@ -7,6 +7,7 @@ export type StreamGetChannelResponse = {
   channelDescription: string;
   channelImageUrl: string | null;
   channelFollower: number;
+  channelVerified: boolean;
   liveStatus: boolean;
   liveTitle: string | null;
   liveThumbnailUrl: string | null;
@@ -46,6 +47,7 @@ async function getChannelChzzk(
     channelDescription: data.content.channelDescription,
     channelImageUrl: data.content.channelImageUrl,
     channelFollower: data.content.followerCount,
+    channelVerified: data.content.verifiedMark,
     liveStatus: data.content.openLive,
     liveTitle: null,
     liveThumbnailUrl: null,
