@@ -1,4 +1,5 @@
 import {
+  BACKGROUND_CLIENT_ID,
   ClientBase,
   ClientId,
   MessageClientId,
@@ -26,7 +27,7 @@ import { hasProperty } from "@message/util.ts";
 
 class WebsiteClient implements ClientBase {
   id: ClientId;
-  listeners: ListenerMap = {};
+  #listeners: ListenerMap = {};
 
   constructor(id: ClientId) {
     this.id = id;
@@ -38,28 +39,28 @@ class WebsiteClient implements ClientBase {
     listener: MessageListener<T>,
     once: boolean = false
   ): void {
-    if (this.listeners[type] === undefined) {
-      this.listeners[type] = [];
+    if (this.#listeners[type] === undefined) {
+      this.#listeners[type] = [];
     }
 
-    this.listeners[type].push({ listener, once });
+    this.#listeners[type].push({ listener, once });
   }
 
   remove<T extends PayloadType>(type: T, listener: MessageListener<T>): void {
-    if (Array.isArray(this.listeners[type]) === false) return;
+    if (Array.isArray(this.#listeners[type]) === false) return;
 
-    const index = this.listeners[type].findIndex(
+    const index = this.#listeners[type].findIndex(
       (item) => item.listener === listener
     );
     if (index === -1) return;
 
-    this.listeners[type].splice(index, 1);
+    this.#listeners[type].splice(index, 1);
   }
 
   send<T extends PayloadType>(
     type: T,
     data: RequestPayload<T>,
-    recipient: MessageClientId = 0
+    recipient: MessageClientId = BACKGROUND_CLIENT_ID
   ): void {
     const message: Message = createRequestMessage(
       this.id,
@@ -79,7 +80,7 @@ class WebsiteClient implements ClientBase {
     reply: string,
     type: T,
     data: ResponsePayload<T>,
-    recipient: MessageClientId = 0
+    recipient: MessageClientId = BACKGROUND_CLIENT_ID
   ): void {
     const message: Message = createResponseMessage(
       this.id,
@@ -99,7 +100,7 @@ class WebsiteClient implements ClientBase {
   request<T extends PayloadType>(
     type: T,
     data: RequestPayload<T>,
-    recipient: MessageClientId = 0
+    recipient: MessageClientId = BACKGROUND_CLIENT_ID
   ): Promise<ResponseMessage<T>> {
     return new Promise((resolve) => {
       // Request Message 생성
@@ -149,9 +150,9 @@ class WebsiteClient implements ClientBase {
     if (isRequestMessage(type, message) === false) return;
 
     // 타입에 대한 Listener가 있는지 확인
-    if (Array.isArray(this.listeners[type]) === false) return;
+    if (Array.isArray(this.#listeners[type]) === false) return;
 
-    const listeners = this.listeners[type] as ListenerItem<typeof type>[];
+    const listeners = this.#listeners[type] as ListenerItem<typeof type>[];
     listeners.forEach((item) => {
       // 각각의 Listener 실행
       item.listener(message);
@@ -178,9 +179,8 @@ export function createWebsiteClient(): Promise<WebsiteClient> {
       if (message.type !== "website") return;
 
       const clientId: ClientId = {
+        id: message.id,
         type: "website",
-        index: message.index,
-        websiteId: message.websiteId,
       };
 
       // Handshake Response 이벤트를 제거하고 Website Client를 생성 후 반환

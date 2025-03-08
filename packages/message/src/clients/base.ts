@@ -6,25 +6,27 @@ import {
 } from "@message/messages/payload/payload.ts";
 export type ClientId =
   | {
+      id: string;
       type: "background";
-      index: 0;
     }
   | {
+      id: string;
       type: "website";
-      index: number;
-      websiteId: string;
     }
   | {
+      id: string;
       type: "content";
-      index: number;
       websiteId: string;
       blockId: string;
     };
 
+export const BACKGROUND_CLIENT_ID: string =
+  "00000000-0000-0000-0000-000000000000";
+
 export type MessageClientId =
-  | number
+  | string
   | { type: "background" }
-  | { type: "website"; websiteId: string }
+  | { type: "website"; id: string }
   | { type: "content"; websiteId: string; blockId: string };
 
 export type MessageListener<T extends PayloadType> = (

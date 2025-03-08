@@ -3,7 +3,7 @@ import {
   isHandshakeResponse,
   isMessage,
 } from "@message/messages/base.ts";
-import { ClientId } from "./base.ts";
+import { browser, ClientId } from "./base.ts";
 
 class WebsiteRelay {
   id: ClientId;
@@ -27,7 +27,7 @@ class WebsiteRelay {
     if (isMessage(message) === false) return;
 
     // 다른 Website Client가 보낸 Message
-    if (message.sender.index !== this.id.index) return;
+    if (message.sender.id !== this.id.id) return;
 
     this.port.postMessage(message);
   }
@@ -61,11 +61,11 @@ export async function createWebsiteRelay() {
       // Handshake Request를 Background Client로 전달합니다.
       if (isHandshakeRequest(message) === false) return;
       if (message.type !== "website") return;
-      const clientId: unknown = await chrome.runtime.sendMessage(message);
+      const clientId: unknown = await browser.runtime.sendMessage(message);
 
       // 요청이 성공하여 Handshake Response를 받으면 Connection을 구성합니다.
       if (isHandshakeResponse(clientId) === false) return;
-      const port = chrome.runtime.connect({ name: "website-client" });
+      const port = browser.runtime.connect({ name: "website-client" });
 
       // 전달받은 ClientId와 생성한 Connection으로 Relay 인스턴스를 생성합니다.
       new WebsiteRelay(clientId, port);

@@ -1,4 +1,6 @@
 import {
+  BACKGROUND_CLIENT_ID,
+  browser,
   ClientBase,
   ClientId,
   MessageClientId,
@@ -27,7 +29,7 @@ import { hasProperty } from "@message/util.ts";
 class ContentClient implements ClientBase {
   id: ClientId;
   port: chrome.runtime.Port;
-  listeners: ListenerMap = {};
+  #listeners: ListenerMap = {};
 
   constructor(id: ClientId, port: chrome.runtime.Port) {
     this.id = id;
@@ -41,28 +43,28 @@ class ContentClient implements ClientBase {
     listener: MessageListener<T>,
     once: boolean = false
   ): void {
-    if (this.listeners[type] === undefined) {
-      this.listeners[type] = [];
+    if (this.#listeners[type] === undefined) {
+      this.#listeners[type] = [];
     }
 
-    this.listeners[type].push({ listener, once });
+    this.#listeners[type].push({ listener, once });
   }
 
   remove<T extends PayloadType>(type: T, listener: MessageListener<T>): void {
-    if (Array.isArray(this.listeners[type]) === false) return;
+    if (Array.isArray(this.#listeners[type]) === false) return;
 
-    const index = this.listeners[type].findIndex(
+    const index = this.#listeners[type].findIndex(
       (item) => item.listener === listener
     );
     if (index === -1) return;
 
-    this.listeners[type].splice(index, 1);
+    this.#listeners[type].splice(index, 1);
   }
 
   send<T extends PayloadType>(
     type: T,
     data: RequestPayload<T>,
-    recipient: MessageClientId = 0
+    recipient: MessageClientId = BACKGROUND_CLIENT_ID
   ): void {
     const message: Message = createRequestMessage(
       this.id,
@@ -78,7 +80,7 @@ class ContentClient implements ClientBase {
     reply: string,
     type: T,
     data: ResponsePayload<T>,
-    recipient: MessageClientId = 0
+    recipient: MessageClientId = BACKGROUND_CLIENT_ID
   ): void {
     const message: Message = createResponseMessage(
       this.id,
@@ -94,7 +96,7 @@ class ContentClient implements ClientBase {
   request<T extends PayloadType>(
     type: T,
     data: RequestPayload<T>,
-    recipient: MessageClientId = 0
+    recipient: MessageClientId = BACKGROUND_CLIENT_ID
   ): Promise<ResponseMessage<T>> {
     return new Promise((resolve) => {
       // Request Message 생성
@@ -126,7 +128,7 @@ class ContentClient implements ClientBase {
     });
   }
 
-  #onMessage(message: unknown, port: chrome.runtime.Port): void {
+  #onMessage(message: unknown, port: chrome.runtime.Port) {
     // Message Check
     if (isMessage(message) === false) return;
 
@@ -137,9 +139,9 @@ class ContentClient implements ClientBase {
     if (isRequestMessage(type, message) === false) return;
 
     // 타입에 대한 Listener가 있는지 확인
-    if (Array.isArray(this.listeners[type]) === false) return;
+    if (Array.isArray(this.#listeners[type]) === false) return;
 
-    const listeners = this.listeners[type] as ListenerItem<typeof type>[];
+    const listeners = this.#listeners[type] as ListenerItem<typeof type>[];
     listeners.forEach((item) => {
       // 각각의 Listener 실행
       item.listener(message);
@@ -165,16 +167,16 @@ export async function createContentClient(
     };
 
     // Handshake Request 전송
-    chrome.runtime.sendMessage(request).then((response: unknown) => {
+    browser.runtime.sendMessage(request).then((response: unknown) => {
       // 올바른 Handshake Response인지 확인
       if (isHandshakeResponse(response) === false) return;
       if (response.type !== "content") return;
 
       // clientId를 가져오고 port 생성
-      const port = chrome.runtime.connect({ name: "content-client" });
+      const port = browser.runtime.connect({ name: "content-client" });
       const clientId: ClientId = {
+        id: response.id,
         type: "content",
-        index: response.index,
         websiteId: response.websiteId,
         blockId: response.blockId,
       };
