@@ -1,4 +1,3 @@
-import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
@@ -12,11 +11,10 @@ export type PlayerEventMessageData = {
   event: PlayerEventType;
 };
 
-export type PlayerEventMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & PlayerEventMessageData;
-};
+export type PlayerEventMessage = Message<
+  typeof MESSAGE_KEY,
+  PlayerEventMessageData
+>;
 
 export enum PlayerEventType {
   Loading = "loading",

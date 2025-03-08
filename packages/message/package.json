@@ -19,6 +19,7 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
+    "@chzstream/api": "workspace:^",
     "nanoevents": "^9.1.0",
     "typescript-event-target": "^1.1.1",
     "uuid": "^11.0.4"

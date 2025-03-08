@@ -14,11 +14,10 @@ export type HandshakeRequestMessageData = {
   type: ClientType;
 };
 
-export type HandshakeRequestMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & HandshakeRequestMessageData;
-};
+export type HandshakeRequestMessage = Message<
+  typeof MESSAGE_KEY,
+  HandshakeRequestMessageData
+>;
 
 export function isHandshakeRequestMessage(
   message: unknown

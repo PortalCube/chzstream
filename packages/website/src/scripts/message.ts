@@ -19,16 +19,13 @@ import {
   isChzzkLiveSearchResponseMessage,
   PlayerControlMessageData,
   PlayerEventMessage,
-  ReceiverType,
+  RecipientType,
   WebsiteClient,
-  WindowClient,
 } from "@chzstream/message";
 
 const iframeClientMap = new Map<number, number>();
 
-export const MessageClient = WebsiteClient.isAvailable()
-  ? new WebsiteClient()
-  : new WindowClient();
+export const MessageClient = new WebsiteClient();
 
 export async function initializeClientMessage() {
   console.log("[website-client] initialize");
@@ -73,7 +70,7 @@ export async function requestChzzkChannelInfo(
   const requestMessage = createChzzkChannelInfoRequestMessage(
     {
       sender: MessageClient.id,
-      receiver: ReceiverType.Extension,
+      recipient: RecipientType.Extension,
     },
     { uuid }
   );
@@ -98,7 +95,7 @@ export async function requestChzzkChannelSearch(
   const requestMessage = createChzzkChannelSearchRequestMessage(
     {
       sender: MessageClient.id,
-      receiver: ReceiverType.Extension,
+      recipient: RecipientType.Extension,
     },
     { query, offset, size }
   );
@@ -121,7 +118,7 @@ export async function requestChzzkLiveInfo(
   const requestMessage = createChzzkLiveInfoRequestMessage(
     {
       sender: MessageClient.id,
-      receiver: ReceiverType.Extension,
+      recipient: RecipientType.Extension,
     },
     { uuid }
   );
@@ -146,7 +143,7 @@ export async function requestChzzkLiveSearch(
   const requestMessage = createChzzkLiveSearchRequestMessage(
     {
       sender: MessageClient.id,
-      receiver: ReceiverType.Extension,
+      recipient: RecipientType.Extension,
     },
     { query, offset, size }
   );
@@ -173,7 +170,7 @@ export async function requestChzzkLiveList(
   const requestMessage = createChzzkLiveListRequestMessage(
     {
       sender: MessageClient.id,
-      receiver: ReceiverType.Extension,
+      recipient: RecipientType.Extension,
     },
     { offset, size }
   );
@@ -202,7 +199,7 @@ export async function sendPlayerControl(
   const message = createPlayerControlMessage(
     {
       sender: MessageClient.id,
-      receiver: id,
+      recipient: id,
     },
     data
   );

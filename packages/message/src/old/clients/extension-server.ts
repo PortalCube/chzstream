@@ -77,8 +77,6 @@ export class ExtensionServer extends ExtensionServerEventTarget {
 
     this.#active = true;
     browser.runtime.onConnect.addListener(this.#onConnect.bind(this));
-    browser.runtime.onConnectExternal.addListener(this.#onConnect.bind(this));
-
     browser.runtime.onMessageExternal.addListener(
       (_message, _sender, sendResponse) => {
         sendResponse();
@@ -107,17 +105,9 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return;
     }
 
-    if (port.sender.id) {
-      if (WEB_EXTENSION_ID.includes(port.sender.id) === false) {
-        return;
-      }
-    } else {
-      if (
-        port.sender.origin === undefined ||
-        this.allowOrigins.includes(port.sender.origin) === false
-      ) {
-        return;
-      }
+    if (port.sender.id === undefined) {
+      if (port.sender.origin === undefined) return;
+      if (this.allowOrigins.includes(port.sender.origin) === false) return;
     }
 
     console.log(`[extension-server] connection established`, port);
@@ -137,8 +127,8 @@ export class ExtensionServer extends ExtensionServerEventTarget {
     return this.#connections.find((connection) => connection.id === id);
   }
 
-  #relayMessage(message: Message) {
-    if (message.receiver === ReceiverType.All) {
+  #relayMessage(message: MessageBase) {
+    if (message.recipient === RecipientType.All) {
       for (const connection of this.#connections) {
         connection.port.postMessage(message);
       }
@@ -146,7 +136,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return false;
     }
 
-    if (message.receiver === ReceiverType.AllWebsite) {
+    if (message.recipient === RecipientType.AllWebsite) {
       for (const connection of this.#connections) {
         if (connection.type === ClientType.Website) {
           connection.port.postMessage(message);
@@ -156,7 +146,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return true;
     }
 
-    if (message.receiver === ReceiverType.AllIframe) {
+    if (message.recipient === RecipientType.AllIframe) {
       for (const connection of this.#connections) {
         if (connection.type === ClientType.Iframe) {
           connection.port.postMessage(message);
@@ -166,12 +156,12 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return true;
     }
 
-    if (message.receiver === ReceiverType.Extension) {
+    if (message.recipient === RecipientType.Extension) {
       return false;
     }
 
-    if (Array.isArray(message.receiver)) {
-      for (const id of message.receiver) {
+    if (Array.isArray(message.recipient)) {
+      for (const id of message.recipient) {
         const connection = this.#findConnection(id);
 
         if (connection !== undefined) {
@@ -182,8 +172,8 @@ export class ExtensionServer extends ExtensionServerEventTarget {
       return true;
     }
 
-    if (typeof message.receiver === "number") {
-      const connection = this.#findConnection(message.receiver);
+    if (typeof message.recipient === "number") {
+      const connection = this.#findConnection(message.recipient);
 
       if (connection !== undefined) {
         connection.port.postMessage(message);
@@ -196,7 +186,10 @@ export class ExtensionServer extends ExtensionServerEventTarget {
   }
 
   #onMessage(id: number, message: unknown, port: chrome.runtime.Port) {
-    const dispatch = (key: keyof ExtensionServerEventMap, message: Message) => {
+    const dispatch = (
+      key: keyof ExtensionServerEventMap,
+      message: MessageBase
+    ) => {
       this.dispatchTypedEvent(
         key,
         new CustomEvent(key, { detail: { message, port } })
@@ -275,7 +268,7 @@ export class ExtensionServer extends ExtensionServerEventTarget {
     const responseMessage = createHandshakeResponseMessage(
       {
         id: message.id,
-        receiver: id,
+        recipient: id,
         sender: 0,
       },
       {

@@ -35,7 +35,7 @@ export async function initializeClientMessage() {
   const handshakeMessage = createHandshakeIframeMessage(
     {
       sender: client.id,
-      receiver: parentId,
+      recipient: parentId,
     },
     {
       iframeId,
@@ -63,7 +63,7 @@ export async function sendPlayerEvent(event: PlayerEventType) {
   const message = createPlayerEventMessage(
     {
       sender: client.id,
-      receiver: parentId,
+      recipient: parentId,
     },
     {
       event,
@@ -89,7 +89,7 @@ export async function sendPointerMove(clientX: number, clientY: number) {
   const message = createIframePointerMoveMessage(
     {
       sender: client.id,
-      receiver: parentId,
+      recipient: parentId,
     },
     {
       clientX,
@@ -116,7 +116,7 @@ export async function sendPlayerControl(data: PlayerControlMessageData) {
   const message = createPlayerControlMessage(
     {
       sender: client.id,
-      receiver: parentId,
+      recipient: parentId,
     },
     data
   );

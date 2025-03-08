@@ -1,4 +1,3 @@
-import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
@@ -12,11 +11,10 @@ export type HandshakeIframeMessageData = {
   iframeId: number;
 };
 
-export type HandshakeIframeMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  } & HandshakeIframeMessageData;
-};
+export type HandshakeIframeMessage = Message<
+  typeof MESSAGE_KEY,
+  HandshakeIframeMessageData
+>;
 
 export function isHandshakeIframeMessage(
   message: unknown

@@ -4,13 +4,13 @@ import {
   createHandshakeRequestMessage,
   isHandshakeResponseMessage,
   isPlayerControlMessage,
-  Message,
+  MessageBase,
   PlayerControlMessage,
 } from "@message/old/messages";
 import { browser, ClientType } from "@message/old/clients/base";
 
 export type IframeClientEvent = {
-  message: (message: Message) => void;
+  message: (message: MessageBase) => void;
   disconnect: () => void;
   "player-control": (message: PlayerControlMessage) => void;
 };
@@ -81,7 +81,7 @@ export class IframeClient {
     const handshakeMessage = createHandshakeRequestMessage(
       {
         sender: null,
-        receiver: ReceiverType.Extension,
+        recipient: RecipientType.Extension,
       },
       ClientType.Iframe
     );
@@ -101,7 +101,7 @@ export class IframeClient {
     this.#port.disconnect();
   }
 
-  send(message: Message) {
+  send(message: MessageBase) {
     if (this.#port === null) {
       return;
     }
@@ -109,9 +109,9 @@ export class IframeClient {
     this.#port.postMessage(message);
   }
 
-  request<T extends Message, K extends Message>(
+  request<T extends MessageBase, K extends MessageBase>(
     message: T,
-    isMessage: (message: Message) => message is K
+    isMessage: (message: MessageBase) => message is K
   ): Promise<K> {
     return new Promise((resolve, reject) => {
       if (this.#port === null) {
@@ -119,7 +119,7 @@ export class IframeClient {
         return;
       }
 
-      const onMessage = (value: Message) => {
+      const onMessage = (value: MessageBase) => {
         if (isMessage(value) === false) {
           return;
         }

@@ -48,7 +48,7 @@ async function onChzzkChannelInfoRequest(
     {
       id: message.id,
       sender: 0,
-      receiver: message.sender ?? -1,
+      recipient: message.sender ?? -1,
     },
     data
   );
@@ -67,7 +67,7 @@ async function onChzzkLiveInfoRequest(
     {
       id: message.id,
       sender: 0,
-      receiver: message.sender ?? -1,
+      recipient: message.sender ?? -1,
     },
     data
   );
@@ -87,7 +87,7 @@ async function onChzzkChannelSearchRequest(
     {
       id: message.id,
       sender: 0,
-      receiver: message.sender ?? -1,
+      recipient: message.sender ?? -1,
     },
     data
   );
@@ -107,7 +107,7 @@ async function onChzzkLiveSearchRequest(
     {
       id: message.id,
       sender: 0,
-      receiver: message.sender ?? -1,
+      recipient: message.sender ?? -1,
     },
     data
   );
@@ -127,7 +127,7 @@ async function onChzzkLiveListRequest(
     {
       id: message.id,
       sender: 0,
-      receiver: message.sender ?? -1,
+      recipient: message.sender ?? -1,
     },
     data
   );

@@ -1,4 +1,3 @@
-import { isTypedObject } from "@message/util.ts";
 import {
   createMessage,
   CreateMessageOptions,
@@ -8,11 +7,7 @@ import {
 
 const MESSAGE_KEY = "_isHeartbeatMessage";
 
-export type HeartbeatMessage = Message & {
-  data: {
-    [MESSAGE_KEY]: true;
-  };
-};
+export type HeartbeatMessage = Message<typeof MESSAGE_KEY, {}>;
 
 export function isHeartbeatMessage(
   message: unknown

@@ -1,6 +1,6 @@
-import { WindowRelay } from "@chzstream/message";
+import { WebsiteRelay } from "@chzstream/message";
 
-const relay = new WindowRelay();
+const relay = new WebsiteRelay();
 
 export async function initializeRelayMessage() {
   console.log("[website-relay] initialize");
