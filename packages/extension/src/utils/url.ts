@@ -22,5 +22,5 @@ export function hasStringParam(name: string, value?: string): boolean {
   return url.searchParams.has(name, value);
 }
 
-export const parentId: number | null = getNumberParam("_csp");
+export const parentId: string | null = getStringParam("_csp");
 export const iframeId: number | null = getNumberParam("_csi");

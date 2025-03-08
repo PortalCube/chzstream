@@ -1,15 +1,75 @@
-import { TypedEventTarget } from "typescript-event-target";
+import { RequestMessage, ResponseMessage } from "@message/messages/base.ts";
 import {
-  ChzzkChannelInfoResponseMessage,
-  ChzzkLiveInfoResponseMessage,
-  HandshakeIframeMessage,
-  IframePointerMoveMessage,
-  MessageBase,
-  PlayerControlMessage,
-  PlayerEventMessage,
-} from "@message/messages/index.ts";
+  PayloadType,
+  RequestPayload,
+  ResponsePayload,
+} from "@message/messages/payload/payload.ts";
+export type ClientId =
+  | {
+      id: string;
+      type: "background";
+    }
+  | {
+      id: string;
+      type: "website";
+    }
+  | {
+      id: string;
+      type: "content";
+      websiteId: string;
+      blockId: number;
+    };
 
-function getBrowser(): typeof chrome {
+export const BACKGROUND_CLIENT_ID: string =
+  "00000000-0000-0000-0000-000000000000";
+
+export type MessageClientId =
+  | string
+  | { type: "background" }
+  | { type: "website"; id: string }
+  | { type: "content"; websiteId: string; blockId: string };
+
+export type MessageListener<T extends PayloadType> = (
+  message: RequestMessage<T>
+) => void;
+
+export type ListenerItem<T extends PayloadType> = {
+  listener: MessageListener<T>;
+  once: boolean;
+};
+
+export type ListenerMap = Partial<{
+  [T in PayloadType]: ListenerItem<T>[];
+}>;
+
+export interface ClientBase {
+  readonly id: ClientId;
+
+  on<T extends PayloadType>(type: T, listener: MessageListener<T>): void;
+
+  remove<T extends PayloadType>(type: T, listener: MessageListener<T>): void;
+
+  send<T extends PayloadType>(
+    type: T,
+    data: RequestPayload<T>,
+    recipient?: MessageClientId
+  ): void;
+
+  reply<T extends PayloadType>(
+    reply: string,
+    type: T,
+    data: ResponsePayload<T>,
+    recipient: MessageClientId
+  ): void;
+
+  request<T extends PayloadType>(
+    type: T,
+    data: RequestPayload<T>,
+    recipient?: MessageClientId
+  ): Promise<ResponseMessage<T>>;
+}
+
+export const browser: typeof chrome = (() => {
   if (globalThis === null || globalThis === undefined) {
     throw new Error(
       "globalThis is not defined. This browser may not be supported."
@@ -23,50 +83,9 @@ function getBrowser(): typeof chrome {
   if (globalThis.browser !== undefined) return globalThis.browser;
 
   // Chromium Only
-  return globalThis.chrome;
-}
+  if (globalThis.chrome === undefined) return globalThis.chrome;
 
-export const browser: typeof chrome = getBrowser();
-
-export const MESSAGE_VERSION = "0.0.0";
-
-export enum ClientType {
-  Website = "website",
-  Iframe = "iframe",
-}
-
-export type ClientMessageEvent<T extends MessageBase> = CustomEvent<T>;
-
-export type ServerMessageEvent<T extends MessageBase> = CustomEvent<{
-  message: T;
-  port: chrome.runtime.Port;
-}>;
-
-export type WebsiteClientEventMap = {
-  message: ClientMessageEvent<MessageBase>;
-  disconnect: CustomEvent<void>;
-  "player-event": ClientMessageEvent<PlayerEventMessage>;
-  "player-control": ClientMessageEvent<PlayerControlMessage>;
-  "chzzk-channel-info": ClientMessageEvent<ChzzkChannelInfoResponseMessage>;
-  "chzzk-channel-search": ClientMessageEvent<ChzzkChannelInfoResponseMessage>;
-  "chzzk-live-info": ClientMessageEvent<ChzzkLiveInfoResponseMessage>;
-  "chzzk-live-search": ClientMessageEvent<ChzzkLiveInfoResponseMessage>;
-  "chzzk-live-list": ClientMessageEvent<ChzzkChannelInfoResponseMessage>;
-  "iframe-pointer-move": ClientMessageEvent<IframePointerMoveMessage>;
-  "iframe-handshake": ClientMessageEvent<HandshakeIframeMessage>;
-};
-
-export const WebsiteClientEventTarget = TypedEventTarget<WebsiteClientEventMap>;
-
-export interface WebsiteClientInterface {
-  get name(): string;
-  get id(): number | null;
-
-  connect(): Promise<void>;
-  disconnect(): void;
-  send(message: MessageBase): void;
-  request<T extends MessageBase>(
-    message: MessageBase,
-    isResponse: (message: MessageBase) => message is T
-  ): Promise<T>;
-}
+  throw new Error(
+    "Browser API is not available. This browser may not be supported."
+  );
+})();

@@ -1,104 +1,72 @@
 import {
-  isHandshakeRequestMessage,
-  isHandshakeResponseMessage,
+  isHandshakeRequest,
+  isHandshakeResponse,
   isMessage,
-} from "@message/messages/index.ts";
-import { browser } from "@message/clients/base.ts";
+} from "@message/messages/base.ts";
+import { browser, ClientId } from "@message/clients/base.ts";
 
 export class WebsiteRelay {
-  get name() {
-    return this.#name;
+  id: ClientId;
+  port: chrome.runtime.Port;
+
+  constructor(id: ClientId, port: chrome.runtime.Port) {
+    this.id = id;
+    this.port = port;
+
+    window.addEventListener("@chzstream/send", this.onSend.bind(this));
+    port.onMessage.addListener(this.onReceive.bind(this));
   }
 
-  get id() {
-    return this.#id;
+  // Website Client에서 Message를 수신하여 Background Client로 전달합니다.
+  onSend(event: CustomEventInit<unknown>): void {
+    const { detail: message } = event;
+
+    if (isMessage(message) === false) return;
+
+    // 다른 Website Client가 보낸 Message
+    if (message.sender.id !== this.id.id) return;
+
+    this.port.postMessage(message);
   }
 
-  get active() {
-    return this.#active === true;
+  // Background Client에서 Message를 수신하여 Website Client로 전달합니다.
+  onReceive(message: unknown, port: chrome.runtime.Port): void {
+    if (isMessage(message) === false) return;
+
+    window.dispatchEvent(
+      new CustomEvent("@chzstream/receive", {
+        detail: message,
+      })
+    );
   }
+}
 
-  #name: string = "window-relay";
-  #id: number | null = null;
-  #port: chrome.runtime.Port | null = null;
-  #active: boolean = false;
-  #origin: string = "";
+// Content Script에 Website Relay를 등록합니다.
+export async function createWebsiteRelay() {
+  // Handshake를 받으면, 새로운 Website Relay를 생성합니다.
+  window.addEventListener(
+    "@chzstream/handshake-request",
+    async (event: CustomEventInit<unknown>) => {
+      const message = event.detail;
 
-  constructor() {}
+      // Handshake Request를 Background Client로 전달합니다.
+      if (isHandshakeRequest(message) === false) return;
+      if (message.type !== "website") return;
+      const clientId: unknown = await browser.runtime.sendMessage(message);
 
-  listen() {
-    if (this.#active === true) {
-      return;
+      // 요청이 성공하여 Handshake Response를 받으면 Connection을 구성합니다.
+      if (isHandshakeResponse(clientId) === false) return;
+      const port = browser.runtime.connect({ name: "website-client" });
+
+      // 전달받은 ClientId와 생성한 Connection으로 Relay 인스턴스를 생성합니다.
+      new WebsiteRelay(clientId, port);
+
+      // Handshake Response를 Website Client로 전달합니다.
+      window.dispatchEvent(
+        new CustomEvent("@chzstream/handshake-response", {
+          detail: clientId,
+        })
+      );
     }
-
-    this.#active = true;
-
-    const url = new URL(window.location.href);
-    this.#origin = url.origin;
-
-    window.addEventListener("message", this.#onWindowMessage.bind(this));
-  }
-
-  #connect() {
-    if (this.#port !== null) {
-      return;
-    }
-
-    this.#port = browser.runtime.connect({
-      name: this.#name,
-    });
-    this.#port.onMessage.addListener(this.#onMessage.bind(this));
-    this.#port.onDisconnect.addListener(this.#onDisconnect.bind(this));
-  }
-
-  disconnect() {
-    if (this.#active === false) {
-      return;
-    }
-
-    this.#active = false;
-
-    window.removeEventListener("message", this.#onWindowMessage.bind(this));
-  }
-
-  #onWindowMessage(event: MessageEvent) {
-    if (event.origin !== this.#origin) {
-      return;
-    }
-
-    const message = event.data;
-
-    if (isMessage(message) === false) {
-      return;
-    }
-
-    if (isHandshakeRequestMessage(message) === true) {
-      this.#connect();
-    }
-
-    if (this.#port === null) {
-      return;
-    }
-
-    this.#port.postMessage(message);
-  }
-
-  #onMessage(message: unknown, _port: chrome.runtime.Port) {
-    if (isMessage(message) === false) {
-      return;
-    }
-
-    if (isHandshakeResponseMessage(message) === true) {
-      this.#id = message.data.id;
-    }
-
-    window.postMessage(message, this.#origin);
-  }
-
-  #onDisconnect() {
-    this.#active = false;
-    this.#port = null;
-
-    console.log(`[window-relay] disconnected`);
-  }
+  );
 }

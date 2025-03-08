@@ -1,5 +1,3 @@
-import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
-import { PlayerEventType } from "@chzstream/message";
 import {
   isEmbedChat,
   makeEmbedChat,
@@ -9,10 +7,10 @@ import {
   isEmbedPlayer,
   makeEmbedPlayer,
 } from "@extension/utils/chzzk-embed-player.ts";
+import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
 import {
+  contentClient,
   initializeClientMessage,
-  sendPlayerControl,
-  sendPlayerEvent,
 } from "@extension/utils/message/iframe-client.ts";
 
 export default defineContentScript({
@@ -46,16 +44,20 @@ async function initializeEmbedPlayer() {
   makeEmbedPlayer();
 
   embedEvent.on("change", async (data) => {
-    await sendPlayerControl(data);
+    contentClient.send("video-status", data);
   });
 
   embedEvent.on("load", async () => {
-    await sendPlayerEvent(PlayerEventType.Ready);
+    contentClient.send("player-status", {
+      type: "ready",
+    });
   });
 }
 
 async function initializeEmbedChat() {
   makeEmbedChat();
 
-  await sendPlayerEvent(PlayerEventType.Ready);
+  contentClient.send("player-status", {
+    type: "ready",
+  });
 }

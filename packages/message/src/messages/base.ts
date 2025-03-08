@@ -1,51 +1,130 @@
-import { v4 as uuid } from "uuid";
-import { isTypedObject } from "@message/util.ts";
+import { ClientId, MessageClientId } from "@message/clients/base.ts";
+import { hasProperty } from "@message/util.ts";
+import {
+  PayloadType,
+  RequestPayload,
+  ResponsePayload,
+} from "./payload/payload.ts";
 
-export enum RecipientType {
-  All = "all",
-  Extension = "extension",
-  AllWebsite = "all_website",
-  AllIframe = "all_iframe",
+/** RawMessage **/
+export interface RawMessage<T extends string> {
+  _CHZSTREAM: T;
 }
 
-export type Recipient = RecipientType | number | number[];
+export function isRawMessage<
+  Type extends string,
+  MessageType extends RawMessage<Type>,
+>(value: unknown, type: Type): value is MessageType {
+  return hasProperty(value, "_CHZSTREAM", type);
+}
 
-const MESSAGE_KEY = "_isChzstreamMessage";
+/** Message **/
+export interface Message extends RawMessage<"MESSAGE"> {
+  id: string; // uuid
+  sender: ClientId;
+  recipient: MessageClientId;
+}
 
-export type MessageBase = {
-  [MESSAGE_KEY]: true;
-  id: string;
-  sender: number | null;
-  recipient: Recipient;
-  data: unknown;
-};
+export function isMessage(value: unknown): value is Message {
+  return isRawMessage(value, "MESSAGE");
+}
 
-export type Message<Key extends string, Body> = MessageBase & {
-  data: {
-    [key in Key]: true;
-  } & Body;
-};
+/** RequestMessage **/
+export interface RequestMessage<T extends PayloadType> extends Message {
+  direction: "request";
+  type: T;
+  data: RequestPayload<T>;
+}
 
-export type CreateMessageOptions = {
-  id?: string;
-  sender: number | null;
-  recipient: Recipient;
-};
-
-export function isMessage(message: unknown): message is MessageBase {
-  if (isTypedObject(message, MESSAGE_KEY) === false) {
-    return false;
-  }
+export function isRequestMessage<T extends PayloadType>(
+  type: T,
+  value: unknown
+): value is RequestMessage<T> {
+  if (isMessage(value) === false) return false;
+  if (hasProperty(value, "direction", "request") === false) return false;
+  if (hasProperty(value, "type", type) === false) return false;
 
   return true;
 }
 
-export function createMessage(options: CreateMessageOptions): MessageBase {
+export function createRequestMessage<T extends PayloadType>(
+  sender: ClientId,
+  recipient: MessageClientId,
+  type: T,
+  data: RequestPayload<T>
+): RequestMessage<T> {
   return {
-    [MESSAGE_KEY]: true,
-    id: options.id ?? uuid(),
-    sender: options.sender,
-    recipient: options.recipient,
-    data: null,
+    _CHZSTREAM: "MESSAGE",
+    id: crypto.randomUUID(),
+    sender,
+    recipient,
+    direction: "request",
+    type,
+    data,
   };
+}
+
+/** ResponseMessage **/
+export interface ResponseMessage<T extends PayloadType> extends Message {
+  direction: "response";
+  reply: string; // uuid
+  type: T;
+  data: ResponsePayload<T>;
+}
+
+export function isResponseMessage<T extends PayloadType>(
+  type: T,
+  value: unknown
+): value is ResponseMessage<T> {
+  if (isMessage(value) === false) return false;
+  if (hasProperty(value, "direction", "response") === false) return false;
+  if (hasProperty(value, "type", type) === false) return false;
+
+  return true;
+}
+
+export function createResponseMessage<T extends PayloadType>(
+  sender: ClientId,
+  recipient: MessageClientId,
+  reply: string,
+  type: T,
+  data: ResponsePayload<T>
+): ResponseMessage<T> {
+  return {
+    _CHZSTREAM: "MESSAGE",
+    id: crypto.randomUUID(),
+    sender,
+    recipient,
+    direction: "response",
+    reply,
+    type,
+    data,
+  };
+}
+
+/** HandshakeRequest **/
+export type HandshakeRequest = RawMessage<"HANDSHAKE_REQUEST"> &
+  (
+    | {
+        type: "website";
+      }
+    | {
+        type: "content";
+        websiteId: string;
+        blockId: number;
+      }
+  );
+
+export function isHandshakeRequest(value: unknown): value is HandshakeRequest {
+  return isRawMessage(value, "HANDSHAKE_REQUEST");
+}
+
+/** HandshakeResponse **/
+export type HandshakeResponse = RawMessage<"HANDSHAKE_RESPONSE"> &
+  Exclude<ClientId, { type: "background" }>;
+
+export function isHandshakeResponse(
+  value: unknown
+): value is HandshakeResponse {
+  return isRawMessage(value, "HANDSHAKE_RESPONSE");
 }

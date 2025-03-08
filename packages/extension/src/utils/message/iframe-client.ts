@@ -1,19 +1,10 @@
 import {
-  createHandshakeIframeMessage,
-  createIframePointerMoveMessage,
-  createPlayerControlMessage,
-  createPlayerEventMessage,
-  IframeClient,
-  PlayerControlMessage,
-  PlayerControlMessageData,
-  PlayerEventType,
+  ContentClient,
+  createContentClient,
+  RequestMessage,
 } from "@chzstream/message";
 
-const client = new IframeClient();
-
-function isNumber(value: number | null): value is number {
-  return value !== null;
-}
+export let contentClient: ContentClient;
 
 // 메세지 모듈 시작
 export async function initializeClientMessage() {
@@ -27,103 +18,12 @@ export async function initializeClientMessage() {
     return;
   }
 
+  contentClient = await createContentClient(parentId, iframeId);
+
   // 이벤트 리스너 등록
-  client.addEventListener("player-control", onPlayerControlMessage);
-
-  await client.connect();
-
-  const handshakeMessage = createHandshakeIframeMessage(
-    {
-      sender: client.id,
-      recipient: parentId,
-    },
-    {
-      iframeId,
-    }
-  );
-
-  console.log("[iframe-client] initialize", handshakeMessage);
-
-  await client.send(handshakeMessage);
+  contentClient.on("video-status", onPlayerControlMessage);
 }
 
-export async function sendPlayerEvent(event: PlayerEventType) {
-  if (client.active === false) {
-    return;
-  }
-
-  if (isNumber(parentId) === false) {
-    return;
-  }
-
-  if (isNumber(iframeId) === false) {
-    return;
-  }
-
-  const message = createPlayerEventMessage(
-    {
-      sender: client.id,
-      recipient: parentId,
-    },
-    {
-      event,
-    }
-  );
-
-  await client.send(message);
-}
-
-export async function sendPointerMove(clientX: number, clientY: number) {
-  if (client.active === false) {
-    return;
-  }
-
-  if (isNumber(parentId) === false) {
-    return;
-  }
-
-  if (isNumber(iframeId) === false) {
-    return;
-  }
-
-  const message = createIframePointerMoveMessage(
-    {
-      sender: client.id,
-      recipient: parentId,
-    },
-    {
-      clientX,
-      clientY,
-    }
-  );
-
-  await client.send(message);
-}
-
-export async function sendPlayerControl(data: PlayerControlMessageData) {
-  if (client.active === false) {
-    return;
-  }
-
-  if (isNumber(parentId) === false) {
-    return;
-  }
-
-  if (isNumber(iframeId) === false) {
-    return;
-  }
-
-  const message = createPlayerControlMessage(
-    {
-      sender: client.id,
-      recipient: parentId,
-    },
-    data
-  );
-
-  await client.send(message);
-}
-
-function onPlayerControlMessage(message: PlayerControlMessage) {
+function onPlayerControlMessage(message: RequestMessage<"video-status">) {
   setPlayerControl(message.data);
 }

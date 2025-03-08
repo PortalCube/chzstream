@@ -1,16 +1,17 @@
 import {
   BACKGROUND_CLIENT_ID,
+  browser,
   ClientBase,
   ClientId,
-  ListenerItem,
-  ListenerMap,
   MessageClientId,
   MessageListener,
+  ListenerMap,
+  ListenerItem,
 } from "@message/clients/base.ts";
 import {
   createRequestMessage,
   createResponseMessage,
-  HandshakeResponse,
+  HandshakeRequest,
   isHandshakeResponse,
   isMessage,
   isRequestMessage,
@@ -25,13 +26,16 @@ import {
 } from "@message/messages/payload/payload.ts";
 import { hasProperty } from "@message/util.ts";
 
-export class WebsiteClient implements ClientBase {
+export class ContentClient implements ClientBase {
   id: ClientId;
+  port: chrome.runtime.Port;
   #listeners: ListenerMap = {};
 
-  constructor(id: ClientId) {
+  constructor(id: ClientId, port: chrome.runtime.Port) {
     this.id = id;
-    window.addEventListener("@chzstream/receive", this.#onMessage);
+    this.port = port;
+
+    this.port.onMessage.addListener(this.#onMessage.bind(this));
   }
 
   on<T extends PayloadType>(
@@ -69,11 +73,7 @@ export class WebsiteClient implements ClientBase {
       data
     );
 
-    window.dispatchEvent(
-      new CustomEvent("@chzstream/send", {
-        detail: message,
-      })
-    );
+    this.port.postMessage(message);
   }
 
   reply<T extends PayloadType>(
@@ -90,11 +90,7 @@ export class WebsiteClient implements ClientBase {
       data
     );
 
-    window.dispatchEvent(
-      new CustomEvent("@chzstream/send", {
-        detail: message,
-      })
-    );
+    this.port.postMessage(message);
   }
 
   request<T extends PayloadType>(
@@ -114,33 +110,26 @@ export class WebsiteClient implements ClientBase {
       const id = message.id;
 
       // Response Message를 받았을 때 실행할 임시 이벤트 리스너
-      const listener = (event: CustomEventInit<Message>) => {
-        const message = event.detail;
-
+      const listener = (message: unknown, port: chrome.runtime.Port) => {
         // 올바른 Response Message인지 확인
         if (isResponseMessage(type, message) === false) return;
         if (message.reply !== id) return;
 
         // Response Message 이벤트를 제거하고 Response Message 반환
-        window.removeEventListener("@chzstream/receive", listener);
+        this.port.onMessage.removeListener(listener);
         resolve(message);
       };
 
       // 임시 이벤트 리스너 등록
-      window.addEventListener("@chzstream/receive", listener);
+      this.port.onMessage.addListener(listener);
 
       // RequestMessage 전송
-      window.dispatchEvent(
-        new CustomEvent("@chzstream/send", {
-          detail: message,
-        })
-      );
+      this.port.postMessage(message);
     });
   }
 
-  #onMessage(event: CustomEventInit<Message>) {
+  #onMessage(message: unknown, port: chrome.runtime.Port) {
     // Message Check
-    const message = event.detail;
     if (isMessage(message) === false) return;
 
     // RequestMessage Check
@@ -165,38 +154,36 @@ export class WebsiteClient implements ClientBase {
   }
 }
 
-// 새로운 Website Client를 등록하고 생성합니다.
-export function createWebsiteClient(): Promise<WebsiteClient> {
+// 새로운 Content Client를 등록하고 생성합니다.
+export async function createContentClient(
+  websiteId: string,
+  blockId: number
+): Promise<ContentClient> {
   return new Promise((resolve) => {
-    // Handshake Response를 받았을 때 실행할 임시 이벤트 리스너
-    const listener = (event: CustomEventInit<HandshakeResponse>) => {
-      const message = event.detail;
-
-      // 올바른 Handshake Response인지 확인
-      if (isHandshakeResponse(message) === false) return;
-      if (message.type !== "website") return;
-
-      const clientId: ClientId = {
-        id: message.id,
-        type: "website",
-      };
-
-      // Handshake Response 이벤트를 제거하고 Website Client를 생성 후 반환
-      window.removeEventListener("@chzstream/handshake-response", listener);
-      resolve(new WebsiteClient(clientId));
+    const request: HandshakeRequest = {
+      _CHZSTREAM: "HANDSHAKE_REQUEST",
+      type: "content",
+      websiteId,
+      blockId,
     };
 
-    // 임시 이벤트 리스너 등록
-    window.addEventListener("@chzstream/handshake-response", listener);
-
     // Handshake Request 전송
-    window.dispatchEvent(
-      new CustomEvent("@chzstream/handshake-request", {
-        detail: {
-          _CHZSTREAM: "HANDSHAKE_REQUEST",
-          type: "website",
-        },
-      })
-    );
+    browser.runtime.sendMessage(request).then((response: unknown) => {
+      // 올바른 Handshake Response인지 확인
+      if (isHandshakeResponse(response) === false) return;
+      if (response.type !== "content") return;
+
+      // clientId를 가져오고 port 생성
+      const port = browser.runtime.connect({ name: "content-client" });
+      const clientId: ClientId = {
+        id: response.id,
+        type: "content",
+        websiteId: response.websiteId,
+        blockId: response.blockId,
+      };
+
+      // Content Client 생성후 반환
+      resolve(new ContentClient(clientId, port));
+    });
   });
 }
