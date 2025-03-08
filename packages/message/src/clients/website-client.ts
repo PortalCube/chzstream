@@ -200,3 +200,8 @@ export function createWebsiteClient(): Promise<WebsiteClient> {
     );
   });
 }
+
+export function checkWebsiteClient(): boolean {
+  // @ts-expect-error Custom Property
+  return window.__CHZSTREAM_EXTENSION__ === true;
+}

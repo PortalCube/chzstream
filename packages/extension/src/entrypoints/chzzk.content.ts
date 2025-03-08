@@ -24,7 +24,6 @@ export default defineContentScript({
 
     await initializeInterceptor();
     await initializeClientMessage();
-
     initializeIframeEventCapture();
 
     if (isEmbedPlayer()) {
