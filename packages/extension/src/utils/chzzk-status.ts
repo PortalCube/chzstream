@@ -1,11 +1,7 @@
-import {
-  ChzzkChannelInfoResponse,
-  ChzzkLiveInfoResponse,
-} from "@chzstream/message";
 import { contentClient } from "@extension/utils/message/iframe-client.ts";
 
 export async function initializePlayerStatus(isChat: boolean) {
-  InterceptEmitter.on("live-info", (response: ChzzkLiveInfoResponse) => {
+  InterceptEmitter.on("live-info", (response) => {
     console.log("[라이브 정보]", response);
 
     if (response === null) {
@@ -34,7 +30,7 @@ export async function initializePlayerStatus(isChat: boolean) {
     }
   });
 
-  InterceptEmitter.on("live-status", (response: Record<string, unknown>) => {
+  InterceptEmitter.on("live-status", (response) => {
     console.log("[라이브 상태]", response);
 
     if (response === null) {
@@ -64,7 +60,7 @@ export async function initializePlayerStatus(isChat: boolean) {
     }
   });
 
-  InterceptEmitter.on("channel-info", (response: ChzzkChannelInfoResponse) => {
+  InterceptEmitter.on("channel-info", (response) => {
     console.log("[채널 정보]", response);
   });
 
