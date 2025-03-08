@@ -1,6 +1,6 @@
-import { contentClient } from "@extension/utils/message/iframe-client.ts";
+import { contentClient } from "@extension/utils/message/content-client.ts";
 
-export async function initializePlayerStatus(isChat: boolean) {
+export async function initializePlayerStatus() {
   InterceptEmitter.on("live-info", (response) => {
     console.log("[라이브 정보]", response);
 
@@ -8,10 +8,6 @@ export async function initializePlayerStatus(isChat: boolean) {
       contentClient.send("player-status", {
         type: "end",
       });
-      return;
-    }
-
-    if (isChat) {
       return;
     }
 
@@ -37,10 +33,6 @@ export async function initializePlayerStatus(isChat: boolean) {
       contentClient.send("player-status", {
         type: "end",
       });
-      return;
-    }
-
-    if (isChat) {
       return;
     }
 

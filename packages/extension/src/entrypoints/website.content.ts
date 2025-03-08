@@ -1,5 +1,5 @@
 import { makeUrls } from "@extension/utils/make-url.ts";
-import { initializeRelayMessage } from "@extension/utils/message/website-relay.ts";
+import { createWebsiteRelay } from "@message/index.ts";
 
 export default defineContentScript({
   runAt: "document_start",
@@ -8,6 +8,6 @@ export default defineContentScript({
     import.meta.env.MODE
   ),
   async main(_context) {
-    initializeRelayMessage();
+    createWebsiteRelay();
   },
 });

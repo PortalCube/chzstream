@@ -42,7 +42,7 @@ export class WebsiteRelay {
 }
 
 // Content Script에 Website Relay를 등록합니다.
-export async function createWebsiteRelay() {
+export function createWebsiteRelay() {
   // Handshake를 받으면, 새로운 Website Relay를 생성합니다.
   window.addEventListener(
     "@chzstream/handshake-request",

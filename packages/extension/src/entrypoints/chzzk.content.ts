@@ -11,7 +11,7 @@ import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
 import {
   contentClient,
   initializeClientMessage,
-} from "@extension/utils/message/iframe-client.ts";
+} from "@extension/utils/message/content-client.ts";
 
 export default defineContentScript({
   // runAt: "document_idle",
@@ -24,10 +24,11 @@ export default defineContentScript({
 
     await initializeInterceptor();
     await initializeClientMessage();
-    initializePlayerStatus(isEmbedChat());
+
     initializeIframeEventCapture();
 
     if (isEmbedPlayer()) {
+      initializePlayerStatus();
       await initializeEmbedPlayer();
     } else if (isEmbedChat()) {
       await initializeEmbedChat();

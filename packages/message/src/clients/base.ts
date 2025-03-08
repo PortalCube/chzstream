@@ -27,7 +27,7 @@ export type MessageClientId =
   | string
   | { type: "background" }
   | { type: "website"; id: string }
-  | { type: "content"; websiteId: string; blockId: string };
+  | { type: "content"; websiteId: string; blockId: number };
 
 export type MessageListener<T extends PayloadType> = (
   message: RequestMessage<T>

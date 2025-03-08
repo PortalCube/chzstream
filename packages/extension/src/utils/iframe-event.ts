@@ -1,4 +1,4 @@
-import { contentClient } from "./message/iframe-client.ts";
+import { contentClient } from "./message/content-client.ts";
 
 export function initializeIframeEventCapture() {
   window.addEventListener("pointermove", async (event) => {

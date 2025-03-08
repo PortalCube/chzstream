@@ -1,6 +1,6 @@
+import { RequestPayload } from "@chzstream/message";
 import { createNanoEvents } from "nanoevents";
 import "@extension/utils/chzzk-embed-player.scss";
-import { PlayerControlMessageData } from "@chzstream/message";
 
 const EMBED_CLASS_NAME = "chzzk-embed-player";
 
@@ -16,7 +16,7 @@ const debouncedPlayerChange = debounce(onPlayerChange, 100);
 
 type EmbedEvent = {
   load: () => void;
-  change: (data: PlayerControlMessageData) => void;
+  change: (data: RequestPayload<"video-status">) => void;
 };
 
 export const embedEvent = createNanoEvents<EmbedEvent>();
@@ -195,7 +195,7 @@ function onPlayerChange() {
   const volume = getVolume();
   const muted = getMuted();
 
-  const data: PlayerControlMessageData = {};
+  const data: RequestPayload<"video-status"> = {};
 
   if (volume !== null) data.volume = volume;
   if (muted !== null) data.muted = muted;
@@ -303,7 +303,7 @@ export function waitForPlayerControl(
   });
 }
 
-export async function setPlayerControl(data: PlayerControlMessageData) {
+export async function setPlayerControl(data: RequestPayload<"video-status">) {
   const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
   if (videoElement === null) return;
 
