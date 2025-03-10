@@ -31,7 +31,7 @@ export class WebsiteClient implements ClientBase {
 
   constructor(id: ClientId) {
     this.id = id;
-    document.addEventListener("@chzstream/receive", this.#onMessage);
+    document.addEventListener("@chzstream/receive", this.#onMessage.bind(this));
   }
 
   on<T extends PayloadType>(
