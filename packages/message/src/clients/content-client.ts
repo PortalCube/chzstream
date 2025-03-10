@@ -173,14 +173,15 @@ export async function createContentClient(
       if (isHandshakeResponse(response) === false) return;
       if (response.type !== "content") return;
 
-      // clientId를 가져오고 port 생성
-      const port = browser.runtime.connect({ name: "content-client" });
       const clientId: ClientId = {
         id: response.id,
         type: "content",
         websiteId: response.websiteId,
         blockId: response.blockId,
       };
+
+      // clientId를 가져오고 port 생성
+      const port = browser.runtime.connect({ name: clientId.id });
 
       // Content Client 생성후 반환
       resolve(new ContentClient(clientId, port));

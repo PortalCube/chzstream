@@ -1,7 +1,10 @@
 import {
   ContentClient,
   createContentClient,
+  PayloadType,
   RequestMessage,
+  RequestPayload,
+  ResponsePayload,
 } from "@chzstream/message";
 
 export let contentClient: ContentClient;
@@ -22,6 +25,32 @@ export async function initializeClientMessage() {
 
   // 이벤트 리스너 등록
   contentClient.on("video-status", onPlayerControlMessage);
+}
+
+export function send<T extends PayloadType>(type: T, data: RequestPayload<T>) {
+  if (parentId === null) {
+    throw new Error("parentId is null");
+  }
+
+  contentClient.send(type, data, {
+    type: "website",
+    id: parentId,
+  });
+}
+
+export function reply<T extends PayloadType>(
+  id: string,
+  type: T,
+  data: ResponsePayload<T>
+) {
+  if (parentId === null) {
+    throw new Error("parentId is null");
+  }
+
+  contentClient.reply(id, type, data, {
+    type: "website",
+    id: parentId,
+  });
 }
 
 function onPlayerControlMessage(message: RequestMessage<"video-status">) {

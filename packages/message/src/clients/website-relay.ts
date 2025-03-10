@@ -13,7 +13,7 @@ export class WebsiteRelay {
     this.id = id;
     this.port = port;
 
-    window.addEventListener("@chzstream/send", this.onSend.bind(this));
+    document.addEventListener("@chzstream/send", this.onSend.bind(this));
     port.onMessage.addListener(this.onReceive.bind(this));
   }
 
@@ -33,7 +33,7 @@ export class WebsiteRelay {
   onReceive(message: unknown, port: chrome.runtime.Port): void {
     if (isMessage(message) === false) return;
 
-    window.dispatchEvent(
+    document.dispatchEvent(
       new CustomEvent("@chzstream/receive", {
         detail: message,
       })
@@ -44,7 +44,7 @@ export class WebsiteRelay {
 // Content Script에 Website Relay를 등록합니다.
 export function createWebsiteRelay() {
   // Handshake를 받으면, 새로운 Website Relay를 생성합니다.
-  window.addEventListener(
+  document.addEventListener(
     "@chzstream/handshake-request",
     async (event: CustomEventInit<unknown>) => {
       const message = event.detail;
@@ -56,20 +56,17 @@ export function createWebsiteRelay() {
 
       // 요청이 성공하여 Handshake Response를 받으면 Connection을 구성합니다.
       if (isHandshakeResponse(clientId) === false) return;
-      const port = browser.runtime.connect({ name: "website-client" });
+      const port = browser.runtime.connect({ name: clientId.id });
 
       // 전달받은 ClientId와 생성한 Connection으로 Relay 인스턴스를 생성합니다.
       new WebsiteRelay(clientId, port);
 
       // Handshake Response를 Website Client로 전달합니다.
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("@chzstream/handshake-response", {
           detail: clientId,
         })
       );
     }
   );
-
-  // @ts-expect-error Custom Property
-  window.__CHZSTREAM_EXTENSION__ = true;
 }

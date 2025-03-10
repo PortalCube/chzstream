@@ -19,7 +19,6 @@ const makeManifest: UserManifestFn = ({ browser, mode }) => {
         "https://naver.com/",
         "https://chzzk.naver.com/*",
         "https://api.chzzk.naver.com/*",
-        "https://chzstream.vercel.app/*",
         "https://chzstream.app/*",
       ],
       mode
@@ -29,6 +28,10 @@ const makeManifest: UserManifestFn = ({ browser, mode }) => {
         resources: ["chzzk-xhr.js"],
         matches: ["https://chzzk.naver.com/*"],
       },
+      {
+        resources: ["website-test.js"],
+        matches: ["http://localhost/*", "https://chzstream.app/*"],
+      },
     ],
   };
 
@@ -36,11 +39,7 @@ const makeManifest: UserManifestFn = ({ browser, mode }) => {
   if (["chrome", "edge", "whale"].includes(browser)) {
     manifest.externally_connectable = {
       matches: makeUrls(
-        [
-          "https://chzstream.vercel.app/*",
-          "https://chzstream.app/*",
-          "https://chzzk.naver.com/live/*",
-        ],
+        ["https://chzstream.app/*", "https://chzzk.naver.com/live/*"],
         mode
       ),
     };

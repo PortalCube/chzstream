@@ -1,25 +1,23 @@
-import { contentClient } from "@extension/utils/message/content-client.ts";
+import { send } from "@extension/utils/message/content-client.ts";
 
 export async function initializePlayerStatus() {
   InterceptEmitter.on("live-info", (response) => {
-    console.log("[라이브 정보]", response);
-
     if (response === null) {
-      contentClient.send("player-status", {
+      send("player-status", {
         type: "end",
       });
       return;
     }
 
     if (response.status === "CLOSE") {
-      contentClient.send("player-status", {
+      send("player-status", {
         type: "end",
       });
       return;
     }
 
     if (response.adult && response.userAdultStatus !== "ADULT") {
-      contentClient.send("player-status", {
+      send("player-status", {
         type: "adult",
       });
       return;
@@ -27,17 +25,15 @@ export async function initializePlayerStatus() {
   });
 
   InterceptEmitter.on("live-status", (response) => {
-    console.log("[라이브 상태]", response);
-
     if (response === null) {
-      contentClient.send("player-status", {
+      send("player-status", {
         type: "end",
       });
       return;
     }
 
     if (response.status === "CLOSE") {
-      contentClient.send("player-status", {
+      send("player-status", {
         type: "end",
       });
       removeEmbedPlayer();
@@ -45,16 +41,16 @@ export async function initializePlayerStatus() {
     }
 
     if (response.adult && response.userAdultStatus !== "ADULT") {
-      contentClient.send("player-status", {
+      send("player-status", {
         type: "adult",
       });
       return;
     }
   });
 
-  InterceptEmitter.on("channel-info", (response) => {
-    console.log("[채널 정보]", response);
-  });
+  // InterceptEmitter.on("channel-info", (response) => {
+  //   console.log("[채널 정보]", response);
+  // });
 
   checkPlayerError();
 }
@@ -69,7 +65,7 @@ function checkPlayerError() {
       }
 
       if (element.classList.contains("pzp-pc--dialog-error") === true) {
-        contentClient.send("player-status", {
+        send("player-status", {
           type: "error",
           message: "플레이어에서 에러가 발생했습니다.",
         });

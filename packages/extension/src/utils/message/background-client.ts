@@ -4,7 +4,7 @@ import { BackgroundClient, createBackgroundClient } from "@message/index.ts";
 export let backgroundClient: BackgroundClient;
 
 // 메세지 모듈 시작
-export function initializeServerMessage() {
+export function initializeBackgroundClient() {
   backgroundClient = createBackgroundClient();
 
   const streamClient = new StreamClient();

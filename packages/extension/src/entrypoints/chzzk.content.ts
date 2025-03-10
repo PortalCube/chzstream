@@ -9,8 +9,8 @@ import {
 } from "@extension/utils/chzzk-embed-player.ts";
 import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
 import {
-  contentClient,
   initializeClientMessage,
+  send,
 } from "@extension/utils/message/content-client.ts";
 
 export default defineContentScript({
@@ -44,11 +44,11 @@ async function initializeEmbedPlayer() {
   makeEmbedPlayer();
 
   embedEvent.on("change", async (data) => {
-    contentClient.send("video-status", data);
+    send("video-status", data);
   });
 
   embedEvent.on("load", async () => {
-    contentClient.send("player-status", {
+    send("player-status", {
       type: "ready",
     });
   });
@@ -57,7 +57,7 @@ async function initializeEmbedPlayer() {
 async function initializeEmbedChat() {
   makeEmbedChat();
 
-  contentClient.send("player-status", {
+  send("player-status", {
     type: "ready",
   });
 }

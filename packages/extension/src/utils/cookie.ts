@@ -19,11 +19,7 @@ const targetCookies = [
   },
 ];
 
-const TOP_LEVEL_DOMAINS = [
-  "https://chzstream.vercel.app",
-  "https://chzstream.app",
-  "http://localhost:5286",
-];
+const TOP_LEVEL_DOMAINS = ["https://chzstream.app", "http://localhost:5286"];
 
 export async function initializeCookie() {
   browser.cookies.onChanged.addListener(onCookieChanged);

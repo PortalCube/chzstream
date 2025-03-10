@@ -83,7 +83,7 @@ export const browser: typeof chrome = (() => {
   if (globalThis.browser !== undefined) return globalThis.browser;
 
   // Chromium Only
-  if (globalThis.chrome === undefined) return globalThis.chrome;
+  if (globalThis.chrome !== undefined) return globalThis.chrome;
 
   throw new Error(
     "Browser API is not available. This browser may not be supported."

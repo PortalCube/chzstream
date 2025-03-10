@@ -31,7 +31,7 @@ export class WebsiteClient implements ClientBase {
 
   constructor(id: ClientId) {
     this.id = id;
-    window.addEventListener("@chzstream/receive", this.#onMessage);
+    document.addEventListener("@chzstream/receive", this.#onMessage);
   }
 
   on<T extends PayloadType>(
@@ -69,7 +69,7 @@ export class WebsiteClient implements ClientBase {
       data
     );
 
-    window.dispatchEvent(
+    document.dispatchEvent(
       new CustomEvent("@chzstream/send", {
         detail: message,
       })
@@ -90,7 +90,7 @@ export class WebsiteClient implements ClientBase {
       data
     );
 
-    window.dispatchEvent(
+    document.dispatchEvent(
       new CustomEvent("@chzstream/send", {
         detail: message,
       })
@@ -122,15 +122,15 @@ export class WebsiteClient implements ClientBase {
         if (message.reply !== id) return;
 
         // Response Message 이벤트를 제거하고 Response Message 반환
-        window.removeEventListener("@chzstream/receive", listener);
+        document.removeEventListener("@chzstream/receive", listener);
         resolve(message);
       };
 
       // 임시 이벤트 리스너 등록
-      window.addEventListener("@chzstream/receive", listener);
+      document.addEventListener("@chzstream/receive", listener);
 
       // RequestMessage 전송
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("@chzstream/send", {
           detail: message,
         })
@@ -182,15 +182,15 @@ export function createWebsiteClient(): Promise<WebsiteClient> {
       };
 
       // Handshake Response 이벤트를 제거하고 Website Client를 생성 후 반환
-      window.removeEventListener("@chzstream/handshake-response", listener);
+      document.removeEventListener("@chzstream/handshake-response", listener);
       resolve(new WebsiteClient(clientId));
     };
 
     // 임시 이벤트 리스너 등록
-    window.addEventListener("@chzstream/handshake-response", listener);
+    document.addEventListener("@chzstream/handshake-response", listener);
 
     // Handshake Request 전송
-    window.dispatchEvent(
+    document.dispatchEvent(
       new CustomEvent("@chzstream/handshake-request", {
         detail: {
           _CHZSTREAM: "HANDSHAKE_REQUEST",
