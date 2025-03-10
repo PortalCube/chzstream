@@ -1,12 +1,6 @@
-import { atom, useAtom } from "jotai";
-import {
-  MessageClient,
-  requestChzzkChannelInfo,
-  requestChzzkChannelSearch,
-  requestChzzkLiveList,
-  requestChzzkLiveSearch,
-} from "@web/scripts/message.ts";
 import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
+import { MessageClient } from "@web/scripts/message.ts";
+import { atom, useAtom } from "jotai";
 
 export enum SearchCategory {
   Summary = "summary",
@@ -79,69 +73,101 @@ export function useSearchModal() {
   }
 
   async function updateRecommendLive() {
-    const response = await requestChzzkLiveList();
-    if (response === null) {
+    if (MessageClient === null) {
       setRecommendResult([]);
       return;
     }
 
-    const items = response.map((item) => ({
-      uuid: item.channel.channelId,
-      title: item.channel.channelName,
-      description: item.liveTitle,
-      profileImage: item.channel.channelImageUrl,
+    const response = await MessageClient.request("stream-get-live-list", {
+      platform: "chzzk",
+      size: 50,
+    });
+
+    const data = response.data.result;
+    if (data === null) {
+      setRecommendResult([]);
+      return;
+    }
+
+    const items = data.map((item) => ({
+      uuid: item.channelId,
+      title: item.channelName,
+      description: item.liveTitle ?? "",
+      profileImage: item.channelImageUrl ?? "",
       countPrefix: "시청자",
-      count: item.concurrentUserCount,
-      verified: item.channel.verifiedMark,
+      count: item.liveViewer,
+      verified: item.channelVerified,
     }));
 
     setRecommendResult(items);
   }
 
   async function updateChannel() {
-    const response = await requestChzzkChannelSearch(query);
-    if (response === null) {
+    if (MessageClient === null) {
       setChannelResult([]);
       return;
     }
 
-    const items = response.map((item) => ({
-      uuid: item.channel.channelId,
-      title: item.channel.channelName,
-      description: item.channel.channelDescription,
-      profileImage: item.channel.channelImageUrl,
+    const response = await MessageClient.request("stream-search-channel", {
+      platform: "chzzk",
+      query,
+      size: 50,
+    });
+    const data = response.data.result;
+
+    if (data === null) {
+      setChannelResult([]);
+      return;
+    }
+
+    const items = data.map((item) => ({
+      uuid: item.channelId,
+      title: item.channelName,
+      description: item.channelDescription,
+      profileImage: item.channelImageUrl,
       countPrefix: "팔로우",
-      count: item.channel.followerCount,
-      verified: item.channel.verifiedMark,
+      count: item.channelFollower,
+      verified: item.channelVerified,
     }));
 
     setChannelResult(items);
   }
 
   async function updateLive() {
-    const response = await requestChzzkLiveSearch(query);
-    if (response === null) {
+    if (MessageClient === null) {
       setLiveResult([]);
       return;
     }
 
-    const items = response
-      .sort((a, b) => b.live.concurrentUserCount - a.live.concurrentUserCount)
+    const response = await MessageClient.request("stream-search-live", {
+      platform: "chzzk",
+      query,
+      size: 50,
+    });
+
+    const data = response.data.result;
+    if (data === null) {
+      setLiveResult([]);
+      return;
+    }
+
+    const items = data
+      .sort((a, b) => b.liveViewer - a.liveViewer)
       .map((item) => ({
-        uuid: item.channel.channelId,
-        title: item.channel.channelName,
-        description: item.live.liveTitle,
-        profileImage: item.channel.channelImageUrl,
+        uuid: item.channelId,
+        title: item.channelName,
+        description: item.liveTitle ?? "",
+        profileImage: item.channelImageUrl ?? "",
         countPrefix: "시청자",
-        count: item.live.concurrentUserCount,
-        verified: item.channel.verifiedMark,
+        count: item.liveViewer,
+        verified: item.channelVerified,
       }));
 
     setLiveResult(items);
   }
 
   async function updateUuid(uuid: string) {
-    if (MessageClient.active === false) {
+    if (MessageClient === null) {
       setChannelResult([
         {
           uuid: uuid,
@@ -156,21 +182,25 @@ export function useSearchModal() {
       return;
     }
 
-    const response = await requestChzzkChannelInfo(uuid);
-    if (response === null || response.channelId === null) {
+    const response = await MessageClient.request("stream-get-channel", {
+      platform: "chzzk",
+      id: uuid,
+    });
+    const data = response.data;
+    if (data === null || data.channelId === null) {
       setChannelResult([]);
       return;
     }
 
     const items = [
       {
-        uuid: response.channelId,
-        title: response.channelName,
-        description: response.channelDescription,
-        profileImage: response.channelImageUrl,
+        uuid: data.channelId,
+        title: data.channelName,
+        description: data.channelDescription,
+        profileImage: data.channelImageUrl,
         countPrefix: "팔로우",
-        count: response.followerCount,
-        verified: response.verifiedMark,
+        count: data.channelFollower,
+        verified: data.channelVerified,
       },
     ];
 

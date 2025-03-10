@@ -1,7 +1,7 @@
-import { PlayerControlMessageData } from "@chzstream/message";
+import { RequestPayload } from "@chzstream/message";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
-import { sendPlayerControl } from "@web/scripts/message.ts";
+import { MessageClient } from "@web/scripts/message.ts";
 import {
   getStoragePlayerMuted,
   getStoragePlayerQuality,
@@ -548,7 +548,7 @@ export const applyPlayerControlAtom = atom(
 
     const forceMute = soloBlockId !== null && soloBlockId !== id;
 
-    await sendPlayerControl(id, {
+    sendPlayerControl(id, {
       volume,
       quality,
       muted: forceMute ? true : muted,
@@ -558,7 +558,7 @@ export const applyPlayerControlAtom = atom(
 
 export const updatePlayerControlAtom = atom(
   null,
-  (get, set, id: number, data: PlayerControlMessageData) => {
+  (get, set, id: number, data: RequestPayload<"video-status">) => {
     const soloBlockId = get(soloBlockIdAtom);
 
     const blockList = get(blockListAtom);
@@ -604,3 +604,13 @@ export const updatePlayerControlAtom = atom(
     }
   }
 );
+
+function sendPlayerControl(id: number, data: RequestPayload<"video-status">) {
+  if (MessageClient === null) return;
+
+  MessageClient.send("video-status", data, {
+    type: "content",
+    websiteId: MessageClient.id.id,
+    blockId: id,
+  });
+}

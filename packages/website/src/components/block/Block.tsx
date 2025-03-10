@@ -1,10 +1,9 @@
-import {
-  ClientMessageEvent,
-  IframePointerMoveMessage,
-  PlayerEventType,
-} from "@chzstream/message";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { RequestMessage } from "@chzstream/message";
+import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
+import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
+import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
+import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
+import ViewBlock from "@web/components/block/ViewBlock.tsx";
 import { layoutSizeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import type { Block } from "@web/librarys/block.ts";
 import { BlockType } from "@web/librarys/block.ts";
@@ -18,17 +17,10 @@ import {
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
-import {
-  getIframeId,
-  MessageClient,
-  PlayerEvent,
-} from "@web/scripts/message.ts";
+import { MessageClient } from "@web/scripts/message.ts";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
-import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
-import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
-import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
-import ViewBlock from "@web/components/block/ViewBlock.tsx";
 
 const popinAnimation = keyframes`
   0% {
@@ -73,7 +65,7 @@ function Block({ block }: BlockProps) {
   const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
 
   useEffect(() => {
-    if (MessageClient.active === false) {
+    if (MessageClient === null) {
       setLoaded(true);
       setInfoType(InfoType.None);
     } else if (channel === null) {
@@ -86,73 +78,76 @@ function Block({ block }: BlockProps) {
   }, [status, channel]);
 
   useEffect(() => {
-    const onIframePointerMove = ({
-      detail: message,
-    }: ClientMessageEvent<IframePointerMoveMessage>) => {
+    const onIframePointerMove = (
+      message: RequestMessage<"iframe-pointer-move">
+    ) => {
       if (ref === null || ref.current === null) {
         return;
       }
+      if (MessageClient === null) return;
 
-      if (message.sender === null) {
-        return;
-      }
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== MessageClient.id.id) return;
+      if (message.sender.blockId !== id) return;
 
-      if (getIframeId(message.sender) !== id) {
-        return;
-      }
+      const data = message.data;
 
-      const y = message.data.clientY + ref.current.offsetTop;
-
+      const y = data.clientY + ref.current.offsetTop;
       const area = (window.document.body.clientHeight / GRID_SIZE_HEIGHT) * 0.5;
       setMouseTop(y < area);
     };
 
-    MessageClient.addEventListener("iframe-pointer-move", onIframePointerMove);
+    if (MessageClient) {
+      MessageClient.on("iframe-pointer-move", onIframePointerMove);
+    }
 
     return () => {
-      MessageClient.removeEventListener(
-        "iframe-pointer-move",
-        onIframePointerMove
-      );
+      if (MessageClient) {
+        MessageClient.remove("iframe-pointer-move", onIframePointerMove);
+      }
     };
   }, [id, setMouseTop, ref]);
 
   useEffect(() => {
-    const listener = ({ detail: message }: PlayerEvent) => {
-      if (message.sender === null) {
-        return;
-      }
+    const listener = (message: RequestMessage<"player-status">) => {
+      if (MessageClient === null) return;
 
-      if (getIframeId(message.sender) !== id) {
-        return;
-      }
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== MessageClient.id.id) return;
+      if (message.sender.blockId !== id) return;
 
-      if (message.data.event === PlayerEventType.Ready) {
+      const data = message.data;
+
+      if (data.type === "ready") {
         setLoaded(true);
         setInfoType(InfoType.None);
         applyPlayerControl(id);
       }
 
-      if (message.data.event === PlayerEventType.End) {
+      if (data.type === "end") {
         setLoaded(true);
         setInfoType(InfoType.Offline);
       }
 
-      if (message.data.event === PlayerEventType.Adult) {
+      if (data.type === "adult") {
         setLoaded(true);
         setInfoType(InfoType.Adult);
       }
 
-      if (message.data.event === PlayerEventType.Error) {
+      if (data.type === "error") {
         setLoaded(true);
         setInfoType(InfoType.Error);
       }
     };
 
-    MessageClient.addEventListener("player-event", listener);
+    if (MessageClient !== null) {
+      MessageClient.on("player-status", listener);
+    }
 
     return () => {
-      MessageClient.removeEventListener("player-event", listener);
+      if (MessageClient !== null) {
+        MessageClient.remove("player-status", listener);
+      }
     };
   }, [id, applyPlayerControl]);
 

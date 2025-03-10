@@ -1,29 +1,33 @@
-import { ClientMessageEvent, PlayerControlMessage } from "@chzstream/message";
+import { RequestMessage } from "@chzstream/message";
+import { updatePlayerControlAtom } from "@web/librarys/mixer.ts";
+import { MessageClient } from "@web/scripts/message.ts";
 import { useSetAtom } from "jotai";
 import { useCallback, useEffect } from "react";
-import { updatePlayerControlAtom } from "@web/librarys/mixer.ts";
-import { getIframeId, MessageClient } from "@web/scripts/message.ts";
 
 export function usePlayerControlListener() {
   const updatePlayerControl = useSetAtom(updatePlayerControlAtom);
 
   const onMessage = useCallback(
-    ({ detail: message }: ClientMessageEvent<PlayerControlMessage>) => {
-      if (message.sender === null) return;
+    (message: RequestMessage<"video-status">) => {
+      if (MessageClient === null) return;
 
-      const id = getIframeId(message.sender);
-      if (id === null) return;
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== MessageClient.id.id) return;
 
-      updatePlayerControl(id, message.data);
+      updatePlayerControl(message.sender.blockId, message.data);
     },
     [updatePlayerControl]
   );
 
   useEffect(() => {
-    MessageClient.addEventListener("player-control", onMessage);
+    if (MessageClient !== null) {
+      MessageClient.on("video-status", onMessage);
+    }
 
     return () => {
-      MessageClient.removeEventListener("player-control", onMessage);
+      if (MessageClient !== null) {
+        MessageClient.remove("video-status", onMessage);
+      }
     };
   }, [onMessage]);
 }

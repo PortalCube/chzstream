@@ -1,15 +1,7 @@
-import { WritableDraft } from "immer";
-import { atom } from "jotai";
-import {
-  MessageClient,
-  requestChzzkChannelInfo,
-  requestChzzkLiveInfo,
-} from "@web/scripts/message.ts";
 import {
   blockListAtom,
   layoutModeAtom,
   nextBlockIdAtom,
-  restrictedModeAtom,
 } from "@web/librarys/app.ts";
 import {
   Block,
@@ -24,6 +16,9 @@ import {
   soloBlockIdAtom,
   updateMuteAtom,
 } from "@web/librarys/mixer.ts";
+import { MessageClient } from "@web/scripts/message.ts";
+import { WritableDraft } from "immer";
+import { atom } from "jotai";
 
 export enum LayoutMode {
   View = "view",
@@ -37,7 +32,7 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
   const block: Block = {
     id: nextBlockId,
     type: BlockType.Stream,
-    status: MessageClient.active === false,
+    status: MessageClient === null,
     lock: true,
     position: position,
     channel: null,
@@ -182,9 +177,8 @@ export const fetchChzzkChannelAtom = atom(
       throw new Error(`Block not found: ${id}`);
     }
 
-    const restrictedMode = get(restrictedModeAtom);
-
-    if (restrictedMode === true) {
+    // const restrictedMode = get(restrictedModeAtom);
+    if (MessageClient === null) {
       set(modifyBlockAtom, {
         id,
         channel: {
@@ -208,29 +202,27 @@ export const fetchChzzkChannelAtom = atom(
       lastUpdate: null,
     };
 
-    const channelResponse = await requestChzzkChannelInfo(uuid);
-    if (channelResponse === null) {
+    const response = await MessageClient.request("stream-get-channel", {
+      platform: "chzzk",
+      id: uuid,
+    });
+
+    const data = response.data;
+    if (data === null) {
       throw new Error(`Channel not found: ${uuid}`);
     }
 
-    channel.name = channelResponse.channelName;
-    channel.iconUrl = getProfileImageUrl(channelResponse.channelImageUrl);
+    channel.name = data.channelName;
+    channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
     channel.lastUpdate = Date.now();
 
-    if (channelResponse.openLive === false) {
-      set(modifyBlockAtom, { id, channel });
-      return;
+    if (data.liveStatus) {
+      channel.title = data.liveTitle ?? "";
     }
 
-    const liveResponse = await requestChzzkLiveInfo(uuid);
-    if (liveResponse === null) {
-      throw new Error(`Live not found: ${uuid}`);
-    }
-
-    channel.title = liveResponse.liveTitle;
-
-    if (liveResponse.liveImageUrl !== null) {
-      const imageUrl = liveResponse.liveImageUrl.replace("{type}", "1080");
+    // TODO: CHZZK 전용 코드 --> 추후 수정
+    if (data.liveThumbnailUrl !== null) {
+      const imageUrl = data.liveThumbnailUrl.replace("{type}", "1080");
       channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;
     }
 

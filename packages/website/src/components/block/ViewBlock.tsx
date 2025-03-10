@@ -1,12 +1,12 @@
-import classNames from "classnames";
-import { useAtomValue } from "jotai";
-import { useContext, useMemo } from "react";
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockType } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context";
 import { LayoutMode } from "@web/librarys/layout.ts";
 import { MessageClient } from "@web/scripts/message.ts";
 import { Mixin } from "@web/scripts/styled.ts";
+import classNames from "classnames";
+import { useAtomValue } from "jotai";
+import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
 const resizeMixin = (scale: number) => {
@@ -65,13 +65,20 @@ function ViewBlock({ loaded }: ViewBlockProps) {
       return "about:blank";
     }
 
-    switch (type) {
-      case BlockType.Chat:
-        return `https://chzzk.naver.com/live/${channel.uuid}/chat?embed=true&_csp=${MessageClient.id}&_csi=${id}`;
-      case BlockType.Stream:
-      default:
-        return `https://chzzk.naver.com/live/${channel.uuid}?embed=true&_csp=${MessageClient.id}&_csi=${id}`;
+    const href =
+      type === BlockType.Chat
+        ? `https://chzzk.naver.com/live/${channel.uuid}/chat`
+        : `https://chzzk.naver.com/live/${channel.uuid}/`;
+    const url = new URL(href);
+
+    url.searchParams.set("embed", "true");
+
+    if (MessageClient !== null) {
+      url.searchParams.set("_csp", MessageClient.id.id);
+      url.searchParams.set("_csi", id.toString());
     }
+
+    return url.toString();
   }, [id, channel, status, type]);
 
   const className = classNames({

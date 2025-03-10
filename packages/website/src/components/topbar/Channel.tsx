@@ -1,11 +1,11 @@
-import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
-import { requestChzzkChannelInfo } from "@web/scripts/message.ts";
-import styled from "styled-components";
 import DragImage from "@web/components/drag/DragImage.tsx";
-import { useAtom } from "jotai";
 import { favoriteChannelsAtom } from "@web/librarys/app";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { MessageClient } from "@web/scripts/message.ts";
+import classNames from "classnames";
+import { useAtom } from "jotai";
+import React, { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 
 const Container = styled.div<{ $index: number; $gap: number }>`
   width: 42px;
@@ -61,7 +61,18 @@ function Channel({ uuid, index, gap }: ChannelProps) {
 
   useEffect(() => {
     const loadChannelInfo = async () => {
-      const data = await requestChzzkChannelInfo(uuid);
+      if (MessageClient === null) {
+        setName("알 수 없음");
+        setIconUrl(getProfileImageUrl());
+        setActive(false);
+        return;
+      }
+
+      const response = await MessageClient.request("stream-get-channel", {
+        platform: "chzzk",
+        id: uuid,
+      });
+      const data = response.data;
 
       if (data === null) {
         setName("알 수 없음");
@@ -72,7 +83,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
 
       setName(data.channelName);
       setIconUrl(getProfileImageUrl(data.channelImageUrl));
-      setActive(data.openLive);
+      setActive(data.liveStatus);
     };
 
     const intervalTimer = setInterval(() => {
