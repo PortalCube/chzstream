@@ -12,16 +12,16 @@
     "default": "./dist/index.js"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.280",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.5",
-    "vite-plugin-dts": "^4.4.0",
+    "@types/chrome": "^0.0.308",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1",
+    "vite-plugin-dts": "^4.5.3",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "dependencies": {
     "@chzstream/api": "workspace:^",
     "nanoevents": "^9.1.0",
     "typescript-event-target": "^1.1.1",
-    "uuid": "^11.0.4"
+    "uuid": "^11.1.0"
   }
 }
