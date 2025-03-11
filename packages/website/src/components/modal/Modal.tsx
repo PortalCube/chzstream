@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
-import { closeModalAtom, modalAtom, ModalType } from "@web/librarys/modal.ts";
+import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
 import styled from "styled-components";
 import MixerModal from "@web/components/modal/mixer/MixerModal.tsx";
 import SearchModal from "@web/components/modal/search-modal/SearchModal.tsx";
@@ -35,7 +35,7 @@ function Modal({}: ModalProps) {
   const closeModal = useSetAtom(closeModalAtom);
 
   const className = classNames({
-    disable: modal.type === ModalType.None,
+    disable: modal.type === "none",
   });
 
   const onPointerDown: React.MouseEventHandler = (event) => {

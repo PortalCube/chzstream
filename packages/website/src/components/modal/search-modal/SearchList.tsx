@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useEffect, useMemo, useState } from "react";
-import { ModalType, useModalListener } from "@web/librarys/modal.ts";
+import { useModalListener } from "@web/librarys/modal.ts";
 import { SearchItemType, useSearchModal } from "@web/librarys/search.ts";
 import styled from "styled-components";
 import Pagination from "@web/components/modal/search-modal/Pagination.tsx";
@@ -65,7 +65,7 @@ function SearchList({ items, size = 10, preview = false }: SearchListProps) {
 
   useModalListener((_get, _set, newVal, prevVal) => {
     if (prevVal.type === newVal.type) return;
-    if (newVal.type !== ModalType.Search) return;
+    if (newVal.type !== "search") return;
     setPage(1);
   });
 

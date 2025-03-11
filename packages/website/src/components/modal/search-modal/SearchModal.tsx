@@ -1,9 +1,9 @@
-import classNames from "classnames";
-import { useAtomValue } from "jotai";
-import { modalAtom, ModalType } from "@web/librarys/modal.ts";
-import styled from "styled-components";
 import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
 import SearchResult from "@web/components/modal/search-modal/SearchResult.tsx";
+import { modalAtom } from "@web/librarys/modal.ts";
+import classNames from "classnames";
+import { useAtomValue } from "jotai";
+import styled from "styled-components";
 
 const Container = styled.div`
   max-width: 600px;
@@ -46,7 +46,7 @@ function SearchModal({}: SearchModalProps) {
   const modal = useAtomValue(modalAtom);
 
   const className = classNames({
-    disable: modal.type !== ModalType.Search,
+    disable: modal.type !== "search",
   });
 
   return (

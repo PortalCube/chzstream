@@ -1,9 +1,9 @@
-import classNames from "classnames";
-import { ModalType, useModalListener } from "@web/librarys/modal.ts";
-import { useSearchModal } from "@web/librarys/search.ts";
-import styled from "styled-components";
 import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
 import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
+import { useModalListener } from "@web/librarys/modal.ts";
+import { useSearchModal } from "@web/librarys/search.ts";
+import classNames from "classnames";
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;
@@ -31,7 +31,7 @@ function SearchResult({}: SearchResultProps) {
 
   useModalListener((_get, _set, newVal, prevVal) => {
     if (prevVal.type === newVal.type) return;
-    if (newVal.type !== ModalType.Search) return;
+    if (newVal.type !== "search") return;
     setQuery("");
     showRecommend();
   });

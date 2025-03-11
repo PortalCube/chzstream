@@ -11,7 +11,6 @@ import {
 import {
   closeModalAtom,
   modalAtom,
-  ModalType,
   useModalListener,
 } from "@web/librarys/modal.ts";
 import styled from "styled-components";
@@ -115,7 +114,7 @@ function MixerModal({}: MixerModalProps) {
   const onApplyClick: React.MouseEventHandler = () => closeModal();
 
   const className = classNames({
-    disable: modal.type !== ModalType.Mixer,
+    disable: modal.type !== "mixer",
   });
 
   const items = mixerItems.map((item) => (
@@ -123,14 +122,14 @@ function MixerModal({}: MixerModalProps) {
   ));
 
   useModalListener((_get, _set, newVal, prevVal) => {
-    if (prevVal.type !== ModalType.Mixer) return;
-    if (newVal.type !== ModalType.None) return;
+    if (prevVal.type !== "mixer") return;
+    if (newVal.type !== "none") return;
     updateAllQuality();
   });
 
   useModalListener((_get, _set, newVal, prevVal) => {
     if (prevVal.type === newVal.type) return;
-    if (newVal.type !== ModalType.Mixer) return;
+    if (newVal.type !== "mixer") return;
     setupMixer();
   });
 
