@@ -7,4 +7,15 @@ export function initializeIframeEventCapture() {
       clientY: event.clientY,
     });
   });
+
+  window.addEventListener("keydown", async (event) => {
+    send("iframe-key-down", {
+      key: event.key,
+    });
+
+    if (event.key === "F11") {
+      // prevent browser native fullscreen
+      // event.preventDefault();
+    }
+  });
 }

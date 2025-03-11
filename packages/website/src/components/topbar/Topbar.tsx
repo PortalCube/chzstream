@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MdEdit,
   MdExpandLess,
@@ -18,6 +18,7 @@ import {
   LayoutMode,
   switchLayoutModeAtom,
 } from "@web/librarys/layout.ts";
+import { RequestMessage } from "@chzstream/message";
 import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import styled, { css } from "styled-components";
 import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
@@ -30,6 +31,7 @@ import {
   openSettingModalAtom,
 } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
+import { MessageClient } from "@web/scripts/message.ts";
 
 const Container = styled.div`
   width: 100%;
@@ -98,19 +100,17 @@ function Topbar() {
   const openSettingModal = useSetAtom(openSettingModalAtom);
   const openMixerModal = useSetAtom(openMixerModalAtom);
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = useCallback(() => {
     if (isFullscreen) {
       document.exitFullscreen();
     } else {
       document.body.requestFullscreen();
     }
-  };
+  }, [isFullscreen]);
 
   useEffect(() => {
     const onPointerMove = (event: PointerEvent) => {
-      // 세로 1칸 / 2
-      const area = (window.document.body.clientHeight / GRID_SIZE_HEIGHT) * 0.5;
-      setMouseTop(event.clientY < area);
+      setMouseTop(event.clientY < 10);
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -124,14 +124,29 @@ function Topbar() {
       }
     };
 
+    const onIframeKeyDown = (message: RequestMessage<"iframe-key-down">) => {
+      const key = message.data.key;
+
+      if (key === "F11") {
+        toggleFullscreen();
+      }
+    };
+
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("keydown", onKeyDown);
+    if (MessageClient) {
+      MessageClient.on("iframe-key-down", onIframeKeyDown);
+    }
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("keydown", onKeyDown);
+
+      if (MessageClient) {
+        MessageClient.remove("iframe-key-down", onIframeKeyDown);
+      }
     };
-  }, []);
+  }, [toggleFullscreen]);
 
   useEffect(() => {
     setShow(isFullscreen === false);
@@ -209,7 +224,7 @@ function Topbar() {
           onClick={item.onClick}
         />
       ));
-  }, [isShow, layoutMode]);
+  }, [isShow, layoutMode, isFullscreen, toggleFullscreen]);
 
   const className = classNames({
     hide: isShow === false,
