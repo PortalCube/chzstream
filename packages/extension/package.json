@@ -13,6 +13,7 @@
     "build:firefox": "wxt build -b firefox",
     "build:edge": "wxt build -b edge",
     "build:whale": "wxt build -b whale",
+    "build:all": "pnpm run build && pnpm run build:firefox && pnpm run build:edge && pnpm run build:whale",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "zip:edge": "wxt zip -b edge",
