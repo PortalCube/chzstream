@@ -43,6 +43,9 @@ export class WebsiteRelay {
 
 // Content Script에 Website Relay를 등록합니다.
 export function createWebsiteRelay() {
+  const heartbeat = () => browser.runtime.sendMessage(new Date().toISOString());
+  setInterval(heartbeat, 20000);
+
   // Handshake를 받으면, 새로운 Website Relay를 생성합니다.
   window.addEventListener(
     "message",
