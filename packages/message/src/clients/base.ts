@@ -42,6 +42,11 @@ export type ListenerMap = Partial<{
   [T in PayloadType]: ListenerItem<T>[];
 }>;
 
+export type WebsiteMessage = {
+  type: "handshake-request" | "handshake-response" | "send" | "receive";
+  body: unknown;
+};
+
 export interface ClientBase {
   readonly id: ClientId;
 
@@ -85,7 +90,9 @@ export const browser: typeof chrome = (() => {
   // Chromium Only
   if (globalThis.chrome !== undefined) return globalThis.chrome;
 
-  throw new Error(
+  console.error(
     "Browser API is not available. This browser may not be supported."
   );
+
+  return undefined;
 })();

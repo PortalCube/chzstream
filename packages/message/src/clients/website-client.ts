@@ -6,11 +6,11 @@ import {
   ListenerMap,
   MessageClientId,
   MessageListener,
+  WebsiteMessage,
 } from "@message/clients/base.ts";
 import {
   createRequestMessage,
   createResponseMessage,
-  HandshakeResponse,
   isHandshakeResponse,
   isMessage,
   isRequestMessage,
@@ -25,13 +25,14 @@ import {
 } from "@message/messages/payload/payload.ts";
 import { hasProperty } from "@message/util.ts";
 
+const ORIGIN = new URL(location.href).origin;
 export class WebsiteClient implements ClientBase {
   id: ClientId;
   #listeners: ListenerMap = {};
 
   constructor(id: ClientId) {
     this.id = id;
-    document.addEventListener("@chzstream/receive", this.#onMessage.bind(this));
+    window.addEventListener("message", this.#onMessage.bind(this));
   }
 
   on<T extends PayloadType>(
@@ -69,11 +70,10 @@ export class WebsiteClient implements ClientBase {
       data
     );
 
-    document.dispatchEvent(
-      new CustomEvent("@chzstream/send", {
-        detail: message,
-      })
-    );
+    window.postMessage({
+      type: "send",
+      body: message,
+    });
   }
 
   reply<T extends PayloadType>(
@@ -90,11 +90,10 @@ export class WebsiteClient implements ClientBase {
       data
     );
 
-    document.dispatchEvent(
-      new CustomEvent("@chzstream/send", {
-        detail: message,
-      })
-    );
+    window.postMessage({
+      type: "send",
+      body: message,
+    });
   }
 
   request<T extends PayloadType>(
@@ -114,33 +113,40 @@ export class WebsiteClient implements ClientBase {
       const id = message.id;
 
       // Response Message를 받았을 때 실행할 임시 이벤트 리스너
-      const listener = (event: CustomEventInit<Message>) => {
-        const message = event.detail;
+      const listener = (event: MessageEventInit<WebsiteMessage>) => {
+        if (event.origin !== ORIGIN) return;
+        if (event.data === undefined) return;
+        if (event.data.type !== "receive") return;
+
+        const message = event.data.body;
 
         // 올바른 Response Message인지 확인
         if (isResponseMessage(type, message) === false) return;
         if (message.reply !== id) return;
 
         // Response Message 이벤트를 제거하고 Response Message 반환
-        document.removeEventListener("@chzstream/receive", listener);
+        window.removeEventListener("message", listener);
         resolve(message);
       };
 
       // 임시 이벤트 리스너 등록
-      document.addEventListener("@chzstream/receive", listener);
+      window.addEventListener("message", listener);
 
       // RequestMessage 전송
-      document.dispatchEvent(
-        new CustomEvent("@chzstream/send", {
-          detail: message,
-        })
-      );
+      window.postMessage({
+        type: "send",
+        body: message,
+      });
     });
   }
 
-  #onMessage(event: CustomEventInit<Message>) {
+  #onMessage(event: MessageEventInit<WebsiteMessage>) {
+    if (event.origin !== ORIGIN) return;
+    if (event.data === undefined) return;
+    if (event.data.type !== "receive") return;
+
     // Message Check
-    const message = event.detail;
+    const message = event.data.body;
     if (isMessage(message) === false) return;
 
     // RequestMessage Check
@@ -169,8 +175,12 @@ export class WebsiteClient implements ClientBase {
 export function createWebsiteClient(): Promise<WebsiteClient> {
   return new Promise((resolve) => {
     // Handshake Response를 받았을 때 실행할 임시 이벤트 리스너
-    const listener = (event: CustomEventInit<HandshakeResponse>) => {
-      const message = event.detail;
+    const listener = (event: MessageEventInit<WebsiteMessage>) => {
+      if (event.origin !== ORIGIN) return;
+      if (event.data === undefined) return;
+      if (event.data.type !== "handshake-response") return;
+
+      const message = event.data.body;
 
       // 올바른 Handshake Response인지 확인
       if (isHandshakeResponse(message) === false) return;
@@ -182,22 +192,21 @@ export function createWebsiteClient(): Promise<WebsiteClient> {
       };
 
       // Handshake Response 이벤트를 제거하고 Website Client를 생성 후 반환
-      document.removeEventListener("@chzstream/handshake-response", listener);
+      window.removeEventListener("message", listener);
       resolve(new WebsiteClient(clientId));
     };
 
     // 임시 이벤트 리스너 등록
-    document.addEventListener("@chzstream/handshake-response", listener);
+    window.addEventListener("message", listener);
 
     // Handshake Request 전송
-    document.dispatchEvent(
-      new CustomEvent("@chzstream/handshake-request", {
-        detail: {
-          _CHZSTREAM: "HANDSHAKE_REQUEST",
-          type: "website",
-        },
-      })
-    );
+    window.postMessage({
+      type: "handshake-request",
+      body: {
+        _CHZSTREAM: "HANDSHAKE_REQUEST",
+        type: "website",
+      },
+    });
   });
 }
 

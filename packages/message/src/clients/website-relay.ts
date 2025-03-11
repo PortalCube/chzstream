@@ -1,10 +1,11 @@
+import { browser, ClientId, WebsiteMessage } from "@message/clients/base.ts";
 import {
   isHandshakeRequest,
   isHandshakeResponse,
   isMessage,
 } from "@message/messages/base.ts";
-import { browser, ClientId } from "@message/clients/base.ts";
 
+const ORIGIN = new URL(location.href).origin;
 export class WebsiteRelay {
   id: ClientId;
   port: chrome.runtime.Port;
@@ -13,45 +14,50 @@ export class WebsiteRelay {
     this.id = id;
     this.port = port;
 
-    document.addEventListener("@chzstream/send", this.onSend.bind(this));
+    window.addEventListener("message", this.onSend.bind(this));
     port.onMessage.addListener(this.onReceive.bind(this));
   }
 
   // Website Client에서 Message를 수신하여 Background Client로 전달합니다.
-  onSend(event: CustomEventInit<unknown>): void {
-    const { detail: message } = event;
+  onSend(event: MessageEventInit<WebsiteMessage>): void {
+    if (event.origin !== ORIGIN) return;
+    if (event.data === undefined) return;
+    if (event.data.type !== "send") return;
 
+    const message = event.data.body;
     if (isMessage(message) === false) return;
-
-    // 다른 Website Client가 보낸 Message
-    if (message.sender.id !== this.id.id) return;
 
     this.port.postMessage(message);
   }
 
   // Background Client에서 Message를 수신하여 Website Client로 전달합니다.
-  onReceive(message: unknown, port: chrome.runtime.Port): void {
+  onReceive(message: unknown, _port: chrome.runtime.Port): void {
     if (isMessage(message) === false) return;
 
-    document.dispatchEvent(
-      new CustomEvent("@chzstream/receive", {
-        detail: message,
-      })
-    );
+    window.postMessage({
+      type: "receive",
+      body: message,
+    });
   }
 }
 
 // Content Script에 Website Relay를 등록합니다.
 export function createWebsiteRelay() {
   // Handshake를 받으면, 새로운 Website Relay를 생성합니다.
-  document.addEventListener(
-    "@chzstream/handshake-request",
-    async (event: CustomEventInit<unknown>) => {
-      const message = event.detail;
+  window.addEventListener(
+    "message",
+    async (event: MessageEventInit<WebsiteMessage>) => {
+      if (event.origin !== ORIGIN) return;
+      if (event.data === undefined) return;
+      if (event.data.type !== "handshake-request") return;
 
-      // Handshake Request를 Background Client로 전달합니다.
+      const message = event.data.body;
+
+      // 올바른 Handshake Request인지 확인
       if (isHandshakeRequest(message) === false) return;
       if (message.type !== "website") return;
+
+      // Handshake Request를 Background Client로 전달합니다.
       const clientId: unknown = await browser.runtime.sendMessage(message);
 
       // 요청이 성공하여 Handshake Response를 받으면 Connection을 구성합니다.
@@ -62,11 +68,7 @@ export function createWebsiteRelay() {
       new WebsiteRelay(clientId, port);
 
       // Handshake Response를 Website Client로 전달합니다.
-      document.dispatchEvent(
-        new CustomEvent("@chzstream/handshake-response", {
-          detail: clientId,
-        })
-      );
+      window.postMessage({ type: "handshake-response", body: clientId });
     }
   );
 }
