@@ -93,7 +93,7 @@ function Keyword({
 
 export type KeywordProps = {
   text: string;
-  icon: (props: object) => JSX.Element;
+  icon: (props: object) => React.ReactNode;
   textColor: string;
   backgroundColor: string;
 };

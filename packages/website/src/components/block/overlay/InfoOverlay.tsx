@@ -1,20 +1,20 @@
+import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
-import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
 import styled, { css } from "styled-components";
 
-import { MdClose, MdLock } from "react-icons/md";
-import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
-import { layoutModeAtom } from "@web/librarys/app.ts";
-import { BlockContext } from "@web/librarys/context.ts";
-import { Mixin } from "@web/scripts/styled.ts";
 import Channel from "@web/components/block/overlay/Channel.tsx";
 import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import Keyword, {
   KeywordProps,
 } from "@web/components/block/overlay/Keyword.tsx";
 import OfflineIcon from "@web/components/block/overlay/OfflineIcon.tsx";
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockContext } from "@web/librarys/context.ts";
+import { Mixin } from "@web/scripts/styled.ts";
+import { MdClose, MdLock } from "react-icons/md";
 
 const Container = styled.div<{ $dpr: number }>`
   overflow: hidden;
@@ -304,7 +304,7 @@ function render(info: Info) {
             return <Channel key={index} />;
           } else if (element.type === "keyword") {
             const text = element.text as string;
-            const icon = element.icon as (props: object) => JSX.Element;
+            const icon = element.icon as (props: object) => React.ReactNode;
             const textColor = element.textColor as string;
             const backgroundColor = element.backgroundColor as string;
 

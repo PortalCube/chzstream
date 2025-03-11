@@ -85,7 +85,7 @@ function DragImage({ _ref, src, name }: DragImageProps) {
 }
 
 type DragImageProps = {
-  _ref: React.RefObject<HTMLDivElement>;
+  _ref: React.RefObject<HTMLDivElement | null>;
   src: string;
   name: string;
 };

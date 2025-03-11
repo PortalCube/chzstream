@@ -1,7 +1,6 @@
-import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
-import React, { useEffect, useRef } from "react";
 import Block from "@web/components/block/Block.tsx";
+import BlockPreview from "@web/components/grid/BlockPreview.tsx";
+import GridBackground from "@web/components/grid/GridBackground.tsx";
 import {
   blockListAtom,
   layoutModeAtom,
@@ -26,9 +25,10 @@ import {
   MIN_BLOCK_HEIGHT,
   MIN_BLOCK_WIDTH,
 } from "@web/scripts/constants.ts";
+import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
-import BlockPreview from "@web/components/grid/BlockPreview.tsx";
-import GridBackground from "@web/components/grid/GridBackground.tsx";
 
 const Container = styled.div`
   width: 100%;
@@ -100,7 +100,7 @@ function Grid() {
     "view-mode": layoutMode === LayoutMode.View,
   });
 
-  const blockElements: JSX.Element[] = blockList.map((block) => (
+  const blockElements: React.ReactNode[] = blockList.map((block) => (
     <Block key={block.id} block={block} />
   ));
 
