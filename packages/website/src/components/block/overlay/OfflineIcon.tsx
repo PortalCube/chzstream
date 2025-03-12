@@ -22,7 +22,7 @@ function OfflineIcon() {
     }, 500);
 
     return () => clearInterval(timer);
-  });
+  }, []);
 
   const Icon = icons[index];
 

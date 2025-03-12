@@ -8,5 +8,5 @@ export function useRefreshChannel() {
   useEffect(() => {
     const interval = setInterval(refreshChannel, 100);
     return () => clearInterval(interval);
-  });
+  }, []);
 }
