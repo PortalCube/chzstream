@@ -45,7 +45,7 @@ function PresetModal({}: PresetModalProps) {
 
   return (
     <Container className={className}>
-      <Title>프리셋셋</Title>
+      <Title>프리셋</Title>
     </Container>
   );
 }
