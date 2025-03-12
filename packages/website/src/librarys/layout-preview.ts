@@ -34,6 +34,8 @@ export const movePreviewAtom = atom(null, (get, set, x: number, y: number) => {
   const blockList = get(blockListAtom);
   const previewBlock = get(previewBlockAtom);
 
+  if (previewBlock.position === null) return;
+
   const position = {
     top: previewBlock.position.top,
     left: previewBlock.position.left,
@@ -56,6 +58,7 @@ export const movePreviewAtom = atom(null, (get, set, x: number, y: number) => {
   }
 
   set(previewBlockAtom, (prev) => {
+    if (prev.position === null) return;
     prev.position.width = x - prev.position.left + 1;
     prev.position.height = y - prev.position.top + 1;
   });
@@ -64,6 +67,7 @@ export const movePreviewAtom = atom(null, (get, set, x: number, y: number) => {
 export const endPreviewAtom = atom(null, (_get, set) => {
   set(previewBlockAtom, (prev) => {
     prev.status = PreviewBlockStatus.Inactive;
+    prev.position = null;
     prev.linkedBlockId = null;
     prev.handle = null;
   });
@@ -92,9 +96,8 @@ export const moveModifyPreviewAtom = atom(
     const blockList = get(blockListAtom);
     const previewBlock = get(previewBlockAtom);
 
-    if (previewBlock.handle === null) {
-      return;
-    }
+    if (previewBlock.handle === null) return;
+    if (previewBlock.position === null) return;
 
     const position = structuredClone(previewBlock.position);
     const top = position.top;

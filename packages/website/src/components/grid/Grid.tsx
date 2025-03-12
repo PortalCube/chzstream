@@ -36,11 +36,8 @@ const Container = styled.div`
 
   background-color: #1f1f1f;
 
-  display: grid;
-  grid-template-columns: repeat(${GRID_SIZE_WIDTH}, 1fr);
-  grid-template-rows: repeat(${GRID_SIZE_HEIGHT}, 1fr);
-
-  transition: background 200ms;
+  position: relative;
+  transition: background-color 200ms;
 
   overflow: hidden;
 
@@ -130,6 +127,7 @@ function Grid() {
 
       const onPointerMove = (event: PointerEvent) => {
         if (previewBlock.status === PreviewBlockStatus.Inactive) return;
+        if (previewBlock.position === null) return;
 
         const { clientX, clientY } = event;
         const [x, y] = getGridPosition(ref.current, clientX, clientY);
@@ -153,6 +151,11 @@ function Grid() {
         if (previewBlock.status === PreviewBlockStatus.Inactive) return;
 
         if (previewBlock.status === PreviewBlockStatus.Modify) {
+          endPreview();
+          return;
+        }
+
+        if (previewBlock.position === null) {
           endPreview();
           return;
         }

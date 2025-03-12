@@ -47,6 +47,10 @@ const Container = styled.div`
   animation-name: ${popinAnimation};
   animation-duration: 200ms;
   animation-timing-function: ease-out;
+
+  transition-property: left, top, right, bottom;
+  transition-duration: 100ms;
+  transition-timing-function: ease-out;
 `;
 
 function Block({ block }: BlockProps) {

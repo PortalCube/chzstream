@@ -19,7 +19,9 @@ const Container = styled.div<{ $dpr: number }>`
   background-color: rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 0 32px rgba(255, 255, 255, 0.1);
 
-  transition: opacity 100ms;
+  transition-property: opacity, left, top, right, bottom;
+  transition-duration: 100ms;
+  transition-timing-function: ease-out;
 
   z-index: 1;
 

@@ -15,12 +15,7 @@ export const layoutSizeAtom = atom<[number, number]>([0, 0]);
 
 export const previewBlockAtom = atomWithImmer<PreviewBlock>({
   status: PreviewBlockStatus.Inactive,
-  position: {
-    top: 0,
-    left: 0,
-    width: 1,
-    height: 1,
-  },
+  position: null,
   linkedBlockId: null,
   handle: null,
 });

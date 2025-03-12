@@ -71,7 +71,7 @@ export enum PreviewBlockHandle {
 
 export type PreviewBlock = {
   status: PreviewBlockStatus;
-  position: BlockPosition;
+  position: BlockPosition | null;
   linkedBlockId: number | null;
   handle: PreviewBlockHandle | null;
 };
