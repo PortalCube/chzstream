@@ -5,6 +5,7 @@ import { useDisplayPixelRatio } from "@web/hooks/useDisplayPixelRatio.tsx";
 import { useFullscreenDetect } from "@web/hooks/useFullscreenDetect.tsx";
 import { usePlayerControlListener } from "@web/hooks/usePlayerControlListener.tsx";
 import { useRefreshChannel } from "@web/hooks/useRefreshChannel.tsx";
+import { useSafariScrollPrevent } from "@web/hooks/useSafariScrollPrevent.ts";
 import { useShortcutKey } from "@web/hooks/useShortcutKey.tsx";
 import { useStorage } from "@web/hooks/useStorage.tsx";
 import { restrictedModeAtom } from "@web/librarys/app.ts";
@@ -39,19 +40,7 @@ function App() {
   useStorage();
   useRefreshChannel();
   usePlayerControlListener();
-
-  // iOS Safari prevent scrolling
-  useEffect(() => {
-    const onTouchMove = (event: TouchEvent) => {
-      event.preventDefault();
-    };
-
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-
-    return () => {
-      window.removeEventListener("touchmove", onTouchMove);
-    };
-  }, []);
+  useSafariScrollPrevent();
 
   useEffect(() => {
     loadDefaultMixer();
