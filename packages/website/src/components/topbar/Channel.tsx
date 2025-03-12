@@ -89,7 +89,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
 
     const intervalTimer = setInterval(() => {
       loadChannelInfo();
-    }, 120000);
+    }, 30000);
 
     loadChannelInfo();
 
