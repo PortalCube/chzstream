@@ -1,7 +1,7 @@
 import { RequestPayload } from "@chzstream/message";
-import { atom } from "jotai";
-import { atomWithImmer } from "jotai-immer";
-import { MessageClient } from "@web/scripts/message.ts";
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
+import { blockListAtom } from "@web/librarys/app.ts";
+import { BlockMixer, BlockType } from "@web/librarys/block.ts";
 import {
   getStoragePlayerMuted,
   getStoragePlayerQuality,
@@ -10,8 +10,8 @@ import {
   setStoragePlayerQuality,
   setStoragePlayerVolume,
 } from "@web/scripts/storage.ts";
-import { blockListAtom } from "@web/librarys/app.ts";
-import { BlockMixer, BlockType } from "@web/librarys/block.ts";
+import { atom } from "jotai";
+import { atomWithImmer } from "jotai-immer";
 
 export type MixerItem = {
   id: number | null;
@@ -86,7 +86,7 @@ export const loadDefaultMixerAtom = atom(null, async (_get, set) => {
   });
 });
 
-export const setupMixerAtom = atom(null, (get, set) => {
+export const setupMixerAtom = atom(null, (_get, set) => {
   set(blockListAtom, (draft) => {
     draft.forEach((item) => {
       if (item.type !== BlockType.Stream) return;
@@ -434,7 +434,7 @@ export const updateSingleVolumeAtom = atom(null, (get, set, id: number) => {
     const item = draft[index];
     item.player.volume = item.mixer.volume;
 
-    sendPlayerControl(id, {
+    set(sendPlayerControlAtom, id, {
       volume: item.player.volume,
     });
   });
@@ -445,7 +445,7 @@ export const updateBatchVolumeAtom = atom(null, (_get, set) => {
     draft.forEach((item) => {
       item.player.volume = item.mixer.volume;
 
-      sendPlayerControl(item.id, {
+      set(sendPlayerControlAtom, item.id, {
         volume: item.player.volume,
       });
     });
@@ -470,7 +470,7 @@ export const updateSingleQualityAtom = atom(null, (get, set, id: number) => {
     const item = draft[index];
     item.player.quality = item.mixer.quality;
 
-    sendPlayerControl(id, {
+    set(sendPlayerControlAtom, id, {
       quality: item.player.quality,
     });
   });
@@ -481,7 +481,7 @@ export const updateBatchQualityAtom = atom(null, (_get, set) => {
     draft.forEach((item) => {
       item.player.quality = item.mixer.quality;
 
-      sendPlayerControl(item.id, {
+      set(sendPlayerControlAtom, item.id, {
         quality: item.player.quality,
       });
     });
@@ -510,7 +510,8 @@ export const updateSingleMuteAtom = atom(null, (get, set, id: number) => {
     item.player.muted = item.mixer.muted;
 
     const forceMute = soloBlockId !== null && soloBlockId !== item.id;
-    sendPlayerControl(item.id, {
+
+    set(sendPlayerControlAtom, item.id, {
       muted: forceMute ? true : item.mixer.muted,
     });
   });
@@ -524,7 +525,8 @@ export const updateBatchMuteAtom = atom(null, (get, set) => {
       item.player.muted = item.mixer.muted;
 
       const forceMute = soloBlockId !== null && soloBlockId !== item.id;
-      sendPlayerControl(item.id, {
+
+      set(sendPlayerControlAtom, item.id, {
         muted: forceMute ? true : item.mixer.muted,
       });
     });
@@ -537,7 +539,7 @@ export const updateBatchMuteAtom = atom(null, (get, set) => {
 
 export const applyPlayerControlAtom = atom(
   null,
-  async (get, _set, id: number) => {
+  async (get, set, id: number) => {
     const blockList = get(blockListAtom);
     const block = blockList.find((item) => item.id === id);
     if (block === undefined) return;
@@ -548,7 +550,7 @@ export const applyPlayerControlAtom = atom(
 
     const forceMute = soloBlockId !== null && soloBlockId !== id;
 
-    sendPlayerControl(id, {
+    set(sendPlayerControlAtom, id, {
       volume,
       quality,
       muted: forceMute ? true : muted,
@@ -605,12 +607,18 @@ export const updatePlayerControlAtom = atom(
   }
 );
 
-function sendPlayerControl(id: number, data: RequestPayload<"video-status">) {
-  if (MessageClient === null) return;
+const sendPlayerControlAtom = atom(
+  null,
+  (get, _set, id: number, data: RequestPayload<"video-status">) => {
+    const messageClient = get(messageClientAtom);
+    if (messageClient === null) return;
 
-  MessageClient.send("video-status", data, {
-    type: "content",
-    websiteId: MessageClient.id.id,
-    blockId: id,
-  });
-}
+    const websiteId = messageClient.id.id;
+
+    messageClient.send("video-status", data, {
+      type: "content",
+      websiteId: websiteId,
+      blockId: id,
+    });
+  }
+);

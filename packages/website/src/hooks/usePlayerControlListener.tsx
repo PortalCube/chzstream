@@ -1,33 +1,27 @@
 import { RequestMessage } from "@chzstream/message";
+import { messageClientAtom } from "@web/hooks/useMessageClient";
 import { updatePlayerControlAtom } from "@web/librarys/mixer.ts";
-import { MessageClient } from "@web/scripts/message.ts";
-import { useSetAtom } from "jotai";
-import { useCallback, useEffect } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useEffect } from "react";
 
 export function usePlayerControlListener() {
   const updatePlayerControl = useSetAtom(updatePlayerControlAtom);
-
-  const onMessage = useCallback(
-    (message: RequestMessage<"video-status">) => {
-      if (MessageClient === null) return;
-
-      if (message.sender.type !== "content") return;
-      if (message.sender.websiteId !== MessageClient.id.id) return;
-
-      updatePlayerControl(message.sender.blockId, message.data);
-    },
-    [updatePlayerControl]
-  );
+  const messageClient = useAtomValue(messageClientAtom);
 
   useEffect(() => {
-    if (MessageClient !== null) {
-      MessageClient.on("video-status", onMessage);
-    }
+    if (messageClient === null) return;
+
+    const onMessage = (message: RequestMessage<"video-status">) => {
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== messageClient.id.id) return;
+
+      updatePlayerControl(message.sender.blockId, message.data);
+    };
+
+    messageClient.on("video-status", onMessage);
 
     return () => {
-      if (MessageClient !== null) {
-        MessageClient.remove("video-status", onMessage);
-      }
+      messageClient.remove("video-status", onMessage);
     };
-  }, [onMessage]);
+  }, [messageClient]);
 }

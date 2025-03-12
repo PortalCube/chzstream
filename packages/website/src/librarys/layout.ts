@@ -1,3 +1,4 @@
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import {
   blockListAtom,
   layoutModeAtom,
@@ -16,7 +17,6 @@ import {
   soloBlockIdAtom,
   updateMuteAtom,
 } from "@web/librarys/mixer.ts";
-import { MessageClient } from "@web/scripts/message.ts";
 import { WritableDraft } from "immer";
 import { atom } from "jotai";
 
@@ -28,11 +28,13 @@ export enum LayoutMode {
 export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
   const nextBlockId = get(nextBlockIdAtom);
   const defaultMixerItem = get(defaultMixerItemAtom);
+  const isRestrictedMode = get(messageClientAtom) === null;
 
   const block: Block = {
     id: nextBlockId,
     type: BlockType.Stream,
-    status: MessageClient === null,
+    // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
+    status: isRestrictedMode,
     lock: true,
     position: position,
     channel: null,
@@ -170,27 +172,13 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
 export const fetchChzzkChannelAtom = atom(
   null,
   async (get, set, id: number, uuid: string) => {
+    const messageClient = get(messageClientAtom);
+    const isRestrictedMode = messageClient === null;
     const blockList = get(blockListAtom);
     const block = blockList.find((item) => item.id === id);
 
     if (block === undefined) {
       throw new Error(`Block not found: ${id}`);
-    }
-
-    // const restrictedMode = get(restrictedModeAtom);
-    if (MessageClient === null) {
-      set(modifyBlockAtom, {
-        id,
-        channel: {
-          uuid: uuid,
-          name: "알 수 없음",
-          title: "제한 모드에서는 채널 정보를 불러올 수 없습니다",
-          thumbnailUrl: "",
-          iconUrl: getProfileImageUrl(),
-          lastUpdate: null,
-        },
-      });
-      return;
     }
 
     const channel: BlockChannel = {
@@ -202,7 +190,15 @@ export const fetchChzzkChannelAtom = atom(
       lastUpdate: null,
     };
 
-    const response = await MessageClient.request("stream-get-channel", {
+    // 제한 모드 처리
+    if (isRestrictedMode) {
+      channel.title = "제한 모드에서는 채널 정보를 불러올 수 없습니다";
+      set(modifyBlockAtom, { id, channel });
+      return;
+    }
+
+    // 채널 데이터 가져오기
+    const response = await messageClient.request("stream-get-channel", {
       platform: "chzzk",
       id: uuid,
     });
@@ -212,15 +208,18 @@ export const fetchChzzkChannelAtom = atom(
       throw new Error(`Channel not found: ${uuid}`);
     }
 
+    // 가져온 데이터로 채널 정보 업데이트
     channel.name = data.channelName;
     channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
     channel.lastUpdate = Date.now();
 
-    if (data.liveStatus) {
+    // 방송이 켜진 경우, 제목도 업데이트
+    if (data.liveStatus === true) {
       channel.title = data.liveTitle ?? "";
     }
 
     // TODO: CHZZK 전용 코드 --> 추후 수정
+    // 썸네일 이미지가 있는 경우, 이미지 URL 업데이트
     if (data.liveThumbnailUrl !== null) {
       const imageUrl = data.liveThumbnailUrl.replace("{type}", "1080");
       channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;

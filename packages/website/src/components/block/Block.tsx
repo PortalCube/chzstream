@@ -17,7 +17,7 @@ import {
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
-import { MessageClient } from "@web/scripts/message.ts";
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
@@ -52,6 +52,7 @@ const Container = styled.div`
 function Block({ block }: BlockProps) {
   const { id, type, status, position, channel } = block;
   const ref = useRef<HTMLDivElement>(null);
+  const messageClient = useAtomValue(messageClientAtom);
   const setMouseTop = useSetAtom(mouseIsTopAtom);
 
   const modifyBlock = useSetAtom(modifyBlockAtom);
@@ -65,29 +66,35 @@ function Block({ block }: BlockProps) {
   const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
 
   useEffect(() => {
-    if (MessageClient === null) {
+    if (messageClient === null) {
+      // 제한 모드
       setLoaded(true);
       setInfoType(InfoType.None);
     } else if (channel === null) {
+      // 채널이 없음
       setLoaded(true);
       setInfoType(InfoType.NoChannel);
     } else if (status === false) {
+      // 아직 로딩 안됨
       setLoaded(false);
       setInfoType(InfoType.None);
     }
-  }, [status, channel]);
+  }, [messageClient, status, channel]);
 
   useEffect(() => {
+    if (messageClient === null) return;
+
     const onIframePointerMove = (
       message: RequestMessage<"iframe-pointer-move">
     ) => {
       if (ref === null || ref.current === null) {
         return;
       }
-      if (MessageClient === null) return;
+
+      const websiteId = messageClient.id.id;
 
       if (message.sender.type !== "content") return;
-      if (message.sender.websiteId !== MessageClient.id.id) return;
+      if (message.sender.websiteId !== websiteId) return;
       if (message.sender.blockId !== id) return;
 
       const data = message.data;
@@ -97,59 +104,57 @@ function Block({ block }: BlockProps) {
       setMouseTop(y < area);
     };
 
-    if (MessageClient) {
-      MessageClient.on("iframe-pointer-move", onIframePointerMove);
-    }
+    messageClient.on("iframe-pointer-move", onIframePointerMove);
 
     return () => {
-      if (MessageClient) {
-        MessageClient.remove("iframe-pointer-move", onIframePointerMove);
-      }
+      messageClient.remove("iframe-pointer-move", onIframePointerMove);
     };
-  }, [id, setMouseTop, ref]);
+  }, [messageClient, id, setMouseTop, ref]);
 
   useEffect(() => {
+    if (messageClient === null) return;
+
     const listener = (message: RequestMessage<"player-status">) => {
-      if (MessageClient === null) return;
+      const websiteId = messageClient.id.id;
 
       if (message.sender.type !== "content") return;
-      if (message.sender.websiteId !== MessageClient.id.id) return;
+      if (message.sender.websiteId !== websiteId) return;
       if (message.sender.blockId !== id) return;
 
       const data = message.data;
 
+      // 플레이어가 준비됨
       if (data.type === "ready") {
         setLoaded(true);
         setInfoType(InfoType.None);
         applyPlayerControl(id);
       }
 
+      // 플레이어가 종료됨
       if (data.type === "end") {
         setLoaded(true);
         setInfoType(InfoType.Offline);
       }
 
+      // 성인 제한으로 인해 재생 불가
       if (data.type === "adult") {
         setLoaded(true);
         setInfoType(InfoType.Adult);
       }
 
+      // 오류로 인해 재생 불가
       if (data.type === "error") {
         setLoaded(true);
         setInfoType(InfoType.Error);
       }
     };
 
-    if (MessageClient !== null) {
-      MessageClient.on("player-status", listener);
-    }
+    messageClient.on("player-status", listener);
 
     return () => {
-      if (MessageClient !== null) {
-        MessageClient.remove("player-status", listener);
-      }
+      messageClient.remove("player-status", listener);
     };
-  }, [id, applyPlayerControl]);
+  }, [messageClient, id, applyPlayerControl]);
 
   const onPointerLeave: React.PointerEventHandler = () => {
     modifyBlock({ id, lock: true });

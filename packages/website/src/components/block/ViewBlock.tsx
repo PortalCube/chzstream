@@ -1,8 +1,8 @@
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockType } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context";
 import { LayoutMode } from "@web/librarys/layout.ts";
-import { MessageClient } from "@web/scripts/message.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
@@ -53,6 +53,7 @@ const Container = styled.iframe`
 function ViewBlock({ loaded }: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
   const { id, type, status, lock, channel } = useContext(BlockContext);
+  const messageClient = useAtomValue(messageClientAtom);
 
   const src = useMemo((): string => {
     // 채널 정보가 비어있는 블록
@@ -73,13 +74,13 @@ function ViewBlock({ loaded }: ViewBlockProps) {
 
     url.searchParams.set("embed", "true");
 
-    if (MessageClient !== null) {
-      url.searchParams.set("_csp", MessageClient.id.id);
+    if (messageClient !== null) {
+      url.searchParams.set("_csp", messageClient.id.id);
       url.searchParams.set("_csi", id.toString());
     }
 
     return url.toString();
-  }, [id, channel, status, type]);
+  }, [messageClient, id, channel, status, type]);
 
   const className = classNames({
     loading: loaded === false,

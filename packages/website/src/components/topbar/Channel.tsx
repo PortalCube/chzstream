@@ -1,9 +1,9 @@
 import DragImage from "@web/components/drag/DragImage.tsx";
-import { favoriteChannelsAtom } from "@web/librarys/app";
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
+import { favoriteChannelsAtom } from "@web/librarys/app.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
-import { MessageClient } from "@web/scripts/message.ts";
 import classNames from "classnames";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -53,6 +53,7 @@ const Image = styled.img`
 
 function Channel({ uuid, index, gap }: ChannelProps) {
   const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
+  const messageClient = useAtomValue(messageClientAtom);
 
   const [name, setName] = useState("");
   const [iconUrl, setIconUrl] = useState("");
@@ -61,14 +62,14 @@ function Channel({ uuid, index, gap }: ChannelProps) {
 
   useEffect(() => {
     const loadChannelInfo = async () => {
-      if (MessageClient === null) {
+      if (messageClient === null) {
         setName("알 수 없음");
         setIconUrl(getProfileImageUrl());
         setActive(false);
         return;
       }
 
-      const response = await MessageClient.request("stream-get-channel", {
+      const response = await messageClient.request("stream-get-channel", {
         platform: "chzzk",
         id: uuid,
       });
@@ -95,7 +96,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
     return () => {
       clearInterval(intervalTimer);
     };
-  }, [uuid]);
+  }, [messageClient, uuid]);
 
   const onDragStart: React.DragEventHandler = (event) => {
     if (event.dataTransfer === null) return;

@@ -8,7 +8,6 @@ import {
 import { LayoutMode } from "@web/librarys/layout.ts";
 
 export const favoriteChannelsAtom = atom<string[]>([]);
-export const restrictedModeAtom = atom<boolean>(false);
 
 export const mouseIsTopAtom = atom<boolean>(false);
 export const layoutModeAtom = atom<LayoutMode>(LayoutMode.Modify);

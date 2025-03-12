@@ -1,6 +1,6 @@
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
-import { MessageClient } from "@web/scripts/message.ts";
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 
 export enum SearchCategory {
   Summary = "summary",
@@ -33,6 +33,7 @@ export function useSearchModal() {
   const [recommendResult, setRecommendResult] = useAtom(recommendResultAtom);
   const [liveResult, setLiveResult] = useAtom(liveResultAtom);
   const [channelResult, setChannelResult] = useAtom(channelResultAtom);
+  const messageClient = useAtomValue(messageClientAtom);
 
   async function showRecommend() {
     setQuery("");
@@ -73,12 +74,12 @@ export function useSearchModal() {
   }
 
   async function updateRecommendLive() {
-    if (MessageClient === null) {
+    if (messageClient === null) {
       setRecommendResult([]);
       return;
     }
 
-    const response = await MessageClient.request("stream-get-live-list", {
+    const response = await messageClient.request("stream-get-live-list", {
       platform: "chzzk",
       size: 50,
     });
@@ -103,12 +104,12 @@ export function useSearchModal() {
   }
 
   async function updateChannel() {
-    if (MessageClient === null) {
+    if (messageClient === null) {
       setChannelResult([]);
       return;
     }
 
-    const response = await MessageClient.request("stream-search-channel", {
+    const response = await messageClient.request("stream-search-channel", {
       platform: "chzzk",
       query,
       size: 50,
@@ -134,12 +135,12 @@ export function useSearchModal() {
   }
 
   async function updateLive() {
-    if (MessageClient === null) {
+    if (messageClient === null) {
       setLiveResult([]);
       return;
     }
 
-    const response = await MessageClient.request("stream-search-live", {
+    const response = await messageClient.request("stream-search-live", {
       platform: "chzzk",
       query,
       size: 50,
@@ -167,7 +168,7 @@ export function useSearchModal() {
   }
 
   async function updateUuid(uuid: string) {
-    if (MessageClient === null) {
+    if (messageClient === null) {
       setChannelResult([
         {
           uuid: uuid,
@@ -182,7 +183,7 @@ export function useSearchModal() {
       return;
     }
 
-    const response = await MessageClient.request("stream-get-channel", {
+    const response = await messageClient.request("stream-get-channel", {
       platform: "chzzk",
       id: uuid,
     });

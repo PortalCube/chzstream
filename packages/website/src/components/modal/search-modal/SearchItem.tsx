@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { MdVerified } from "react-icons/md";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
-import { SearchItemType } from "@web/librarys/search";
+import { SearchItemType } from "@web/librarys/search.ts";
 import { formatFollowerCount } from "@web/scripts/format.ts";
 import styled from "styled-components";
 

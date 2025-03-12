@@ -1,3 +1,12 @@
+import { RequestMessage } from "@chzstream/message";
+import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
+import MenuButton from "@web/components/topbar/MenuButton.tsx";
+import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
+import {
+  clearBlockAtom,
+  LayoutMode,
+  switchLayoutModeAtom,
+} from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,28 +19,20 @@ import {
   MdOndemandVideo,
   MdRefresh,
   MdSettings,
+  MdViewQuilt,
   MdVolumeUp,
 } from "react-icons/md";
-import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
-import {
-  clearBlockAtom,
-  LayoutMode,
-  switchLayoutModeAtom,
-} from "@web/librarys/layout.ts";
-import { RequestMessage } from "@chzstream/message";
-import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import styled, { css } from "styled-components";
-import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
-import MenuButton from "@web/components/topbar/MenuButton.tsx";
 
 import LogoImage from "@web/assets/logo.png";
+import { messageClientAtom } from "@web/hooks/useMessageClient";
 import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import {
   openMixerModalAtom,
+  openPresetModalAtom,
   openSettingModalAtom,
 } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
-import { MessageClient } from "@web/scripts/message.ts";
 
 const Container = styled.div`
   width: 100%;
@@ -92,6 +93,7 @@ function Topbar() {
   const isFullscreen = useAtomValue(isFullscreenAtom);
   const [isShow, setShow] = useState(true);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
+  const messageClient = useAtomValue(messageClientAtom);
 
   const layoutMode = useAtomValue(layoutModeAtom);
   const clearBlock = useSetAtom(clearBlockAtom);
@@ -99,6 +101,7 @@ function Topbar() {
 
   const openSettingModal = useSetAtom(openSettingModalAtom);
   const openMixerModal = useSetAtom(openMixerModalAtom);
+  const openPresetModal = useSetAtom(openPresetModalAtom);
 
   const toggleFullscreen = useCallback(() => {
     if (isFullscreen) {
@@ -106,6 +109,10 @@ function Topbar() {
     } else {
       document.body.requestFullscreen();
     }
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    setShow(isFullscreen === false);
   }, [isFullscreen]);
 
   useEffect(() => {
@@ -124,6 +131,18 @@ function Topbar() {
       }
     };
 
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [toggleFullscreen]);
+
+  useEffect(() => {
+    if (messageClient === null) return;
+
     const onIframeKeyDown = (message: RequestMessage<"iframe-key-down">) => {
       const key = message.data.key;
 
@@ -132,45 +151,30 @@ function Topbar() {
       }
     };
 
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("keydown", onKeyDown);
-    if (MessageClient) {
-      MessageClient.on("iframe-key-down", onIframeKeyDown);
-    }
+    messageClient.on("iframe-key-down", onIframeKeyDown);
 
-    return () => {
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("keydown", onKeyDown);
-
-      if (MessageClient) {
-        MessageClient.remove("iframe-key-down", onIframeKeyDown);
-      }
-    };
-  }, [toggleFullscreen]);
-
-  useEffect(() => {
-    setShow(isFullscreen === false);
-  }, [isFullscreen]);
-
-  const onClearButtonClick: React.MouseEventHandler = () => {
-    if (confirm("레이아웃을 초기화할까요?") === true) {
-      clearBlock();
-    }
-  };
-
-  const onFoldButtonClick: React.MouseEventHandler = () => {
-    setShow((prev) => !prev);
-
-    if (isShow) {
-      setMouseTop(false);
-    }
-  };
-
-  const onModeButtonClick: React.MouseEventHandler = () => {
-    switchLayoutMode();
-  };
+    return () => messageClient.remove("iframe-key-down", onIframeKeyDown);
+  }, [toggleFullscreen, messageClient]);
 
   const buttons = useMemo(() => {
+    const onClearButtonClick: React.MouseEventHandler = () => {
+      if (confirm("레이아웃을 초기화할까요?") === true) {
+        clearBlock();
+      }
+    };
+
+    const onFoldButtonClick: React.MouseEventHandler = () => {
+      setShow((prev) => !prev);
+
+      if (isShow) {
+        setMouseTop(false);
+      }
+    };
+
+    const onModeButtonClick: React.MouseEventHandler = () => {
+      switchLayoutMode();
+    };
+
     return [
       {
         key: "refresh",
@@ -178,6 +182,13 @@ function Topbar() {
         text: "레이아웃 초기화",
         onClick: onClearButtonClick,
         filter: [LayoutMode.Modify],
+      },
+      {
+        key: "preset",
+        Icon: MdViewQuilt,
+        text: "프리셋",
+        onClick: openPresetModal,
+        filter: [LayoutMode.Modify, LayoutMode.View],
       },
       {
         key: "fullscreen",
