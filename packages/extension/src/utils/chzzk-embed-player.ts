@@ -28,11 +28,42 @@ export function isEmbedPlayer() {
   return hasEmbedParam && isLivePage;
 }
 
+function getChatAreaStatus() {
+  const showChatButton = getElement(
+    "div[class^='live_information_player_control'] > button:nth-of-type(1)"
+  );
+  return showChatButton === null;
+}
+
+function setChatAreaStatus(value: boolean) {
+  if (value) {
+    clickElement(
+      "div[class^='live_information_player_control'] > button:nth-of-type(1)"
+    );
+  } else {
+    clickElement("button[class^='live_chatting_header_button']");
+  }
+}
+
 export function makeEmbedPlayer() {
-  // ESC로 넓은 화면을 종료하는 것을 방지하기 위해 ESC키 이벤트 중지
   window.addEventListener("keydown", (event) => {
+    // ESC로 넓은 화면을 종료하는 것을 방지하기 위해 ESC키 이벤트 중지
     if (event.key === "Escape") {
       event.stopImmediatePropagation();
+    }
+
+    // T키로 채팅 접기/펼치기
+    if (event.key === "t") {
+      setChatAreaStatus(!getChatAreaStatus());
+    }
+
+    // G키로 채팅 있는 전체화면 켜기
+    if (event.key === "g") {
+      // 전체화면 활성화시 채팅 켜기
+      if (document.fullscreenElement === null) {
+        setTimeout(() => setChatAreaStatus(true), 150);
+      }
+      clickElement("button.pzp-fullscreen-button");
     }
   });
 
@@ -107,8 +138,19 @@ export function makeEmbedPlayer() {
   });
 }
 
+function getElement(selector: string) {
+  return document.querySelector<HTMLButtonElement>(selector);
+}
+
 function clickElement(selector: string) {
-  document.querySelector<HTMLButtonElement>(selector)?.click();
+  const element = document.querySelector<HTMLButtonElement>(selector);
+
+  if (element) {
+    element.click();
+    return true;
+  }
+
+  return false;
 }
 
 function onPlayerLoaded() {
