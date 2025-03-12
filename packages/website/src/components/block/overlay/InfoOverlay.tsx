@@ -1,4 +1,4 @@
-import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
+import { removeBlockAtom } from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
@@ -340,7 +340,7 @@ function InfoOverlay({ type }: InfoOverlayProps) {
   const { id } = useContext(BlockContext);
 
   const isShow = useMemo(
-    () => layoutMode === LayoutMode.View && type !== "none",
+    () => layoutMode === "view" && type !== "none",
     [layoutMode, type]
   );
 

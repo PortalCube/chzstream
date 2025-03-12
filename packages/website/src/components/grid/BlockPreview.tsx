@@ -1,6 +1,5 @@
 import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
 import { previewBlockAtom } from "@web/librarys/app.ts";
-import { PreviewBlockStatus } from "@web/librarys/block.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
@@ -39,7 +38,7 @@ function BlockPreview() {
 
   const style = useMemo(() => getGridStyle(position), [position]);
   const className = classNames({
-    hidden: status !== PreviewBlockStatus.Create,
+    hidden: status !== "create",
   });
 
   return (

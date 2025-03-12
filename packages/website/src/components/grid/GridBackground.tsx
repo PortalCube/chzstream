@@ -1,9 +1,8 @@
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "@web/scripts/constants.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
-import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
-import { LayoutMode } from "@web/librarys/layout.ts";
-import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "@web/scripts/constants.ts";
 import styled from "styled-components";
 
 import LogoImage from "@web/assets/logo.png";
@@ -156,7 +155,7 @@ function GridBackground({
     return columnLines;
   }, [displayPixelRatio, width, subWidth]);
 
-  const className = classNames({ "view-mode": mode === LayoutMode.View });
+  const className = classNames({ "view-mode": mode === "view" });
   const welcomeClassName = classNames({ show: blockId === 1 });
 
   return (

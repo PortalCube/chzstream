@@ -7,10 +7,7 @@ import { MdForum, MdSmartDisplay } from "react-icons/md";
 
 export type Store = ReturnType<typeof createStore>;
 
-export enum BlockType {
-  Stream = "steam",
-  Chat = "chat",
-}
+export type BlockType = "stream" | "chat";
 
 export type BlockPosition = {
   top: number;
@@ -52,22 +49,17 @@ export type Block = {
   player: BlockPlayer;
 };
 
-export enum PreviewBlockStatus {
-  Create = "create", // 생성 모드
-  Modify = "modify", // 수정 모드
-  Inactive = "inactive", // 비활성화
-}
+export type PreviewBlockStatus = "create" | "modify" | "inactive";
 
-export enum PreviewBlockHandle {
-  TopLeft = "top-left",
-  Top = "top",
-  TopRight = "top-right",
-  Left = "left",
-  Right = "right",
-  BottomLeft = "bottom-left",
-  Bottom = "bottom",
-  BottomRight = "bottom-right",
-}
+export type PreviewBlockHandle =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right"
+  | "top"
+  | "right"
+  | "bottom"
+  | "left";
 
 export type PreviewBlock = {
   status: PreviewBlockStatus;
@@ -78,18 +70,18 @@ export type PreviewBlock = {
 
 export function getBlockTypeName(type: BlockType) {
   switch (type) {
-    case BlockType.Stream:
+    case "stream":
       return BLOCK_TYPE_STREAM_NAME;
-    case BlockType.Chat:
+    case "chat":
       return BLOCK_TYPE_CHAT_NAME;
   }
 }
 
 export function getBlockTypeIcon(type: BlockType) {
   switch (type) {
-    case BlockType.Stream:
+    case "stream":
       return MdSmartDisplay;
-    case BlockType.Chat:
+    case "chat":
       return MdForum;
   }
 }

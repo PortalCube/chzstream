@@ -4,12 +4,7 @@ import {
   layoutModeAtom,
   nextBlockIdAtom,
 } from "@web/librarys/app.ts";
-import {
-  Block,
-  BlockChannel,
-  BlockPosition,
-  BlockType,
-} from "@web/librarys/block.ts";
+import { Block, BlockChannel, BlockPosition } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import {
   defaultMixerItemAtom,
@@ -20,10 +15,7 @@ import {
 import { WritableDraft } from "immer";
 import { atom } from "jotai";
 
-export enum LayoutMode {
-  View = "view",
-  Modify = "modify",
-}
+export type LayoutMode = "view" | "modify";
 
 export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
   const nextBlockId = get(nextBlockIdAtom);
@@ -32,7 +24,7 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
 
   const block: Block = {
     id: nextBlockId,
-    type: BlockType.Stream,
+    type: "stream",
     // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
     status: isRestrictedMode,
     lock: true,
@@ -148,7 +140,7 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
   const delay = 1000 * 60;
 
   // 시청 중일때는 불필요하게 fetch하지 않음
-  if (get(layoutModeAtom) === LayoutMode.View) return;
+  if (get(layoutModeAtom) === "view") return;
 
   const expiredBlockList = get(blockListAtom).filter((block, index) => {
     if (block.channel === null) return false;
@@ -230,19 +222,19 @@ export const fetchChzzkChannelAtom = atom(
 );
 
 export const activateViewModeAtom = atom(null, (_get, set) => {
-  set(layoutModeAtom, LayoutMode.View);
+  set(layoutModeAtom, "view");
   set(activateBlockAtom);
 });
 
 export const activateEditModeAtom = atom(null, (_get, set) => {
-  set(layoutModeAtom, LayoutMode.Modify);
+  set(layoutModeAtom, "modify");
 });
 
 export const switchLayoutModeAtom = atom(null, (get, set) => {
   const mode = get(layoutModeAtom);
-  if (mode === LayoutMode.View) {
+  if (mode === "view") {
     set(activateEditModeAtom);
-  } else if (mode === LayoutMode.Modify) {
+  } else if (mode === "modify") {
     set(activateViewModeAtom);
   }
 });

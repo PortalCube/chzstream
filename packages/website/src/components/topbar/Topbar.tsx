@@ -2,11 +2,7 @@ import { RequestMessage } from "@chzstream/message";
 import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
 import MenuButton from "@web/components/topbar/MenuButton.tsx";
 import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
-import {
-  clearBlockAtom,
-  LayoutMode,
-  switchLayoutModeAtom,
-} from "@web/librarys/layout.ts";
+import { clearBlockAtom, switchLayoutModeAtom } from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -181,49 +177,49 @@ function Topbar() {
         Icon: MdRefresh,
         text: "레이아웃 초기화",
         onClick: onClearButtonClick,
-        filter: [LayoutMode.Modify],
+        filter: ["modify"],
       },
       {
         key: "preset",
         Icon: MdViewQuilt,
         text: "프리셋",
         onClick: openPresetModal,
-        filter: [LayoutMode.Modify, LayoutMode.View],
+        filter: ["modify", "view"],
       },
       {
         key: "fullscreen",
         Icon: isFullscreen ? MdFullscreenExit : MdFullscreen,
         text: isFullscreen ? "전체 화면 종료" : "전체 화면",
         onClick: toggleFullscreen,
-        filter: [LayoutMode.Modify, LayoutMode.View],
+        filter: ["modify", "view"],
       },
       {
         key: "mode",
-        Icon: layoutMode === LayoutMode.View ? MdEdit : MdOndemandVideo,
-        text: layoutMode === LayoutMode.View ? "편집 모드" : "시청 모드",
+        Icon: layoutMode === "view" ? MdEdit : MdOndemandVideo,
+        text: layoutMode === "view" ? "편집 모드" : "시청 모드",
         onClick: onModeButtonClick,
-        filter: [LayoutMode.Modify, LayoutMode.View],
+        filter: ["modify", "view"],
       },
       {
         key: "mixer",
         Icon: MdVolumeUp,
         text: "스트림 믹서",
         onClick: openMixerModal,
-        filter: [LayoutMode.Modify, LayoutMode.View],
+        filter: ["modify", "view"],
       },
       {
         key: "setting",
         Icon: MdSettings,
         text: "설정",
         onClick: openSettingModal,
-        filter: [LayoutMode.Modify, LayoutMode.View],
+        filter: ["modify", "view"],
       },
       {
         key: "fold",
         Icon: isShow ? MdExpandLess : MdExpandMore,
         text: isShow ? "접기" : "펼치기",
         onClick: onFoldButtonClick,
-        filter: [LayoutMode.Modify, LayoutMode.View],
+        filter: ["modify", "view"],
       },
     ]
       .filter((item) => item.filter.includes(layoutMode))

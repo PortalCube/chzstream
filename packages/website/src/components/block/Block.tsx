@@ -7,7 +7,6 @@ import ViewBlock from "@web/components/block/ViewBlock.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { mouseIsTopAtom } from "@web/librarys/app.ts";
 import type { Block } from "@web/librarys/block.ts";
-import { BlockType } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import {
   activateBlockAtom,
@@ -66,21 +65,21 @@ function Block({ block }: BlockProps) {
   const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
 
   const [loaded, setLoaded] = useState(false);
-  const [infoType, setInfoType] = useState<InfoType>(InfoType.None);
+  const [infoType, setInfoType] = useState<InfoType>("none");
 
   useEffect(() => {
     if (messageClient === null) {
       // 제한 모드
       setLoaded(true);
-      setInfoType(InfoType.None);
+      setInfoType("none");
     } else if (channel === null) {
       // 채널이 없음
       setLoaded(true);
-      setInfoType(InfoType.NoChannel);
+      setInfoType("no-channel");
     } else if (status === false) {
       // 아직 로딩 안됨
       setLoaded(false);
-      setInfoType(InfoType.None);
+      setInfoType("none");
     }
   }, [messageClient, status, channel]);
 
@@ -129,26 +128,26 @@ function Block({ block }: BlockProps) {
       // 플레이어가 준비됨
       if (data.type === "ready") {
         setLoaded(true);
-        setInfoType(InfoType.None);
+        setInfoType("none");
         applyPlayerControl(id);
       }
 
       // 플레이어가 종료됨
       if (data.type === "end") {
         setLoaded(true);
-        setInfoType(InfoType.Offline);
+        setInfoType("offline");
       }
 
       // 성인 제한으로 인해 재생 불가
       if (data.type === "adult") {
         setLoaded(true);
-        setInfoType(InfoType.Adult);
+        setInfoType("adult");
       }
 
       // 오류로 인해 재생 불가
       if (data.type === "error") {
         setLoaded(true);
-        setInfoType(InfoType.Error);
+        setInfoType("error");
       }
     };
 
@@ -194,12 +193,12 @@ function Block({ block }: BlockProps) {
         return;
       }
 
-      if (type === BlockType.Chat && data.block.type === BlockType.Stream) {
+      if (type === "chat" && data.block.type === "stream") {
         modifyBlock({ id, channel: data.block.channel });
         activateBlock();
 
         setLoaded(false);
-        setInfoType(InfoType.None);
+        setInfoType("none");
       } else {
         swapBlock(id, data.block.id);
       }

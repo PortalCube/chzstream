@@ -4,7 +4,6 @@ import { useContext } from "react";
 import LogoImage from "@web/assets/logo.png";
 import { BlockContext } from "@web/librarys/context";
 
-import { BlockType } from "@web/librarys/block.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -133,10 +132,10 @@ function Background({}: BackgroundProps) {
   const iconUrl = channel?.iconUrl ?? "";
   const name = channel?.name ?? "알 수 없는 채널";
 
-  const showThumbnail = type === BlockType.Stream && thumbnailUrl !== "";
+  const showThumbnail = type === "stream" && thumbnailUrl !== "";
   const showBlur = iconUrl !== "";
   const showPlaceholder =
-    channel === null || (type === BlockType.Stream && thumbnailUrl === "");
+    channel === null || (type === "stream" && thumbnailUrl === "");
 
   const thumbnailClass = classNames({
     hidden: showThumbnail === false,
@@ -144,12 +143,12 @@ function Background({}: BackgroundProps) {
 
   const blurClass = classNames({
     hidden: showBlur === false,
-    thumbnail: type === BlockType.Stream,
+    thumbnail: type === "stream",
   });
 
   const placeholderClass = classNames({
     hidden: showPlaceholder === false,
-    thumbnail: channel !== null || type === BlockType.Stream,
+    thumbnail: channel !== null || type === "stream",
   });
 
   return (

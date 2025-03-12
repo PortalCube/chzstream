@@ -71,13 +71,13 @@ const Line = styled.div`
 
 function getLineClass(direction: PreviewBlockHandle) {
   switch (direction) {
-    case PreviewBlockHandle.Top:
+    case "top":
       return "horizontal";
-    case PreviewBlockHandle.Right:
+    case "right":
       return "vertical";
-    case PreviewBlockHandle.Bottom:
+    case "bottom":
       return "horizontal";
-    case PreviewBlockHandle.Left:
+    case "left":
       return "vertical";
     default:
       return "horizontal";

@@ -1,12 +1,11 @@
-import { atom } from "jotai";
-import { MIN_BLOCK_HEIGHT, MIN_BLOCK_WIDTH } from "@web/scripts/constants.ts";
 import { blockListAtom, previewBlockAtom } from "@web/librarys/app.ts";
 import {
   Block,
   BlockPosition,
   PreviewBlockHandle,
-  PreviewBlockStatus,
 } from "@web/librarys/block.ts";
+import { MIN_BLOCK_HEIGHT, MIN_BLOCK_WIDTH } from "@web/scripts/constants.ts";
+import { atom } from "jotai";
 
 export const beginPreviewAtom = atom(null, (get, set, x: number, y: number) => {
   const blockList = get(blockListAtom);
@@ -23,7 +22,7 @@ export const beginPreviewAtom = atom(null, (get, set, x: number, y: number) => {
   }
 
   set(previewBlockAtom, (prev) => {
-    prev.status = PreviewBlockStatus.Create;
+    prev.status = "create";
     prev.position = position;
     prev.linkedBlockId = null;
     prev.handle = null;
@@ -66,7 +65,7 @@ export const movePreviewAtom = atom(null, (get, set, x: number, y: number) => {
 
 export const endPreviewAtom = atom(null, (_get, set) => {
   set(previewBlockAtom, (prev) => {
-    prev.status = PreviewBlockStatus.Inactive;
+    prev.status = "inactive";
     prev.position = null;
     prev.linkedBlockId = null;
     prev.handle = null;
@@ -77,7 +76,7 @@ export const beginModifyPreviewAtom = atom(
   null,
   (_get, set, block: Block, handle: PreviewBlockHandle) => {
     set(previewBlockAtom, (prev) => {
-      prev.status = PreviewBlockStatus.Modify;
+      prev.status = "modify";
       prev.position = {
         top: block.position.top,
         left: block.position.left,
@@ -132,14 +131,14 @@ export const moveModifyPreviewAtom = atom(
     };
 
     const functions = {
-      [PreviewBlockHandle.TopLeft]: [moveLeft, moveTop],
-      [PreviewBlockHandle.Top]: [moveTop],
-      [PreviewBlockHandle.TopRight]: [moveTop, moveRight],
-      [PreviewBlockHandle.Left]: [moveLeft],
-      [PreviewBlockHandle.Right]: [moveRight],
-      [PreviewBlockHandle.BottomLeft]: [moveLeft, moveBottom],
-      [PreviewBlockHandle.Bottom]: [moveBottom],
-      [PreviewBlockHandle.BottomRight]: [moveBottom, moveRight],
+      ["top-left"]: [moveLeft, moveTop],
+      ["top"]: [moveTop],
+      ["top-right"]: [moveTop, moveRight],
+      ["left"]: [moveLeft],
+      ["right"]: [moveRight],
+      ["bottom-left"]: [moveLeft, moveBottom],
+      ["bottom"]: [moveBottom],
+      ["bottom-right"]: [moveBottom, moveRight],
     };
 
     functions[previewBlock.handle].forEach((func) => func());

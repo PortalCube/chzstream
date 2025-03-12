@@ -1,8 +1,6 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
-import { BlockType } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context";
-import { LayoutMode } from "@web/librarys/layout.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
@@ -67,7 +65,7 @@ function ViewBlock({ loaded }: ViewBlockProps) {
     }
 
     const href =
-      type === BlockType.Chat
+      type === "chat"
         ? `https://chzzk.naver.com/live/${channel.uuid}/chat`
         : `https://chzzk.naver.com/live/${channel.uuid}/`;
     const url = new URL(href);
@@ -84,8 +82,8 @@ function ViewBlock({ loaded }: ViewBlockProps) {
 
   const className = classNames({
     loading: loaded === false,
-    "modify-mode": layoutMode === LayoutMode.Modify,
-    chat: type === BlockType.Chat,
+    "modify-mode": layoutMode === "modify",
+    chat: type === "chat",
     lock,
   });
 

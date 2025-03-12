@@ -90,11 +90,11 @@ function TypeButton({}: BlockTypeButtonProps) {
 
   const onButtonClick: React.MouseEventHandler = () => {
     switch (type) {
-      case BlockType.Stream:
-        modifyBlock({ id, type: BlockType.Chat });
+      case "stream":
+        modifyBlock({ id, type: "chat" });
         break;
-      case BlockType.Chat:
-        modifyBlock({ id, type: BlockType.Stream });
+      case "chat":
+        modifyBlock({ id, type: "stream" });
         break;
       default:
         break;

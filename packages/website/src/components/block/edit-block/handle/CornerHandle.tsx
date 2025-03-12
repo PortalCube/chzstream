@@ -207,13 +207,13 @@ function BottomLeftCornerHandle({
 
 function getComponent(direction: PreviewBlockHandle | null) {
   switch (direction) {
-    case PreviewBlockHandle.TopLeft:
+    case "top-left":
       return TopLeftCornerHandle;
-    case PreviewBlockHandle.TopRight:
+    case "top-right":
       return TopRightCornerHandle;
-    case PreviewBlockHandle.BottomRight:
+    case "bottom-right":
       return BottomRightCornerHandle;
-    case PreviewBlockHandle.BottomLeft:
+    case "bottom-left":
       return BottomLeftCornerHandle;
     default:
       return TopLeftCornerHandle;

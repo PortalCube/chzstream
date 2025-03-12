@@ -2,12 +2,7 @@ import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
 import { atom, useAtom, useAtomValue } from "jotai";
 
-export enum SearchCategory {
-  Summary = "summary",
-  Channel = "channel",
-  Live = "live",
-  Recommend = "recommend",
-}
+export type SearchCategory = "summary" | "channel" | "live" | "recommend";
 
 export type SearchItemType = {
   uuid: string;
@@ -20,7 +15,7 @@ export type SearchItemType = {
 };
 
 const queryAtom = atom<string>("");
-const categoryAtom = atom<SearchCategory>(SearchCategory.Recommend);
+const categoryAtom = atom<SearchCategory>("recommend");
 const loadingAtom = atom<boolean>(false);
 const recommendResultAtom = atom<SearchItemType[]>([]);
 const liveResultAtom = atom<SearchItemType[]>([]);
@@ -37,14 +32,14 @@ export function useSearchModal() {
 
   async function showRecommend() {
     setQuery("");
-    setCategory(SearchCategory.Recommend);
+    setCategory("recommend");
     setLoading(true);
     await updateRecommendLive();
     setLoading(false);
   }
 
   async function showSummary() {
-    setCategory(SearchCategory.Summary);
+    setCategory("summary");
     setLoading(true);
     await updateChannel();
     await updateLive();
@@ -52,7 +47,7 @@ export function useSearchModal() {
   }
 
   async function showUuid(uuid: string) {
-    setCategory(SearchCategory.Summary);
+    setCategory("summary");
     setLoading(true);
     setLiveResult([]);
     await updateUuid(uuid);
@@ -60,14 +55,14 @@ export function useSearchModal() {
   }
 
   async function showChannel() {
-    setCategory(SearchCategory.Channel);
+    setCategory("channel");
     setLoading(true);
     await updateChannel();
     setLoading(false);
   }
 
   async function showLive() {
-    setCategory(SearchCategory.Live);
+    setCategory("live");
     setLoading(true);
     await updateLive();
     setLoading(false);

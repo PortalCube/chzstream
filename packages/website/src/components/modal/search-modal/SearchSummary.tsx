@@ -1,9 +1,9 @@
-import classNames from "classnames";
-import { MdNavigateNext } from "react-icons/md";
-import { SearchCategory, useSearchModal } from "@web/librarys/search.ts";
-import styled from "styled-components";
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
+import { useSearchModal } from "@web/librarys/search.ts";
+import classNames from "classnames";
+import { MdNavigateNext } from "react-icons/md";
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;
@@ -63,14 +63,14 @@ const Spliter = styled.div`
 function SearchSummary({}: SearchSummaryProps) {
   const { channelResult, liveResult, category, setCategory } = useSearchModal();
   const className = classNames({
-    hidden: category !== SearchCategory.Summary,
+    hidden: category !== "summary",
   });
 
   return (
     <Container className={className}>
       <Section>
         <Category name="채널" interactable={false} />
-        <MoreButton onClick={() => setCategory(SearchCategory.Channel)}>
+        <MoreButton onClick={() => setCategory("channel")}>
           모두 보기
           <MdNavigateNext size={24} />
         </MoreButton>
@@ -79,7 +79,7 @@ function SearchSummary({}: SearchSummaryProps) {
       <Spliter />
       <Section>
         <Category name="라이브" interactable={false} />
-        <MoreButton onClick={() => setCategory(SearchCategory.Live)}>
+        <MoreButton onClick={() => setCategory("live")}>
           모두 보기
           <MdNavigateNext size={24} />
         </MoreButton>
