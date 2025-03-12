@@ -5,6 +5,7 @@ import styled from "styled-components";
 import MixerModal from "@web/components/modal/mixer/MixerModal.tsx";
 import SearchModal from "@web/components/modal/search-modal/SearchModal.tsx";
 import SettingModal from "@web/components/modal/SettingModal.tsx";
+import PresetModal from "@web/components/modal/preset/PresetModal.tsx";
 
 const Container = styled.div`
   position: fixed;
@@ -48,6 +49,7 @@ function Modal({}: ModalProps) {
       <SettingModal />
       <SearchModal />
       <MixerModal />
+      <PresetModal />
     </Container>
   );
 }

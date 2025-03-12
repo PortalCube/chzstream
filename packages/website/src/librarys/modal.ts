@@ -1,6 +1,6 @@
-import { atom } from "jotai";
 import { atomWithListeners } from "@web/hooks/atomWithListeners.tsx";
 import { SearchItemType } from "@web/librarys/search.ts";
+import { atom } from "jotai";
 
 export type ModalType = "none" | "setting" | "search" | "mixer" | "preset";
 
@@ -48,7 +48,7 @@ type SearchCallbackType = (channel: SearchItemType) => void;
 // Mixer
 export type MixerModalMessage = ModalMessageBase<"mixer">;
 
-// Mixer
+// Preset
 export type PresetModalMessage = ModalMessageBase<"preset">;
 
 export const [modalAtom, useModalListener] = atomWithListeners<ModalMessage>({
@@ -68,6 +68,10 @@ export const openSearchModalAtom = atom(
 
 export const openMixerModalAtom = atom(null, (_get, set) => {
   set(modalAtom, { type: "mixer" });
+});
+
+export const openPresetModalAtom = atom(null, (_get, set) => {
+  set(modalAtom, { type: "preset" });
 });
 
 export const closeModalAtom = atom(null, (_get, set) => {
