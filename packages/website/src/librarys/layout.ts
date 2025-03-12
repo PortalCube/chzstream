@@ -45,6 +45,8 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
 
   set(blockListAtom, (prev) => [...prev, block]);
   set(nextBlockIdAtom, (prev) => prev + 1);
+
+  return block.id;
 });
 
 export const addBlockAtom = atom(null, (get, set, block: Block) => {

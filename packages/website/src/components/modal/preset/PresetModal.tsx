@@ -1,6 +1,8 @@
-import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
+import PresetButton from "@web/components/modal/preset/PresetItem.tsx";
+import { modalAtom } from "@web/librarys/modal.ts";
+import { presetListAtom } from "@web/librarys/preset.ts";
 import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -35,17 +37,29 @@ const Title = styled.p`
   color: rgba(255, 255, 255, 1);
 `;
 
+const List = styled.div`
+  display: grid;
+  gap: 16px;
+
+  grid-template-columns: repeat(3, 1fr);
+`;
+
 function PresetModal({}: PresetModalProps) {
   const modal = useAtomValue(modalAtom);
-  const closeModal = useSetAtom(closeModalAtom);
+  const presetList = useAtomValue(presetListAtom);
 
   const className = classNames({
     disable: modal.type !== "preset",
   });
 
+  const items = presetList.map((preset, index) => (
+    <PresetButton key={index} preset={preset} />
+  ));
+
   return (
     <Container className={className}>
       <Title>프리셋</Title>
+      <List>{items}</List>
     </Container>
   );
 }
