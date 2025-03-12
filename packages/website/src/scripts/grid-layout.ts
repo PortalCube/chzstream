@@ -2,9 +2,7 @@ import { BlockPosition } from "@web/librarys/block.ts";
 import { GRID_SIZE_HEIGHT, GRID_SIZE_WIDTH } from "@web/scripts/constants.ts";
 
 export function getGridStyle(
-  position: BlockPosition | null,
-  gridWidth: number,
-  gridHeight: number
+  position: BlockPosition | null
 ): React.CSSProperties {
   if (position === null) {
     return {};
@@ -23,19 +21,15 @@ export function getGridStyle(
     height = 2 - height;
   }
 
-  // left, top, right, bottom을 계산
-  width = (gridWidth / GRID_SIZE_WIDTH) * width;
-  height = (gridHeight / GRID_SIZE_HEIGHT) * height;
-  left = (gridWidth / GRID_SIZE_WIDTH) * left;
-  top = (gridHeight / GRID_SIZE_HEIGHT) * top;
-  const right = gridWidth - left - width;
-  const bottom = gridHeight - top - height;
+  const right = 24 - left - width;
+  const bottom = 24 - top - height;
 
+  // left, top, right, bottom을 계산
   return {
     position: "absolute",
-    left: `${left}px`,
-    top: `${top}px`,
-    right: `${right}px`,
-    bottom: `${bottom}px`,
+    left: (left / GRID_SIZE_WIDTH) * 100 + "%",
+    top: (top / GRID_SIZE_HEIGHT) * 100 + "%",
+    right: (right / GRID_SIZE_WIDTH) * 100 + "%",
+    bottom: (bottom / GRID_SIZE_HEIGHT) * 100 + "%",
   };
 }

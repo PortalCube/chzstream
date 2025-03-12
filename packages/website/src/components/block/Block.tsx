@@ -4,7 +4,8 @@ import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
 import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
 import ViewBlock from "@web/components/block/ViewBlock.tsx";
-import { layoutSizeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
+import { mouseIsTopAtom } from "@web/librarys/app.ts";
 import type { Block } from "@web/librarys/block.ts";
 import { BlockType } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
@@ -17,7 +18,6 @@ import {
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
-import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
@@ -67,7 +67,6 @@ function Block({ block }: BlockProps) {
 
   const [loaded, setLoaded] = useState(false);
   const [infoType, setInfoType] = useState<InfoType>(InfoType.None);
-  const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
 
   useEffect(() => {
     if (messageClient === null) {
@@ -211,7 +210,7 @@ function Block({ block }: BlockProps) {
     event.preventDefault();
   };
 
-  const style = getGridStyle(position, gridWidth, gridHeight);
+  const style = getGridStyle(position);
 
   return (
     <BlockContext.Provider value={block}>
