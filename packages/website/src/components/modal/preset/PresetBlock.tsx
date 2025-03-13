@@ -16,9 +16,6 @@ const Container = styled.div<{ $dpr: number }>`
 
   background-color: rgb(53, 53, 53);
 
-  transition-property: left, top, right, bottom;
-  transition-duration: 100ms;
-  transition-timing-function: ease-out;
   overflow: hidden;
 
   &.chat {

@@ -5,7 +5,7 @@ import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
 import ViewBlock from "@web/components/block/ViewBlock.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import { mouseIsTopAtom } from "@web/librarys/app.ts";
+import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import {
@@ -17,6 +17,7 @@ import {
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
+import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
@@ -47,9 +48,11 @@ const Container = styled.div`
   animation-duration: 200ms;
   animation-timing-function: ease-out;
 
-  transition-property: left, top, right, bottom;
-  transition-duration: 100ms;
-  transition-timing-function: ease-out;
+  &.modify-mode {
+    transition-property: left, top, right, bottom;
+    transition-duration: 100ms;
+    transition-timing-function: ease-out;
+  }
 `;
 
 function Block({ block }: BlockProps) {
@@ -57,6 +60,7 @@ function Block({ block }: BlockProps) {
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
   const setMouseTop = useSetAtom(mouseIsTopAtom);
+  const layoutMode = useAtomValue(layoutModeAtom);
 
   const modifyBlock = useSetAtom(modifyBlockAtom);
   const activateBlock = useSetAtom(activateBlockAtom);
@@ -210,6 +214,8 @@ function Block({ block }: BlockProps) {
     event.preventDefault();
   };
 
+  const className = classNames({ "modify-mode": layoutMode === "modify" });
+
   const style = getGridStyle(position);
 
   return (
@@ -217,6 +223,7 @@ function Block({ block }: BlockProps) {
       <Container
         ref={ref}
         style={style}
+        className={className}
         onPointerLeave={onPointerLeave}
         onDrop={onDrop}
         onDragEnter={preventDragHandler}
