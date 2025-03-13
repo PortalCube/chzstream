@@ -166,19 +166,21 @@ function Channel({}: ChannelProps) {
   const { id, channel } = block;
 
   const { iconUrl, name, title } = useMemo(() => {
+    const result = {
+      iconUrl: getProfileImageUrl(),
+      name: "채널 없음",
+      title: "여기를 클릭해서 채널을 지정하세요",
+    };
+
     if (channel === null) {
-      return {
-        iconUrl: getProfileImageUrl(),
-        name: "채널 없음" + " " + id,
-        title: "여기를 클릭해서 채널을 지정하세요",
-      };
+      return result;
     }
 
-    return {
-      iconUrl: channel.iconUrl,
-      name: channel.name,
-      title: channel.title,
-    };
+    result.iconUrl = channel.iconUrl;
+    result.name = channel.name;
+    result.title = channel.title;
+
+    return result;
   }, [channel]);
 
   const onClick: React.MouseEventHandler = () => {

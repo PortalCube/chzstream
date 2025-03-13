@@ -37,3 +37,7 @@ export const blockContextMenuAtom = atom<Block | null>((get) => {
 
   return find;
 });
+
+export const clearBlockContextMenuAtom = atom(null, (_get, set) => {
+  set(blockContextMenuOptionsAtom, null);
+});

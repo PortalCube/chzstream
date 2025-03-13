@@ -54,6 +54,7 @@ const Name = styled.p<{ $dpr: number }>`
   max-width: 100%;
   font-size: ${ratioMixin(20)};
   font-weight: 700;
+  color: rgb(255, 255, 255);
 
   overflow: hidden;
   text-overflow: ellipsis;
