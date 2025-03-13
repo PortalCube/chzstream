@@ -162,10 +162,6 @@ function Block({ block }: BlockProps) {
     };
   }, [messageClient, id, applyPlayerControl]);
 
-  const onPointerLeave: React.PointerEventHandler = () => {
-    modifyBlock({ id, lock: true });
-  };
-
   const onDrop: React.DragEventHandler = async (event) => {
     if (event.dataTransfer === null) return;
 
@@ -224,7 +220,6 @@ function Block({ block }: BlockProps) {
         ref={ref}
         style={style}
         className={className}
-        onPointerLeave={onPointerLeave}
         onDrop={onDrop}
         onDragEnter={preventDragHandler}
         onDragOver={preventDragHandler}

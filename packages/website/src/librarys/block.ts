@@ -42,7 +42,6 @@ export type Block = {
   id: number;
   type: BlockType;
   status: boolean;
-  lock: boolean;
   position: BlockPosition;
   channel: BlockChannel | null;
   mixer: BlockMixer;

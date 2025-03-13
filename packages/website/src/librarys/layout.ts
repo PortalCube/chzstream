@@ -27,7 +27,6 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
     type: "stream",
     // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
     status: isRestrictedMode,
-    lock: true,
     position: position,
     channel: null,
     mixer: {

@@ -32,10 +32,6 @@ const Container = styled.iframe`
     display: none;
   }
 
-  &.lock {
-    /* pointer-events: none; */
-  }
-
   &.loading {
     pointer-events: none;
   }
@@ -49,7 +45,7 @@ const Container = styled.iframe`
 
 function ViewBlock({ loaded }: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
-  const { id, type, status, lock, channel } = useContext(BlockContext);
+  const { id, type, status, channel } = useContext(BlockContext);
   const messageClient = useAtomValue(messageClientAtom);
 
   const src = useMemo((): string => {
@@ -83,7 +79,6 @@ function ViewBlock({ loaded }: ViewBlockProps) {
     loading: loaded === false,
     "modify-mode": layoutMode === "modify",
     chat: type === "chat",
-    lock,
   });
 
   return (
