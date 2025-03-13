@@ -112,9 +112,20 @@ export const applyPresetItemAtom = atom(
 export const pushChannelWithDefaultPresetAtom = atom(
   null,
   async (get, set, channel: BlockChannel) => {
+    const streamBlock = get(blockListAtom).filter(
+      (item) => item.type === "stream"
+    );
+
+    // 비어있는 스트리밍 블록을 찾고, 존재하면 그 블록에 채널을 넣기기
+    const blankStreamBlock = streamBlock.find((item) => item.channel === null);
+    if (blankStreamBlock !== undefined) {
+      set(modifyBlockAtom, { id: blankStreamBlock.id, channel });
+      return;
+    }
+
     // 현재 활성화 블록 갯수 체크
-    const channelCount = get(blockListAtom).filter(
-      (item) => item.type === "stream" && item.channel !== null
+    const channelCount = streamBlock.filter(
+      (item) => item.channel !== null
     ).length;
 
     // 활성화 블록 갯수 + 1개 블록을 갖는 프리셋을 찾기
