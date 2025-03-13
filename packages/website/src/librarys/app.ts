@@ -21,3 +21,19 @@ export const blockListAtom = atomWithImmer<Block[]>(initialBlockList);
 
 const initialId = 1;
 export const nextBlockIdAtom = atom<number>(initialId);
+
+export const blockContextMenuOptionsAtom = atom<{
+  id: number;
+  x: number;
+  y: number;
+} | null>(null);
+export const blockContextMenuAtom = atom<Block | null>((get) => {
+  const options = get(blockContextMenuOptionsAtom);
+  if (options === null) return null;
+
+  const id = options.id;
+  const find = get(blockListAtom).find((block) => block.id === id);
+  if (find === undefined) return null;
+
+  return find;
+});

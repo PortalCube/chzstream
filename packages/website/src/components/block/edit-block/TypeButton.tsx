@@ -29,15 +29,16 @@ const Container = styled.button`
     padding: 4px;
   `)}
 
-  color: rgba(0, 0, 0, 1);
+  color: rgba(255,255,255, 0.75);
   cursor: pointer;
 
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
-  background-color: rgb(0, 255, 163);
-
+  background: none;
   transition: background-color 100ms;
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px);
+
   &:hover {
-    background-color: rgb(71, 255, 188);
+    background-color: rgba(0, 0, 0, 0.35);
   }
 
   & > svg {

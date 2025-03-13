@@ -5,7 +5,11 @@ import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
 import ViewBlock from "@web/components/block/ViewBlock.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
+import {
+  blockContextMenuOptionsAtom,
+  layoutModeAtom,
+  mouseIsTopAtom,
+} from "@web/librarys/app.ts";
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import {
@@ -18,7 +22,7 @@ import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
@@ -62,6 +66,9 @@ function Block({ block }: BlockProps) {
   const setMouseTop = useSetAtom(mouseIsTopAtom);
   const layoutMode = useAtomValue(layoutModeAtom);
 
+  const [blockContextMenuOptions, setBlockContextMenuOptions] = useAtom(
+    blockContextMenuOptionsAtom
+  );
   const modifyBlock = useSetAtom(modifyBlockAtom);
   const activateBlock = useSetAtom(activateBlockAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
@@ -162,6 +169,20 @@ function Block({ block }: BlockProps) {
     };
   }, [messageClient, id, applyPlayerControl]);
 
+  const onContextMenu: React.MouseEventHandler = (event) => {
+    event.preventDefault();
+
+    if (blockContextMenuOptions === null) {
+      setBlockContextMenuOptions({
+        id,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    } else {
+      setBlockContextMenuOptions(null);
+    }
+  };
+
   const onDrop: React.DragEventHandler = async (event) => {
     if (event.dataTransfer === null) return;
 
@@ -220,6 +241,7 @@ function Block({ block }: BlockProps) {
         ref={ref}
         style={style}
         className={className}
+        onContextMenu={onContextMenu}
         onDrop={onDrop}
         onDragEnter={preventDragHandler}
         onDragOver={preventDragHandler}

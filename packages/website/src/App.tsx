@@ -1,3 +1,4 @@
+import BlockContextMenu from "@web/components/block-context-menu/BlockContextMenu.tsx";
 import Grid from "@web/components/grid/Grid.tsx";
 import Modal from "@web/components/modal/Modal.tsx";
 import Topbar from "@web/components/topbar/Topbar.tsx";
@@ -78,6 +79,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Modal />
+      <BlockContextMenu />
       <Container>
         <Topbar />
         <Grid />
