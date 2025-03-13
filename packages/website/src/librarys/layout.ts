@@ -159,21 +159,16 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
   });
 
   for (const block of expiredBlockList) {
-    await set(fetchChzzkChannelAtom, block.id, block.channel!.uuid);
+    const channel = await set(fetchChzzkChannelAtom, block.channel!.uuid);
+    set(modifyBlockAtom, { id: block.id, channel });
   }
 });
 
 export const fetchChzzkChannelAtom = atom(
   null,
-  async (get, set, id: number, uuid: string) => {
+  async (get, _set, uuid: string) => {
     const messageClient = get(messageClientAtom);
     const isRestrictedMode = messageClient === null;
-    const blockList = get(blockListAtom);
-    const block = blockList.find((item) => item.id === id);
-
-    if (block === undefined) {
-      throw new Error(`Block not found: ${id}`);
-    }
 
     const channel: BlockChannel = {
       uuid: uuid,
@@ -187,8 +182,7 @@ export const fetchChzzkChannelAtom = atom(
     // 제한 모드 처리
     if (isRestrictedMode) {
       channel.title = "제한 모드에서는 채널 정보를 불러올 수 없습니다";
-      set(modifyBlockAtom, { id, channel });
-      return;
+      return channel;
     }
 
     // 채널 데이터 가져오기
@@ -219,7 +213,7 @@ export const fetchChzzkChannelAtom = atom(
       channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;
     }
 
-    set(modifyBlockAtom, { id, channel });
+    return channel;
   }
 );
 

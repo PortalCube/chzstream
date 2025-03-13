@@ -3,7 +3,10 @@ import { useContext, useMemo, useRef } from "react";
 import DragImage from "@web/components/drag/DragImage.tsx";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContext } from "@web/librarys/context";
-import { fetchChzzkChannelAtom } from "@web/librarys/layout.ts";
+import {
+  fetchChzzkChannelAtom,
+  modifyBlockAtom,
+} from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import styled, { css } from "styled-components";
@@ -158,6 +161,7 @@ function Channel({}: ChannelProps) {
   const ref = useRef<HTMLImageElement>(null);
   const openSearchModal = useSetAtom(openSearchModalAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
+  const modifyBlock = useSetAtom(modifyBlockAtom);
   const block = useContext(BlockContext);
   const { id, channel } = block;
 
@@ -178,7 +182,10 @@ function Channel({}: ChannelProps) {
   }, [channel]);
 
   const onClick: React.MouseEventHandler = () => {
-    openSearchModal((channel) => fetchChzzkChannel(id, channel.uuid));
+    openSearchModal(async (_channel) => {
+      const channel = await fetchChzzkChannel(_channel.uuid);
+      modifyBlock({ id, channel });
+    });
   };
 
   const onDragStart: React.DragEventHandler = (event) => {

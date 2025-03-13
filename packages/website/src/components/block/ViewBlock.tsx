@@ -37,7 +37,6 @@ const Container = styled.iframe`
   }
 
   &.loading {
-    visibility: hidden;
     pointer-events: none;
   }
 

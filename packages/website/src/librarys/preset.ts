@@ -1,7 +1,8 @@
 import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
 import { blockListAtom, nextBlockIdAtom } from "@web/librarys/app.ts";
-import { BlockPosition, BlockType } from "@web/librarys/block.ts";
+import { BlockChannel, BlockPosition, BlockType } from "@web/librarys/block.ts";
 import {
+  fetchChzzkChannelAtom,
   modifyBlockAtom,
   pushBlockAtom,
   removeBlockAtom,
@@ -55,7 +56,7 @@ export const presetListAtom = atom<PresetItem[]>((_get) =>
 // 프리셋을 현재 blockList에 적용
 export const applyPresetItemAtom = atom(
   null,
-  (get, set, preset: PresetItem) => {
+  (get, set, preset: PresetItem, channels: BlockChannel[] = []) => {
     const blockList = get(blockListAtom);
 
     const streamBlocks = preset.blocks.filter(
@@ -93,7 +94,11 @@ export const applyPresetItemAtom = atom(
 
     // 새로 추가되는 스트리밍 블록을 삽입
     while (streamIndex < streamBlocks.length) {
-      set(pushBlockAtom, streamBlocks[streamIndex++].position);
+      const id = set(pushBlockAtom, streamBlocks[streamIndex++].position);
+      const channel = channels.shift();
+      if (channel !== undefined) {
+        set(modifyBlockAtom, { id, channel });
+      }
     }
 
     // 새로 추가되는 채널 블록을 삽입
@@ -101,6 +106,27 @@ export const applyPresetItemAtom = atom(
       const id = set(pushBlockAtom, chatBlocks[chatIndex++].position);
       set(modifyBlockAtom, { id, type: "chat" });
     }
+  }
+);
+
+export const pushChannelWithDefaultPresetAtom = atom(
+  null,
+  async (get, set, channel: BlockChannel) => {
+    // 현재 활성화 블록 갯수 체크
+    const channelCount = get(blockListAtom).filter(
+      (item) => item.type === "stream" && item.channel !== null
+    ).length;
+
+    // 활성화 블록 갯수 + 1개 블록을 갖는 프리셋을 찾기
+    const preset = get(presetListAtom).find(
+      (item) => item.streamCount === channelCount + 1 && item.chatCount === 0
+    );
+
+    // 프리셋이 존재하지 않으면, 아무것도 안함
+    if (preset === undefined) return;
+
+    // 프리셋이 존재한다면, 전달받은 채널과 함께 적용
+    set(applyPresetItemAtom, preset, [channel]);
   }
 );
 
@@ -134,18 +160,20 @@ export const exportPresetListAtom = atom((_get) => {
       return 0;
     }),
   })).sort((a, b) => {
-    const streamBlockCountA = a.blocks.filter(
-      (block) => block.type === "stream"
-    ).length;
-    const streamBlockCountB = b.blocks.filter(
-      (block) => block.type === "stream"
-    ).length;
     const categoryCompare = a.category.localeCompare(b.category);
-
     if (categoryCompare !== 0) return categoryCompare;
 
-    if (streamBlockCountA < streamBlockCountB) return -1;
-    if (streamBlockCountA > streamBlockCountB) return 1;
+    const filter = (item: PresetItemBase) =>
+      item.blocks.filter((block) => block.type === "stream");
+    const countA = filter(a).length;
+    const countB = filter(b).length;
+
+    if (countA < countB) return -1;
+    if (countA > countB) return 1;
+
+    if (a.default === true) return -1;
+    if (b.default === true) return 1;
+
     return 0;
   });
 });

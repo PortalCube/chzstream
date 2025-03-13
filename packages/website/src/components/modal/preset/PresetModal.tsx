@@ -152,6 +152,7 @@ function PresetModal({}: PresetModalProps) {
     requestAnimationFrame(() => scrollToSection(channelCount));
   });
 
+  // 주어진 섹션으로 스크롤
   const scrollToSection = useCallback(
     (section: number) => {
       const element = sectionRef.current.get(`section-${section}`);
@@ -230,7 +231,7 @@ function PresetModal({}: PresetModalProps) {
           </SectionMenuItem>
         );
       }),
-    [sections, currentSection]
+    [sections, currentSection, scrollToSection]
   );
 
   const listItems = useMemo(

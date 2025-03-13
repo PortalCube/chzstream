@@ -170,7 +170,8 @@ function Block({ block }: BlockProps) {
     const json = JSON.parse(event.dataTransfer.getData("application/json"));
 
     if (json._isChannel === true) {
-      await fetchChzzkChannel(id, json.uuid);
+      const channel = await fetchChzzkChannel(json.uuid);
+      modifyBlock({ id, channel });
     } else if (json._isBlock === true) {
       if (position === null) {
         return;

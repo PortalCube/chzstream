@@ -2,8 +2,10 @@ import DragImage from "@web/components/drag/DragImage.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { favoriteChannelsAtom } from "@web/librarys/app.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { fetchChzzkChannelAtom } from "@web/librarys/layout.ts";
+import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 import classNames from "classnames";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -54,6 +56,10 @@ const Image = styled.img`
 function Channel({ uuid, index, gap }: ChannelProps) {
   const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
   const messageClient = useAtomValue(messageClientAtom);
+  const pushChannelWithDefaultPreset = useSetAtom(
+    pushChannelWithDefaultPresetAtom
+  );
+  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
 
   const [name, setName] = useState("");
   const [iconUrl, setIconUrl] = useState("");
@@ -98,6 +104,11 @@ function Channel({ uuid, index, gap }: ChannelProps) {
     };
   }, [messageClient, uuid]);
 
+  const onClick: React.MouseEventHandler = async () => {
+    const channel = await fetchChzzkChannel(uuid);
+    pushChannelWithDefaultPreset(channel);
+  };
+
   const onDragStart: React.DragEventHandler = (event) => {
     if (event.dataTransfer === null) return;
 
@@ -133,6 +144,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
       $gap={gap}
       className={classNames({ active })}
       draggable={true}
+      onClick={onClick}
       onDragStart={onDragStart}
       onPointerDown={onPointerDown}
     >

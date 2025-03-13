@@ -56,6 +56,8 @@ const Container = styled.div<{ $delay: number }>`
   animation-iteration-count: infinite;
   animation-direction: alternate;
 
+  opacity: 0.5;
+
   &.hidden {
     display: none;
   }
