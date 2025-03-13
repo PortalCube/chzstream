@@ -28,6 +28,9 @@ const Container = styled.div`
   transition-property: background-color;
   transition-duration: 100ms;
 
+  user-select: none;
+  -webkit-user-select: none;
+
   &:hover {
     background-color: rgba(255, 255, 255, 0.025);
   }

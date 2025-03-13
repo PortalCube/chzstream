@@ -1,7 +1,5 @@
-import { useAtomValue, useSetAtom } from "jotai";
-import { useContext, useMemo } from "react";
-import { MdVolumeDown, MdVolumeOff, MdVolumeUp } from "react-icons/md";
-import { MixerContext } from "@web/librarys/context.ts";
+import MixerSlider from "@web/components/block-context-menu/MixerSlider.tsx";
+import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import {
   setMuteAtom,
   setVolumeAtom,
@@ -9,11 +7,30 @@ import {
   updateMuteAtom,
   updateVolumeAtom,
 } from "@web/librarys/mixer.ts";
-import MixerSlider from "@web/components/modal/mixer/MixerSlider.tsx";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useContext, useMemo } from "react";
+import { MdVolumeDown, MdVolumeOff, MdVolumeUp } from "react-icons/md";
 
 function MixerVolume({}: MixerVolumeProps) {
-  const { id, mixer } = useContext(MixerContext);
-  const { volume, muted } = mixer;
+  const block = useContext(BlockContextMenuContext);
+
+  const { id, volume, muted } = useMemo(() => {
+    const result = {
+      id: 0,
+      volume: 0,
+      muted: false,
+    };
+    if (block === null) return result;
+
+    result.id = block.id;
+
+    if (block.mixer === null) return result;
+
+    result.volume = block.mixer.volume;
+    result.muted = block.mixer.muted;
+
+    return result;
+  }, [block]);
 
   const soloBlockId = useAtomValue(soloBlockIdAtom);
   const solo = useMemo(() => soloBlockId === id, [soloBlockId, id]);

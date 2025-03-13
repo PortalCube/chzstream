@@ -1,11 +1,18 @@
+import ButtonMenu from "@web/components/block-context-menu/ButtonMenu.tsx";
 import Channel from "@web/components/block-context-menu/Channel.tsx";
+import MixerItem from "@web/components/block-context-menu/MixerItem.tsx";
+import MixerQuality from "@web/components/block-context-menu/MixerQuality.tsx";
+import MixerVolume from "@web/components/block-context-menu/MixerVolume.tsx";
 import {
   blockContextMenuAtom,
   blockContextMenuOptionsAtom,
   blockListAtom,
 } from "@web/librarys/app.ts";
 import { Block } from "@web/librarys/block.ts";
-import { BlockContextMenuContext } from "@web/librarys/context.ts";
+import {
+  BlockContextMenuContext,
+  MixerContext,
+} from "@web/librarys/context.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -13,7 +20,6 @@ import styled from "styled-components";
 
 const Container = styled.div`
   width: 240px;
-  height: 400px;
   padding: 12px;
 
   box-sizing: border-box;
@@ -39,6 +45,11 @@ const Container = styled.div`
     opacity: 0;
     pointer-events: none;
   }
+`;
+
+const Divider = styled.div`
+  height: 2px;
+  background-color: rgb(53, 53, 53);
 `;
 
 function BlockContextMenu() {
@@ -129,6 +140,11 @@ function BlockContextMenu() {
         onContextMenu={onContextMenu}
       >
         <Channel />
+        <MixerQuality />
+        <MixerVolume />
+        <MixerItem />
+        <Divider />
+        <ButtonMenu />
       </Container>
     </BlockContextMenuContext>
   );
