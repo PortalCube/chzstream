@@ -39,13 +39,13 @@ const Title = styled.p`
 `;
 
 const Content = styled.div`
+  max-height: 480px;
   display: flex;
   justify-content: center;
   gap: 16px;
 `;
 
 const List = styled.div`
-  max-height: 480px;
   padding-right: 16px;
 
   display: flex;
@@ -54,6 +54,10 @@ const List = styled.div`
   align-items: center;
 
   overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Section = styled.div`
@@ -94,7 +98,16 @@ const SectionMenu = styled.div`
   justify-content: flex-start;
   gap: 4px;
 
+  overflow-y: auto;
+
   background-color: rgb(36, 36, 36);
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const SectionMenuItem = styled.button`
@@ -122,7 +135,7 @@ function PresetModal({}: PresetModalProps) {
   const modal = useAtomValue(modalAtom);
   const presetList = useAtomValue(presetListAtom);
   const ref = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<Map<number, HTMLDivElement>>(new Map());
+  const sectionRef = useRef<Map<string, HTMLElement>>(new Map());
   const [currentSection, setCurrentSection] = useState<number | null>(null);
 
   const className = classNames({
@@ -165,8 +178,18 @@ function PresetModal({}: PresetModalProps) {
   const menuItems = useMemo(
     () =>
       sections.map((section) => {
+        const refCallback = (item: HTMLButtonElement) => {
+          sectionRef.current.set(`menu-${section.streamCount}`, item);
+
+          return () => {
+            sectionRef.current.delete(`menu-${section.streamCount}`);
+          };
+        };
+
         const onMenuItemClick: React.MouseEventHandler = () => {
-          const element = sectionRef.current.get(section.streamCount);
+          const element = sectionRef.current.get(
+            `section-${section.streamCount}`
+          );
           if (element) {
             element.scrollIntoView();
             setTimeout(() => setCurrentSection(section.streamCount), 1);
@@ -180,6 +203,7 @@ function PresetModal({}: PresetModalProps) {
         return (
           <SectionMenuItem
             key={section.streamCount}
+            ref={refCallback}
             className={className}
             onClick={onMenuItemClick}
           >
@@ -198,7 +222,7 @@ function PresetModal({}: PresetModalProps) {
         ));
 
         const refCallback = (item: HTMLDivElement) => {
-          sectionRef.current.set(section.streamCount, item);
+          sectionRef.current.set(`section-${section.streamCount}`, item);
 
           const options = {
             root: ref.current,
@@ -212,6 +236,14 @@ function PresetModal({}: PresetModalProps) {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
                 setCurrentSection(section.streamCount);
+
+                const element = sectionRef.current.get(
+                  `menu-${section.streamCount}`
+                );
+
+                if (element) {
+                  element.scrollIntoView();
+                }
               }
             });
           };
@@ -220,7 +252,7 @@ function PresetModal({}: PresetModalProps) {
           observer.observe(item);
 
           return () => {
-            sectionRef.current.delete(section.streamCount);
+            sectionRef.current.delete(`section-${section.streamCount}`);
             observer.disconnect();
           };
         };

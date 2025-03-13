@@ -165,7 +165,7 @@ function Channel({}: ChannelProps) {
     if (channel === null) {
       return {
         iconUrl: getProfileImageUrl(),
-        name: "채널 없음",
+        name: "채널 없음" + " " + id,
         title: "여기를 클릭해서 채널을 지정하세요",
       };
     }

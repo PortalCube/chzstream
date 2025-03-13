@@ -104,6 +104,7 @@ export const applyPresetItemAtom = atom(
   }
 );
 
+// 새로운 프리셋 아이템 생성
 export const createPresetItemAtom = atom(
   null,
   (get, _set, category: PresetCategory) => {
@@ -114,20 +115,37 @@ export const createPresetItemAtom = atom(
       position: block.position,
     }));
 
-    const channelCount = blocks.filter(
-      (block) => block.type === "stream"
-    ).length;
-    const chatCount = blocks.filter((block) => block.type === "chat").length;
-
-    const name =
-      chatCount === 0
-        ? `채널 ${channelCount}개 #`
-        : `채널 ${channelCount}개, 채팅 ${chatCount}개 #`;
-
     return {
-      name,
       category,
       blocks,
     };
   }
 );
+
+// 개발 전용
+export const exportPresetListAtom = atom((_get) => {
+  return PRESET_LIST.map((item) => ({
+    ...item,
+    blocks: item.blocks.sort((a, b) => {
+      if (a.position.top < b.position.top) return -1;
+      if (a.position.top > b.position.top) return 1;
+      if (a.position.left < b.position.left) return -1;
+      if (a.position.left > b.position.left) return 1;
+      return 0;
+    }),
+  })).sort((a, b) => {
+    const streamBlockCountA = a.blocks.filter(
+      (block) => block.type === "stream"
+    ).length;
+    const streamBlockCountB = b.blocks.filter(
+      (block) => block.type === "stream"
+    ).length;
+    const categoryCompare = a.category.localeCompare(b.category);
+
+    if (categoryCompare !== 0) return categoryCompare;
+
+    if (streamBlockCountA < streamBlockCountB) return -1;
+    if (streamBlockCountA > streamBlockCountB) return 1;
+    return 0;
+  });
+});
