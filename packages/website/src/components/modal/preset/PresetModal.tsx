@@ -1,9 +1,10 @@
 import PresetButton from "@web/components/modal/preset/PresetItem.tsx";
-import { modalAtom } from "@web/librarys/modal.ts";
+import { blockListAtom } from "@web/librarys/app.ts";
+import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
 import { PresetItem, presetListAtom } from "@web/librarys/preset.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -138,6 +139,30 @@ function PresetModal({}: PresetModalProps) {
   const sectionRef = useRef<Map<string, HTMLElement>>(new Map());
   const [currentSection, setCurrentSection] = useState<number | null>(null);
 
+  // 패널을 열었을 때, 현재 레이아웃에 맞는 섹션으로 스크롤
+  useModalListener((get, _set, newVal, prevVal) => {
+    if (prevVal.type === newVal.type) return;
+    if (newVal.type !== "preset") return;
+
+    // 현재 활성화된 스트리밍 블록의 갯수
+    const channelCount = get(blockListAtom).filter(
+      (item) => item.type === "stream" && item.channel !== null
+    ).length;
+
+    requestAnimationFrame(() => scrollToSection(channelCount));
+  });
+
+  const scrollToSection = useCallback(
+    (section: number) => {
+      const element = sectionRef.current.get(`section-${section}`);
+      if (element) {
+        element.scrollIntoView();
+        setTimeout(() => setCurrentSection(section), 1);
+      }
+    },
+    [sectionRef]
+  );
+
   const className = classNames({
     disable: modal.type !== "preset",
   });
@@ -187,13 +212,7 @@ function PresetModal({}: PresetModalProps) {
         };
 
         const onMenuItemClick: React.MouseEventHandler = () => {
-          const element = sectionRef.current.get(
-            `section-${section.streamCount}`
-          );
-          if (element) {
-            element.scrollIntoView();
-            setTimeout(() => setCurrentSection(section.streamCount), 1);
-          }
+          scrollToSection(section.streamCount);
         };
 
         const className = classNames({
