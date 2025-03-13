@@ -1,3 +1,4 @@
+import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
 import { blockListAtom, nextBlockIdAtom } from "@web/librarys/app.ts";
 import { BlockPosition, BlockType } from "@web/librarys/block.ts";
 import {
@@ -10,16 +11,46 @@ import { atom } from "jotai";
 
 export type PresetCategory = "16:9" | "16:10" | "mobile";
 
-export type PresetItem = {
-  name: string;
+export type PresetItemBase = {
+  name?: string;
   category: PresetCategory;
   blocks: {
     position: BlockPosition;
     type: BlockType;
   }[];
+  default?: boolean;
 };
 
-export const presetListAtom = atom<PresetItem[]>((_get) => PRESET_LIST);
+export type PresetItem = PresetItemBase & {
+  description: string;
+  streamCount: number;
+  chatCount: number;
+};
+
+export const presetListAtom = atom<PresetItem[]>((_get) =>
+  PRESET_LIST.map((item) => {
+    const filter = (type: BlockType) =>
+      item.blocks.filter((block) => block.type === type);
+
+    const streamBlocks = filter("stream");
+    const chatBlocks = filter("chat");
+
+    const streamCount = streamBlocks.length;
+    const chatCount = chatBlocks.length;
+
+    const description =
+      chatCount === 0
+        ? `채널 ${streamCount}개`
+        : `채널 ${streamCount}개, 채팅 ${chatCount}개`;
+
+    return {
+      ...item,
+      description,
+      streamCount,
+      chatCount,
+    };
+  })
+);
 
 // 프리셋을 현재 blockList에 적용
 export const applyPresetItemAtom = atom(
