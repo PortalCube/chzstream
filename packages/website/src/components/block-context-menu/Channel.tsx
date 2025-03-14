@@ -48,18 +48,28 @@ const Info = styled.div`
   align-items: stretch;
   justify-content: center;
   gap: 2px;
+
+  overflow: hidden;
 `;
 
 const Name = styled.div`
   color: rgb(255, 255, 255);
   font-size: 16px;
   font-weight: 600;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const Description = styled.div`
   color: rgb(127, 127, 127);
   font-size: 14px;
   font-weight: 500;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 function Channel() {
