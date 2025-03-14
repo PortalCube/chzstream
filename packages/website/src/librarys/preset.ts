@@ -1,5 +1,9 @@
 import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
-import { blockListAtom, nextBlockIdAtom } from "@web/librarys/app.ts";
+import {
+  blockListAtom,
+  layoutModeAtom,
+  nextBlockIdAtom,
+} from "@web/librarys/app.ts";
 import { BlockChannel, BlockPosition, BlockType } from "@web/librarys/block.ts";
 import {
   fetchChzzkChannelAtom,
@@ -58,6 +62,7 @@ export const applyPresetItemAtom = atom(
   null,
   (get, set, preset: PresetItem, channels: BlockChannel[] = []) => {
     const blockList = get(blockListAtom);
+    const layoutMode = get(layoutModeAtom);
 
     const streamBlocks = preset.blocks.filter(
       (block) => block.type === "stream"
@@ -77,7 +82,7 @@ export const applyPresetItemAtom = atom(
         if (streamIndex < streamBlocks.length) {
           // 프리셋에 존재하는 같은 유형의 블록으로 위치를 변경
           const position = streamBlocks[streamIndex++].position;
-          set(modifyBlockAtom, { id, position });
+          set(modifyBlockAtom, { id, position, status: layoutMode === "view" });
         } else {
           // 프리셋에 더 이상 해당 유형의 블록이 남아있지 않다면 제거
           set(removeBlockAtom, id);
@@ -85,7 +90,7 @@ export const applyPresetItemAtom = atom(
       } else if (type === "chat") {
         if (chatIndex < chatBlocks.length) {
           const position = chatBlocks[chatIndex++].position;
-          set(modifyBlockAtom, { id, position });
+          set(modifyBlockAtom, { id, position, status: layoutMode === "view" });
         } else {
           set(removeBlockAtom, id);
         }
@@ -97,14 +102,14 @@ export const applyPresetItemAtom = atom(
       const id = set(pushBlockAtom, streamBlocks[streamIndex++].position);
       const channel = channels.shift();
       if (channel !== undefined) {
-        set(modifyBlockAtom, { id, channel });
+        set(modifyBlockAtom, { id, channel, status: layoutMode === "view" });
       }
     }
 
     // 새로 추가되는 채널 블록을 삽입
     while (chatIndex < chatBlocks.length) {
       const id = set(pushBlockAtom, chatBlocks[chatIndex++].position);
-      set(modifyBlockAtom, { id, type: "chat" });
+      set(modifyBlockAtom, { id, type: "chat", status: layoutMode === "view" });
     }
   }
 );
@@ -112,6 +117,8 @@ export const applyPresetItemAtom = atom(
 export const pushChannelWithDefaultPresetAtom = atom(
   null,
   async (get, set, channel: BlockChannel) => {
+    const layoutMode = get(layoutModeAtom);
+
     const streamBlock = get(blockListAtom).filter(
       (item) => item.type === "stream"
     );
@@ -119,7 +126,11 @@ export const pushChannelWithDefaultPresetAtom = atom(
     // 비어있는 스트리밍 블록을 찾고, 존재하면 그 블록에 채널을 넣기기
     const blankStreamBlock = streamBlock.find((item) => item.channel === null);
     if (blankStreamBlock !== undefined) {
-      set(modifyBlockAtom, { id: blankStreamBlock.id, channel });
+      set(modifyBlockAtom, {
+        id: blankStreamBlock.id,
+        channel,
+        status: layoutMode === "view",
+      });
       return;
     }
 
