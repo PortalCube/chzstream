@@ -14,7 +14,6 @@ import { MdClose } from "react-icons/md";
 import styled, { css } from "styled-components";
 
 const Container = styled.div<{ $dpr: number }>`
-  /* margin: ${(props) => 4 / props.$dpr + "px"}; */
   --block-margin-base: 4px;
   border-radius: 8px;
   padding: 16px;

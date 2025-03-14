@@ -70,7 +70,6 @@ function Block({ block }: BlockProps) {
     blockContextMenuOptionsAtom
   );
   const modifyBlock = useSetAtom(modifyBlockAtom);
-  const activateBlock = useSetAtom(activateBlockAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
   const swapBlock = useSetAtom(swapBlockAtom);
   const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
@@ -217,7 +216,6 @@ function Block({ block }: BlockProps) {
 
       if (type === "chat" && data.block.type === "stream") {
         modifyBlock({ id, channel: data.block.channel });
-        activateBlock();
 
         setLoaded(false);
         setInfoType("none");

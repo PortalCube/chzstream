@@ -40,6 +40,7 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
     },
+    needRefresh: false,
   };
 
   set(blockListAtom, (prev) => [...prev, block]);
@@ -114,7 +115,9 @@ export const updateBlockAtom = atom(
 );
 
 export const activateBlockAtom = atom(null, (_get, set) => {
-  set(blockListAtom, (prev) => prev.map((item) => ({ ...item, status: true })));
+  set(blockListAtom, (prev) =>
+    prev.map((item) => ({ ...item, status: true, needRefresh: false }))
+  );
 });
 
 export const swapBlockAtom = atom(

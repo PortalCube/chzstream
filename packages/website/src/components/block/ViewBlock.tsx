@@ -1,9 +1,10 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockContext } from "@web/librarys/context";
+import { modifyBlockAtom } from "@web/librarys/layout.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
@@ -45,7 +46,8 @@ const Container = styled.iframe`
 
 function ViewBlock({ loaded }: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
-  const { id, type, status, channel } = useContext(BlockContext);
+  const { id, type, status, channel, needRefresh } = useContext(BlockContext);
+  const modifyBlock = useSetAtom(modifyBlockAtom);
   const messageClient = useAtomValue(messageClientAtom);
 
   const src = useMemo((): string => {
@@ -56,6 +58,12 @@ function ViewBlock({ loaded }: ViewBlockProps) {
 
     // 아직 활성화되지 않음
     if (status === false) {
+      return "about:blank";
+    }
+
+    // 새로고침
+    if (needRefresh === true) {
+      modifyBlock({ id, status: false, needRefresh: false });
       return "about:blank";
     }
 
@@ -73,7 +81,7 @@ function ViewBlock({ loaded }: ViewBlockProps) {
     }
 
     return url.toString();
-  }, [messageClient, id, channel, status, type]);
+  }, [messageClient, id, channel, status, type, needRefresh]);
 
   const className = classNames({
     loading: loaded === false,

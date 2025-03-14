@@ -8,6 +8,7 @@ const Container = styled.button`
   border-radius: 4px;
 
   display: flex;
+  align-items: center;
   gap: 8px;
 
   cursor: pointer;

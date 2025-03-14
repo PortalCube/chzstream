@@ -46,6 +46,7 @@ export type Block = {
   channel: BlockChannel | null;
   mixer: BlockMixer;
   player: BlockPlayer;
+  needRefresh: boolean; // 새로고침 플래그 -- 나중에 event 방식으로 교체?
 };
 
 export type PreviewBlockStatus = "create" | "modify" | "inactive";
