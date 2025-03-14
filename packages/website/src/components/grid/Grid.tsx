@@ -93,7 +93,7 @@ function Grid() {
   });
 
   const blockElements: React.ReactNode[] = blockList.map((block) => (
-    <Block key={block.id} block={block} />
+    <Block key={block.id} block={block} gridRef={ref} />
   ));
 
   const onPointerDown: React.PointerEventHandler = (event) => {

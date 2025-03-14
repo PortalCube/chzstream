@@ -58,7 +58,7 @@ const Container = styled.div`
   }
 `;
 
-function Block({ block }: BlockProps) {
+function Block({ block, gridRef }: BlockProps) {
   const { id, type, status, position, channel } = block;
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
@@ -130,9 +130,13 @@ function Block({ block }: BlockProps) {
 
       const data = message.data;
 
+      const gridTop = gridRef.current?.offsetTop ?? 0;
+
+      if (gridRef.current === null) return;
+
       if (blockContextMenuOptions === null) {
         const x = data.clientX + ref.current.offsetLeft;
-        const y = data.clientY + ref.current.offsetTop;
+        const y = data.clientY + ref.current.offsetTop + gridTop;
 
         setBlockContextMenuOptions({ id, x, y });
       } else {
@@ -147,7 +151,7 @@ function Block({ block }: BlockProps) {
       messageClient.remove("iframe-pointer-move", onIframePointerMove);
       messageClient.remove("iframe-contextmenu", onIframeContextMenu);
     };
-  }, [messageClient, id, setMouseTop, ref]);
+  }, [messageClient, id, setMouseTop, ref, gridRef]);
 
   useEffect(() => {
     if (messageClient === null) return;
@@ -284,6 +288,7 @@ function Block({ block }: BlockProps) {
 
 type BlockProps = {
   block: Block;
+  gridRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export default Block;

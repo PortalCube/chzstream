@@ -26,7 +26,7 @@ const Container = styled.div`
   border-radius: 8px;
 
   position: fixed;
-  z-index: 1;
+  z-index: 9;
 
   display: flex;
   flex-direction: column;
