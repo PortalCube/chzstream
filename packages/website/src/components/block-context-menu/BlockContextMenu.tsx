@@ -5,10 +5,8 @@ import MixerItem from "@web/components/block-context-menu/MixerItem.tsx";
 import MixerQuality from "@web/components/block-context-menu/MixerQuality.tsx";
 import MixerVolume from "@web/components/block-context-menu/MixerVolume.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import {
-  blockContextMenuOptionsAtom,
-  blockListAtom,
-} from "@web/librarys/app.ts";
+import { blockListAtom } from "@web/librarys/app.ts";
+import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts";
 import { Block } from "@web/librarys/block.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import classNames from "classnames";
@@ -60,7 +58,8 @@ function BlockContextMenu() {
   );
   const className = classNames({ disable: blockContextMenuOptions === null });
 
-  const [style, setStyle] = useState<React.CSSProperties>({});
+  // 초기값을 display none으로 지정하여 (0,0) 에서 렌더링이 되지 않도록 함
+  const [style, setStyle] = useState<React.CSSProperties>({ display: "none" });
 
   useEffect(() => {
     if (blockContextMenuOptions === null) return;

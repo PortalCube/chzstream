@@ -1,5 +1,5 @@
 import ButtonMenuItem from "@web/components/block-context-menu/ButtonMenuItem.tsx";
-import { clearBlockContextMenuAtom } from "@web/librarys/app.ts";
+import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import { modifyBlockAtom, removeBlockAtom } from "@web/librarys/layout.ts";

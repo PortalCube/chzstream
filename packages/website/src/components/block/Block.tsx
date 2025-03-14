@@ -1,15 +1,13 @@
 import { RequestMessage } from "@chzstream/message";
+import DragOverlay from "@web/components/block/DragOverlay.tsx";
 import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
 import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
 import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
 import ViewBlock from "@web/components/block/ViewBlock.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import {
-  blockContextMenuOptionsAtom,
-  layoutModeAtom,
-  mouseIsTopAtom,
-} from "@web/librarys/app.ts";
+import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
+import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts";
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import {
@@ -151,7 +149,7 @@ function Block({ block, gridRef }: BlockProps) {
       messageClient.remove("iframe-pointer-move", onIframePointerMove);
       messageClient.remove("iframe-contextmenu", onIframeContextMenu);
     };
-  }, [messageClient, id, setMouseTop, ref, gridRef]);
+  }, [messageClient, id, setMouseTop, ref, gridRef, blockContextMenuOptions]);
 
   useEffect(() => {
     if (messageClient === null) return;
@@ -277,6 +275,7 @@ function Block({ block, gridRef }: BlockProps) {
         onDragEnter={preventDragHandler}
         onDragOver={preventDragHandler}
       >
+        <DragOverlay />
         <InfoOverlay type={infoType} />
         <LoadingOverlay loaded={loaded} />
         <EditBlock />
