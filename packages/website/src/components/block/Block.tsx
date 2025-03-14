@@ -1,5 +1,4 @@
 import { RequestMessage } from "@chzstream/message";
-import DragOverlay from "@web/components/block/DragOverlay.tsx";
 import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
 import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
 import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
@@ -275,7 +274,6 @@ function Block({ block, gridRef }: BlockProps) {
         onDragEnter={preventDragHandler}
         onDragOver={preventDragHandler}
       >
-        <DragOverlay />
         <InfoOverlay type={infoType} />
         <LoadingOverlay loaded={loaded} />
         <EditBlock />
