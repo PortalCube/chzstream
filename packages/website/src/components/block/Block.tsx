@@ -13,7 +13,6 @@ import {
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import {
-  activateBlockAtom,
   fetchChzzkChannelAtom,
   modifyBlockAtom,
   swapBlockAtom,
@@ -116,10 +115,37 @@ function Block({ block }: BlockProps) {
       setMouseTop(y < area);
     };
 
+    const onIframeContextMenu = (
+      message: RequestMessage<"iframe-contextmenu">
+    ) => {
+      if (ref === null || ref.current === null) {
+        return;
+      }
+
+      const websiteId = messageClient.id.id;
+
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== websiteId) return;
+      if (message.sender.blockId !== id) return;
+
+      const data = message.data;
+
+      if (blockContextMenuOptions === null) {
+        const x = data.clientX + ref.current.offsetLeft;
+        const y = data.clientY + ref.current.offsetTop;
+
+        setBlockContextMenuOptions({ id, x, y });
+      } else {
+        setBlockContextMenuOptions(null);
+      }
+    };
+
     messageClient.on("iframe-pointer-move", onIframePointerMove);
+    messageClient.on("iframe-contextmenu", onIframeContextMenu);
 
     return () => {
       messageClient.remove("iframe-pointer-move", onIframePointerMove);
+      messageClient.remove("iframe-contextmenu", onIframeContextMenu);
     };
   }, [messageClient, id, setMouseTop, ref]);
 
@@ -169,6 +195,9 @@ function Block({ block }: BlockProps) {
   }, [messageClient, id, applyPlayerControl]);
 
   const onContextMenu: React.MouseEventHandler = (event) => {
+    // Ctrl키를 누른 경우, 원래 메뉴를 표시
+    if (event.ctrlKey === true) return;
+
     event.preventDefault();
 
     if (blockContextMenuOptions === null) {

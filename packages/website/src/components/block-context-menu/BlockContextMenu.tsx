@@ -1,18 +1,16 @@
+import { RequestMessage } from "@message/index.ts";
 import ButtonMenu from "@web/components/block-context-menu/ButtonMenu.tsx";
 import Channel from "@web/components/block-context-menu/Channel.tsx";
 import MixerItem from "@web/components/block-context-menu/MixerItem.tsx";
 import MixerQuality from "@web/components/block-context-menu/MixerQuality.tsx";
 import MixerVolume from "@web/components/block-context-menu/MixerVolume.tsx";
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import {
-  blockContextMenuAtom,
   blockContextMenuOptionsAtom,
   blockListAtom,
 } from "@web/librarys/app.ts";
 import { Block } from "@web/librarys/block.ts";
-import {
-  BlockContextMenuContext,
-  MixerContext,
-} from "@web/librarys/context.ts";
+import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -48,12 +46,13 @@ const Container = styled.div`
 `;
 
 const Divider = styled.div`
-  height: 2px;
+  height: 1px;
   background-color: rgb(53, 53, 53);
 `;
 
 function BlockContextMenu() {
   const ref = useRef<HTMLDivElement>(null);
+  const messageClient = useAtomValue(messageClientAtom);
   const blockList = useAtomValue(blockListAtom);
   const [blockContextMenu, setBlockContextMenu] = useState<Block | null>(null);
   const [blockContextMenuOptions, setBlockContextMenuOptions] = useAtom(
@@ -131,6 +130,56 @@ function BlockContextMenu() {
     };
   }, [ref]);
 
+  useEffect(() => {
+    if (messageClient === null) return;
+
+    const pointerListener = (
+      message: RequestMessage<"iframe-pointer-down">
+    ) => {
+      const websiteId = messageClient.id.id;
+
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== websiteId) return;
+
+      setBlockContextMenuOptions(null);
+    };
+
+    const keyListener = (message: RequestMessage<"iframe-key-down">) => {
+      const websiteId = messageClient.id.id;
+
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== websiteId) return;
+
+      const data = message.data;
+
+      if (data.key === "Escape") {
+        setBlockContextMenuOptions(null);
+      }
+    };
+
+    messageClient.on("iframe-pointer-down", pointerListener);
+    messageClient.on("iframe-key-down", keyListener);
+
+    return () => {
+      messageClient.remove("iframe-pointer-down", pointerListener);
+      messageClient.remove("iframe-key-down", keyListener);
+    };
+  }, [messageClient]);
+
+  const mixer = useMemo(() => {
+    if (blockContextMenu === null) return null;
+    if (blockContextMenu.type !== "stream") return null;
+
+    return (
+      <>
+        <MixerQuality />
+        <MixerVolume />
+        <MixerItem />
+        <Divider />
+      </>
+    );
+  }, [blockContextMenu]);
+
   return (
     <BlockContextMenuContext value={blockContextMenu}>
       <Container
@@ -140,10 +189,7 @@ function BlockContextMenu() {
         onContextMenu={onContextMenu}
       >
         <Channel />
-        <MixerQuality />
-        <MixerVolume />
-        <MixerItem />
-        <Divider />
+        {mixer}
         <ButtonMenu />
       </Container>
     </BlockContextMenuContext>
