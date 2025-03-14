@@ -63,7 +63,7 @@ function ViewBlock({ loaded }: ViewBlockProps) {
 
     // 새로고침
     if (needRefresh === true) {
-      modifyBlock({ id, status: false, needRefresh: false });
+      modifyBlock({ id, status: layoutMode === "view", needRefresh: false });
       return "about:blank";
     }
 
@@ -81,7 +81,7 @@ function ViewBlock({ loaded }: ViewBlockProps) {
     }
 
     return url.toString();
-  }, [messageClient, id, channel, status, type, needRefresh]);
+  }, [messageClient, id, channel, status, type, needRefresh, layoutMode]);
 
   const className = classNames({
     loading: loaded === false,

@@ -21,8 +21,8 @@ export function getGridStyle(
     height = 2 - height;
   }
 
-  const right = 24 - left - width;
-  const bottom = 24 - top - height;
+  const right = GRID_SIZE_WIDTH - left - width;
+  const bottom = GRID_SIZE_HEIGHT - top - height;
 
   // left, top, right, bottom을 계산
   return {

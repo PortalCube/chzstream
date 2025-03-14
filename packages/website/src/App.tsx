@@ -74,7 +74,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [blockList]);
+  }, [blockList, presetList]);
 
   return (
     <ThemeProvider theme={theme}>
