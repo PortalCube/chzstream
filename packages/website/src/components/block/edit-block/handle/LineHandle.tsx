@@ -88,7 +88,8 @@ function LineHandle({ direction }: LineHandleProps) {
   const block = useContext(BlockContext);
   const beginModifyPreview = useSetAtom(beginModifyPreviewAtom);
 
-  const onPointerDown: React.PointerEventHandler = () => {
+  const onPointerDown: React.PointerEventHandler = (event) => {
+    if (event.button !== 0) return;
     beginModifyPreview(block, direction);
   };
 
