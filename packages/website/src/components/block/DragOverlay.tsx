@@ -1,6 +1,6 @@
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockContext } from "@web/librarys/context.ts";
-import { useBlockDrop } from "@web/librarys/drag-and-drop.ts";
+import { dragStatusAtom, useBlockDrop } from "@web/librarys/drag-and-drop.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
@@ -94,6 +94,10 @@ const Item = styled.div`
     background-color: rgba(0, 12, 24, 0.8);
     box-shadow: inset 0 0 20px rgba(5, 171, 216, 0.5);
   }
+
+  &.hidden {
+    display: none;
+  }
 `;
 
 const ItemText = styled.div`
@@ -111,6 +115,7 @@ function DragOverlay({}: LoadingOverlayProps) {
   const { lock } = block;
   const ref = useRef<HTMLDivElement>(null);
   const layoutMode = useAtomValue(layoutModeAtom);
+  const dragStatus = useAtomValue(dragStatusAtom);
   const { onDrop } = useBlockDrop(block);
 
   const [active, setActive] = useState<boolean>(false);
@@ -182,10 +187,13 @@ function DragOverlay({}: LoadingOverlayProps) {
         onDragOver={onItemDragOver}
         onDragLeave={onItemDragLeave}
         onDrop={onItemDrop("swap")}
-        className={classNames({ hover: selection === 2 })}
+        className={classNames({
+          hidden: dragStatus === false,
+          hover: selection === 2,
+        })}
       >
         <MdSwapHoriz />
-        <ItemText>채널 이동</ItemText>
+        <ItemText>블록 이동</ItemText>
       </Item>
     </Container>
   );
