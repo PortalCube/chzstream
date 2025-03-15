@@ -180,6 +180,7 @@ export const fetchChzzkChannelAtom = atom(
       thumbnailUrl: "",
       iconUrl: getProfileImageUrl(),
       lastUpdate: null,
+      liveStatus: false,
     };
 
     // 제한 모드 처리
@@ -202,6 +203,7 @@ export const fetchChzzkChannelAtom = atom(
     // 가져온 데이터로 채널 정보 업데이트
     channel.name = data.channelName;
     channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
+    channel.liveStatus = data.liveStatus;
     channel.lastUpdate = Date.now();
 
     // 방송이 켜진 경우, 제목도 업데이트

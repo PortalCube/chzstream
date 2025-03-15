@@ -23,6 +23,7 @@ export type BlockChannel = {
   thumbnailUrl: string;
   iconUrl: string;
   lastUpdate: number | null;
+  liveStatus: boolean;
 };
 
 export type BlockMixer = {

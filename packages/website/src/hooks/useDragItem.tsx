@@ -1,7 +1,6 @@
 import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
 import { Block, BlockChannel } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
-import { DragItem } from "@web/librarys/drag-and-drop.ts";
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";

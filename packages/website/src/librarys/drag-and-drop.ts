@@ -1,4 +1,4 @@
-import { DragItem, useDragItem } from "@web/hooks/useDragItem";
+import { DragItem, useDragItem } from "@web/hooks/useDragItem.tsx";
 import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { Block, BlockChannel } from "@web/librarys/block.ts";
 import {

@@ -62,6 +62,7 @@ function getDefaultChannel(uuid: string): BlockChannel {
     thumbnailUrl: "",
     iconUrl: getProfileImageUrl(),
     lastUpdate: null,
+    liveStatus: false,
   };
 }
 
@@ -74,7 +75,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
 
   const [channel, setChannel] = useState(getDefaultChannel(uuid));
-  const { name, iconUrl } = channel;
+  const { name, iconUrl, liveStatus } = channel;
 
   const { dragElement, onDragStart, onDragEnd } = useChannelDrag(channel);
 
@@ -103,6 +104,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
       channel.lastUpdate = Date.now();
       channel.thumbnailUrl = data.liveThumbnailUrl ?? "";
       channel.title = data.liveTitle ?? "";
+      channel.liveStatus = data.liveStatus;
 
       setChannel(channel);
     };
@@ -133,7 +135,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
     <Container
       $index={index}
       $gap={gap}
-      className={classNames({ active: false })}
+      className={classNames({ active: liveStatus })}
       draggable={true}
       onClick={onClick}
       onDragStart={onDragStart}
