@@ -1,4 +1,5 @@
 import { RequestMessage } from "@chzstream/message";
+import DragOverlay from "@web/components/block/DragOverlay.tsx";
 import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
 import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
 import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
@@ -9,13 +10,9 @@ import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts";
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
-import {
-  fetchChzzkChannelAtom,
-  modifyBlockAtom,
-  swapBlockAtom,
-} from "@web/librarys/layout.ts";
+import { dragStatusAtom } from "@web/librarys/drag-and-drop.ts";
+import { modifyBlockAtom } from "@web/librarys/layout.ts";
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
-import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -56,19 +53,19 @@ const Container = styled.div`
 `;
 
 function Block({ block, gridRef }: BlockProps) {
-  const { id, type, status, position, channel } = block;
+  const { id, status, position, channel } = block;
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
-  const setMouseTop = useSetAtom(mouseIsTopAtom);
+  const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
   const layoutMode = useAtomValue(layoutModeAtom);
 
   const [blockContextMenuOptions, setBlockContextMenuOptions] = useAtom(
     blockContextMenuOptionsAtom
   );
+
   const modifyBlock = useSetAtom(modifyBlockAtom);
-  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
-  const swapBlock = useSetAtom(swapBlockAtom);
   const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
+  const dragStatus = useAtomValue(dragStatusAtom);
 
   const [loaded, setLoaded] = useState(false);
   const [infoType, setInfoType] = useState<InfoType>("none");
@@ -108,8 +105,13 @@ function Block({ block, gridRef }: BlockProps) {
       const data = message.data;
 
       const y = data.clientY + ref.current.offsetTop;
-      const area = (window.document.body.clientHeight / GRID_SIZE_HEIGHT) * 0.5;
-      setMouseTop(y < area);
+
+      setMouseTop(y < 10);
+      // if (mouseIsTop) {
+      //   setMouseTop(y < 90);
+      // } else {
+      //   setMouseTop(y < 10);
+      // }
     };
 
     const onIframeContextMenu = (
@@ -148,7 +150,7 @@ function Block({ block, gridRef }: BlockProps) {
       messageClient.remove("iframe-pointer-move", onIframePointerMove);
       messageClient.remove("iframe-contextmenu", onIframeContextMenu);
     };
-  }, [messageClient, id, setMouseTop, ref, gridRef, blockContextMenuOptions]);
+  }, [messageClient, id, mouseIsTop, ref, gridRef, blockContextMenuOptions]);
 
   useEffect(() => {
     if (messageClient === null) return;
@@ -212,51 +214,13 @@ function Block({ block, gridRef }: BlockProps) {
     }
   };
 
-  const onDrop: React.DragEventHandler = async (event) => {
-    if (event.dataTransfer === null) return;
-
-    event.preventDefault();
-
-    const json = JSON.parse(event.dataTransfer.getData("application/json"));
-
-    if (json._isChannel === true) {
-      const channel = await fetchChzzkChannel(json.uuid);
-      modifyBlock({ id, channel });
-    } else if (json._isBlock === true) {
-      if (position === null) {
-        return;
-      }
-
-      const data = json as {
-        _isBlock: true;
-        block: Block;
-      };
-
-      if (id === data.block.id) {
-        return;
-      }
-
-      if (data.block.channel === null) {
-        return;
-      }
-
-      if (data.block.position === null) {
-        return;
-      }
-
-      if (type === "chat" && data.block.type === "stream") {
-        modifyBlock({ id, channel: data.block.channel });
-
-        setLoaded(false);
-        setInfoType("none");
-      } else {
-        swapBlock(id, data.block.id);
-      }
-    }
+  const onPointerEnter: React.PointerEventHandler = () => {
+    if (dragStatus === true) return;
+    modifyBlock({ id, lock: false });
   };
 
-  const preventDragHandler: React.DragEventHandler = (event) => {
-    event.preventDefault();
+  const onPointerLeave: React.PointerEventHandler = () => {
+    modifyBlock({ id, lock: true });
   };
 
   const className = classNames({ "modify-mode": layoutMode === "modify" });
@@ -269,11 +233,11 @@ function Block({ block, gridRef }: BlockProps) {
         ref={ref}
         style={style}
         className={className}
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
         onContextMenu={onContextMenu}
-        onDrop={onDrop}
-        onDragEnter={preventDragHandler}
-        onDragOver={preventDragHandler}
       >
+        <DragOverlay />
         <InfoOverlay type={infoType} />
         <LoadingOverlay loaded={loaded} />
         <EditBlock />

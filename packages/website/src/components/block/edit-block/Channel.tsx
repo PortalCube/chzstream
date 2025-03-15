@@ -1,14 +1,14 @@
-import { useSetAtom } from "jotai";
-import { useContext, useMemo, useRef } from "react";
-import DragImage from "@web/components/drag/DragImage.tsx";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContext } from "@web/librarys/context";
+import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
 import {
   fetchChzzkChannelAtom,
   modifyBlockAtom,
 } from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
+import { useSetAtom } from "jotai";
+import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
 const Container = styled.div`
@@ -158,12 +158,12 @@ const Title = styled.p`
 `;
 
 function Channel({}: ChannelProps) {
-  const ref = useRef<HTMLImageElement>(null);
+  const block = useContext(BlockContext);
+  const { id, channel } = block;
   const openSearchModal = useSetAtom(openSearchModalAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
   const modifyBlock = useSetAtom(modifyBlockAtom);
-  const block = useContext(BlockContext);
-  const { id, channel } = block;
+  const { dragElement, onDragStart, onDragEnd } = useBlockDrag(block);
 
   const { iconUrl, name, title } = useMemo(() => {
     const result = {
@@ -190,33 +190,14 @@ function Channel({}: ChannelProps) {
     });
   };
 
-  const onDragStart: React.DragEventHandler = (event) => {
-    if (event.dataTransfer === null) return false;
-
-    if (channel === null) return false;
-
-    if (ref?.current) {
-      event.dataTransfer.setDragImage(ref.current, 0, 0);
-    }
-
-    event.dataTransfer.effectAllowed = "all";
-    event.dataTransfer.dropEffect = "move";
-
-    const data = JSON.stringify({
-      _isBlock: true,
-      block: block,
-    });
-
-    event.dataTransfer.setData("application/json", data);
-  };
-
   return (
     <Container
       draggable={channel !== null}
       onClick={onClick}
       onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
-      <DragImage _ref={ref} src={iconUrl} name={name} />
+      {dragElement}
       <InfoGroup>
         <Icon src={iconUrl} draggable="false" />
         <TextGroup>

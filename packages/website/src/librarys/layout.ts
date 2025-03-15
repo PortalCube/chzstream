@@ -41,6 +41,7 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       muted: defaultMixerItem.mixer.muted,
     },
     needRefresh: false,
+    lock: true,
   };
 
   set(blockListAtom, (prev) => [...prev, block]);
@@ -235,4 +236,8 @@ export const switchLayoutModeAtom = atom(null, (get, set) => {
   } else if (mode === "modify") {
     set(activateViewModeAtom);
   }
+});
+
+export const lockBlockAtom = atom(null, (_get, set) => {
+  set(blockListAtom, (prev) => prev.map((item) => ({ ...item, lock: true })));
 });

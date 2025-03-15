@@ -17,7 +17,7 @@ import {
   exportPresetListAtom,
 } from "@web/librarys/preset.ts";
 import { theme } from "@web/scripts/styled.ts";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
 
@@ -70,7 +70,6 @@ function App() {
     };
 
     window.addEventListener("keydown", listener);
-
     return () => {
       window.removeEventListener("keydown", listener);
     };

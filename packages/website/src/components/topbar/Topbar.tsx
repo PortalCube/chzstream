@@ -35,7 +35,7 @@ const Container = styled.div`
   height: var(--height);
   padding: 0 24px;
 
-  z-index: 1;
+  z-index: 2;
 
   box-sizing: border-box;
 
@@ -113,7 +113,14 @@ function Topbar() {
 
   useEffect(() => {
     const onPointerMove = (event: PointerEvent) => {
-      setMouseTop(event.clientY < 10);
+      const y = event.clientY;
+
+      setMouseTop(y < 10);
+      // if (mouseIsTop) {
+      //   setMouseTop(y < 90);
+      // } else {
+      //   setMouseTop(y < 10);
+      // }
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -127,14 +134,14 @@ function Topbar() {
       }
     };
 
-    window.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointermove", onPointerMove);
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      window.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [toggleFullscreen]);
+  }, [mouseIsTop, toggleFullscreen]);
 
   useEffect(() => {
     if (messageClient === null) return;

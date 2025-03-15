@@ -1,5 +1,9 @@
-import { useAtomValue } from "jotai";
 import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { Block, BlockChannel } from "@web/librarys/block.ts";
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { DragItem } from "@web/librarys/drag-and-drop.ts";
+import { useAtomValue } from "jotai";
+import { useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 
 const ratioMixin = (value: number) => {
@@ -67,28 +71,47 @@ const Description = styled.p<{ $dpr: number }>`
   color: rgb(200, 200, 200);
 `;
 
+export type DragItem = {
+  _isChzstreamDragItem: true;
+  block: number | null;
+  channelPlatform: "chzzk"; // TODO
+  channelId: string;
+  channelName: string;
+  channelImageUrl: string;
+};
+
 // Note: Windows에서는 DragImage가 300x300을 초과하면 방사형 투명도 그라데이션이 적용됨
 
-function DragImage({ _ref, src, name }: DragImageProps) {
+export function useDragItem(
+  blockId: number | null,
+  channel: BlockChannel | null
+): [React.ReactNode, DragItem, HTMLDivElement | null] {
+  const ref = useRef<HTMLDivElement>(null);
   const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
-  return (
-    <Container ref={_ref} $dpr={displayPixelRatio}>
-      <Image src={src} $dpr={displayPixelRatio} />
+  const dragItem: DragItem = useMemo(
+    () => ({
+      _isChzstreamDragItem: true,
+      block: blockId,
+      channelPlatform: "chzzk",
+      channelId: channel?.uuid ?? "",
+      channelName: channel?.name ?? "채널 없음",
+      channelImageUrl: channel?.iconUrl ?? getProfileImageUrl(),
+    }),
+    [blockId, channel]
+  );
+
+  const dragElement = (
+    <Container ref={ref} $dpr={displayPixelRatio}>
+      <Image src={dragItem.channelImageUrl} $dpr={displayPixelRatio} />
       <Info $dpr={displayPixelRatio}>
-        <Name $dpr={displayPixelRatio}>{name}</Name>
+        <Name $dpr={displayPixelRatio}>{dragItem.channelName}</Name>
         <Description $dpr={displayPixelRatio}>
           원하는 블록에 드롭하세요!
         </Description>
       </Info>
     </Container>
   );
+
+  return [dragElement, dragItem, ref.current];
 }
-
-type DragImageProps = {
-  _ref: React.RefObject<HTMLDivElement | null>;
-  src: string;
-  name: string;
-};
-
-export default DragImage;

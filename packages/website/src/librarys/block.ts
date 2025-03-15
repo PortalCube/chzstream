@@ -47,6 +47,7 @@ export type Block = {
   mixer: BlockMixer;
   player: BlockPlayer;
   needRefresh: boolean; // 새로고침 플래그 -- 나중에 event 방식으로 교체?
+  lock: boolean; // DnD 전용 플래그 -- true: 컨트롤러 이벤트 잠금, dnd 활성화 / false: 컨트롤러 이벤트 활성화, dnd 비활성화
 };
 
 export type PreviewBlockStatus = "create" | "modify" | "inactive";
