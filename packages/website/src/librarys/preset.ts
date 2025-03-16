@@ -171,31 +171,37 @@ export const createPresetItemAtom = atom(
 );
 
 // 개발 전용
-export const exportPresetListAtom = atom((_get) => {
-  return PRESET_LIST.map((item) => ({
-    ...item,
-    blocks: item.blocks.sort((a, b) => {
-      if (a.position.top < b.position.top) return -1;
-      if (a.position.top > b.position.top) return 1;
-      if (a.position.left < b.position.left) return -1;
-      if (a.position.left > b.position.left) return 1;
-      return 0;
-    }),
-  })).sort((a, b) => {
-    const categoryCompare = a.category.localeCompare(b.category);
-    if (categoryCompare !== 0) return categoryCompare;
+export const exportPresetListAtom = atom(
+  null,
+  (_get, _set, list: PresetItemBase[] = PRESET_LIST) => {
+    return list
+      .sort((a, b) => {
+        const categoryCompare = a.category.localeCompare(b.category);
+        if (categoryCompare !== 0) return categoryCompare;
 
-    const filter = (item: PresetItemBase) =>
-      item.blocks.filter((block) => block.type === "stream");
-    const countA = filter(a).length;
-    const countB = filter(b).length;
+        const filter = (item: PresetItemBase) =>
+          item.blocks.filter((block) => block.type === "stream");
+        const countA = filter(a).length;
+        const countB = filter(b).length;
 
-    if (countA < countB) return -1;
-    if (countA > countB) return 1;
+        if (countA < countB) return -1;
+        if (countA > countB) return 1;
 
-    if (a.default === true) return -1;
-    if (b.default === true) return 1;
+        if (a.default === true) return -1;
+        if (b.default === true) return 1;
 
-    return 0;
-  });
-});
+        return 0;
+      })
+      .map((item, index) => ({
+        ...item,
+        name: `프리셋 ${index + 1}`,
+        blocks: item.blocks.sort((a, b) => {
+          if (a.position.top < b.position.top) return -1;
+          if (a.position.top > b.position.top) return 1;
+          if (a.position.left < b.position.left) return -1;
+          if (a.position.left > b.position.left) return 1;
+          return 0;
+        }),
+      }));
+  }
+);

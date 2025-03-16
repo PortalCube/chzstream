@@ -12,9 +12,11 @@ import { useShortcutKey } from "@web/hooks/useShortcutKey.tsx";
 import { useStorage } from "@web/hooks/useStorage.tsx";
 import { blockListAtom } from "@web/librarys/app.ts";
 import { loadDefaultMixerAtom } from "@web/librarys/mixer.ts";
+import { PRESET_LIST } from "@web/librarys/preset-data.ts";
 import {
   createPresetItemAtom,
   exportPresetListAtom,
+  PresetItemBase,
 } from "@web/librarys/preset.ts";
 import { theme } from "@web/scripts/styled.ts";
 import { useAtomValue, useSetAtom } from "jotai";
@@ -35,7 +37,7 @@ const Container = styled.div`
 function App() {
   const loadDefaultMixer = useSetAtom(loadDefaultMixerAtom);
   const createPresetItem = useSetAtom(createPresetItemAtom);
-  const presetList = useAtomValue(exportPresetListAtom);
+  const exportPresetList = useSetAtom(exportPresetListAtom);
   const blockList = useAtomValue(blockListAtom);
 
   useMessageClient();
@@ -61,6 +63,11 @@ function App() {
       }
 
       if (event.key === "F8") {
+        const preset = createPresetItem("16:9");
+        const presetList = exportPresetList(
+          preset.blocks.length === 0 ? PRESET_LIST : [...PRESET_LIST, preset]
+        );
+
         console.log(presetList);
         window.navigator.clipboard.writeText(
           JSON.stringify(presetList, null, 2)
@@ -73,7 +80,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [blockList, presetList]);
+  }, [blockList]);
 
   return (
     <ThemeProvider theme={theme}>

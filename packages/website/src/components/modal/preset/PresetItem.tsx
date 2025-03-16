@@ -47,7 +47,12 @@ function PresetButton({ preset }: PresetButtonProps) {
   };
 
   return (
-    <Container $ratio={16 / 9} $dpr={displayPixelRatio} onClick={onClick}>
+    <Container
+      $ratio={16 / 9}
+      $dpr={displayPixelRatio}
+      onClick={onClick}
+      title={preset.name}
+    >
       <Grid>{blocks}</Grid>
     </Container>
   );
