@@ -62,10 +62,10 @@ export function useBlockDrag(block: Block | null) {
       setDragItem(event, dragItem);
       setDragStatus("block");
     },
-    [block, dragItem, dragRef]
+    [channel, block, dragItem, dragRef]
   );
 
-  const onDragEnd: React.DragEventHandler = () => setDragStatus(false);
+  const onDragEnd: React.DragEventHandler = () => setDragStatus("none");
 
   return {
     dragElement,
@@ -95,7 +95,7 @@ export function useChannelDrag(channel: BlockChannel | null) {
     [dragItem, dragRef]
   );
 
-  const onDragEnd: React.DragEventHandler = () => setDragStatus(false);
+  const onDragEnd: React.DragEventHandler = () => setDragStatus("none");
 
   return {
     dragElement,
