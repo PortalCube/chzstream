@@ -18,6 +18,7 @@ function isDragItem(value: Record<string, unknown>): value is DragItem {
 
 function getDragItem(event: React.DragEvent): DragItem | null {
   const rawText = event.dataTransfer.getData("application/json");
+  console.log("getDragItem", rawText);
   const rawJson = JSON.parse(rawText);
 
   if (isDragItem(rawJson)) return rawJson;
@@ -31,6 +32,7 @@ const setDragItemAtom = atom(
     event.dataTransfer.dropEffect = "move";
 
     const data = JSON.stringify(dragItem);
+    console.log("setDragItem", data);
     event.dataTransfer.setData("application/json", data);
 
     requestAnimationFrame(() => {
