@@ -1,22 +1,35 @@
 import { send } from "@extension/utils/message/content-client.ts";
 
+const isObject = (value: unknown): value is Record<string, unknown> => {
+  return value !== null && typeof value === "object";
+};
+
 export async function initializePlayerStatus() {
   InterceptEmitter.on("live-info", (response) => {
-    if (response === null) {
+    if (response.content === null) {
+      // 방송을 오랫동안 키지 않음
       send("player-status", {
         type: "end",
       });
+      removeEmbedPlayer();
       return;
     }
 
-    if (response.status === "CLOSE") {
+    if (isObject(response.content) === false) return;
+
+    const content = response.content;
+
+    if (content.status === "CLOSE") {
+      // 방송이 오프라인임
       send("player-status", {
         type: "end",
       });
+      removeEmbedPlayer();
       return;
     }
 
-    if (response.adult && response.userAdultStatus !== "ADULT") {
+    if (content.adult && content.userAdultStatus !== "ADULT") {
+      // 성인 방송인데 현재 사용자가 성인 인증되지 않음
       send("player-status", {
         type: "adult",
       });
@@ -25,14 +38,8 @@ export async function initializePlayerStatus() {
   });
 
   InterceptEmitter.on("live-status", (response) => {
-    if (response === null) {
-      send("player-status", {
-        type: "end",
-      });
-      return;
-    }
-
-    if (response.status === "CLOSE") {
+    if (response.content === null) {
+      // 방송을 오랫동안 키지 않음
       send("player-status", {
         type: "end",
       });
@@ -40,7 +47,21 @@ export async function initializePlayerStatus() {
       return;
     }
 
-    if (response.adult && response.userAdultStatus !== "ADULT") {
+    if (isObject(response.content) === false) return;
+
+    const content = response.content;
+
+    if (content.status === "CLOSE") {
+      // 방송이 오프라인임
+      send("player-status", {
+        type: "end",
+      });
+      removeEmbedPlayer();
+      return;
+    }
+
+    if (content.adult && content.userAdultStatus !== "ADULT") {
+      // 성인 방송인데 현재 사용자가 성인 인증되지 않음
       send("player-status", {
         type: "adult",
       });
@@ -65,10 +86,13 @@ function checkPlayerError() {
       }
 
       if (element.classList.contains("pzp-pc--dialog-error") === true) {
+        // 플레이어가 에러 UI를 표시함
         send("player-status", {
           type: "error",
           message: "플레이어에서 에러가 발생했습니다.",
         });
+
+        // 즉시 새로고침
         location.reload();
       }
     });
