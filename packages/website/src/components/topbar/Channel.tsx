@@ -75,13 +75,17 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
 
   const [channel, setChannel] = useState(getDefaultChannel(uuid));
-  const { name, iconUrl, liveStatus } = channel;
+  const { name, iconUrl, liveStatus, lastUpdate } = channel;
 
   const { dragElement, onDragStart, onDragEnd } = useChannelDrag(channel);
 
   useEffect(() => {
+    // TODO: Atom으로 분리
     const loadChannelInfo = async () => {
       const channel: BlockChannel = getDefaultChannel(uuid);
+
+      // 마지막 업데이트로부터 60초 이내인 경우 skip
+      if (lastUpdate !== null && Date.now() - lastUpdate < 60000) return;
 
       if (messageClient === null) {
         setChannel(channel);
@@ -109,13 +113,13 @@ function Channel({ uuid, index, gap }: ChannelProps) {
       setChannel(channel);
     };
 
-    const intervalTimer = setInterval(() => loadChannelInfo, 30000);
+    const intervalTimer = setInterval(loadChannelInfo, 3000);
     loadChannelInfo();
 
     return () => {
       clearInterval(intervalTimer);
     };
-  }, [messageClient, uuid]);
+  }, [lastUpdate, messageClient, uuid]);
 
   const onClick: React.MouseEventHandler = async () => {
     const channel = await fetchChzzkChannel(uuid);
