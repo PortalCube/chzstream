@@ -30,12 +30,12 @@ import {
 } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 
-const Container = styled.div`
+const Header = styled.div`
   width: 100%;
   height: var(--height);
   padding: 0 24px;
 
-  z-index: 2;
+  z-index: 1;
 
   box-sizing: border-box;
 
@@ -115,12 +115,11 @@ function Topbar() {
     const onPointerMove = (event: PointerEvent) => {
       const y = event.clientY;
 
-      setMouseTop(y < 10);
-      // if (mouseIsTop) {
-      //   setMouseTop(y < 90);
-      // } else {
-      //   setMouseTop(y < 10);
-      // }
+      if (mouseIsTop) {
+        setMouseTop(y < 110);
+      } else {
+        setMouseTop(y < 10);
+      }
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -246,14 +245,14 @@ function Topbar() {
   });
 
   return (
-    <Container
+    <Header
       className={className}
       onPointerMove={(event) => event.stopPropagation()}
     >
       <Title src={LogoImage} alt="chzstream" />
       <ChannelGroup />
       <MenuGroup>{buttons}</MenuGroup>
-    </Container>
+    </Header>
   );
 }
 

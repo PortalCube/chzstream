@@ -106,12 +106,11 @@ function Block({ block, gridRef }: BlockProps) {
 
       const y = data.clientY + ref.current.offsetTop;
 
-      setMouseTop(y < 10);
-      // if (mouseIsTop) {
-      //   setMouseTop(y < 90);
-      // } else {
-      //   setMouseTop(y < 10);
-      // }
+      if (mouseIsTop) {
+        setMouseTop(y < 110);
+      } else {
+        setMouseTop(y < 10);
+      }
     };
 
     const onIframeContextMenu = (

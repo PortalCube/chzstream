@@ -29,6 +29,8 @@ const Container = styled.div`
   width: 100%;
   flex-grow: 1;
 
+  z-index: 0;
+
   background-color: #1f1f1f;
 
   position: relative;
