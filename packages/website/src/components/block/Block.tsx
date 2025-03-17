@@ -215,7 +215,7 @@ function Block({ block, gridRef }: BlockProps) {
   };
 
   const onPointerEnter: React.PointerEventHandler = () => {
-    if (dragStatus === true) return;
+    if (dragStatus !== "none") return;
     modifyBlock({ id, lock: false });
   };
 

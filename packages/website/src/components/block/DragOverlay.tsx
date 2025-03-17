@@ -188,7 +188,7 @@ function DragOverlay({}: LoadingOverlayProps) {
         onDragLeave={onItemDragLeave}
         onDrop={onItemDrop("swap")}
         className={classNames({
-          hidden: dragStatus === false,
+          hidden: dragStatus !== "block",
           hover: selection === 2,
         })}
       >

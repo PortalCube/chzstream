@@ -10,7 +10,7 @@ import {
 import { atom, useSetAtom } from "jotai";
 import { useCallback } from "react";
 
-export const dragStatusAtom = atom<boolean>(false);
+export const dragStatusAtom = atom<"none" | "channel" | "block">("none");
 
 function isDragItem(value: Record<string, unknown>): value is DragItem {
   return value._isChzstreamDragItem === true;
@@ -60,7 +60,7 @@ export function useBlockDrag(block: Block | null) {
       }
 
       setDragItem(event, dragItem);
-      setDragStatus(true);
+      setDragStatus("block");
     },
     [block, dragItem, dragRef]
   );
@@ -90,7 +90,7 @@ export function useChannelDrag(channel: BlockChannel | null) {
       }
 
       setDragItem(event, dragItem);
-      setDragStatus(true);
+      setDragStatus("channel");
     },
     [dragItem, dragRef]
   );
