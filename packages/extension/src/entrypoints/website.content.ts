@@ -9,7 +9,7 @@ export default defineContentScript({
   ),
   async main(_context) {
     createWebsiteRelay();
-    await injectScript("/website-test.js", {
+    await injectScript("/website-flag.js", {
       keepInDom: false,
     });
   },
