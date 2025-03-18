@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import LogoImage from "@web/assets/logo.png";
 import { BlockContext } from "@web/librarys/context";
@@ -128,14 +128,21 @@ const Logo = styled.img`
 function Background({}: BackgroundProps) {
   const { type, channel } = useContext(BlockContext);
 
+  const [error, setError] = useState(false);
+
   const thumbnailUrl = channel?.thumbnailUrl ?? "";
   const iconUrl = channel?.iconUrl ?? "";
   const name = channel?.name ?? "알 수 없는 채널";
 
-  const showThumbnail = type === "stream" && thumbnailUrl !== "";
+  useEffect(() => {
+    setError(false);
+  }, [thumbnailUrl]);
+
+  const showThumbnail =
+    type === "stream" && thumbnailUrl !== "" && error === false;
   const showBlur = iconUrl !== "";
   const showPlaceholder =
-    channel === null || (type === "stream" && thumbnailUrl === "");
+    channel === null || (type === "stream" && (thumbnailUrl === "" || error));
 
   const thumbnailClass = classNames({
     hidden: showThumbnail === false,
@@ -154,7 +161,12 @@ function Background({}: BackgroundProps) {
   return (
     <Container>
       <Blur className={blurClass} src={iconUrl} alt={name} />
-      <Thumbnail className={thumbnailClass} src={thumbnailUrl} alt={name} />
+      <Thumbnail
+        className={thumbnailClass}
+        src={thumbnailUrl}
+        alt={name}
+        onError={() => setError(true)}
+      />
       <Placeholder className={placeholderClass}>
         <Logo src={LogoImage} />
       </Placeholder>
