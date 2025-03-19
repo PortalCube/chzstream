@@ -1,62 +1,48 @@
-import { makeUrls } from "./src/utils/make-url.js";
+import tsConfigPaths from "vite-tsconfig-paths";
 import {
   defineConfig,
-  UserManifest,
   UserManifestFn,
   Wxt,
   WxtDirEntry,
   WxtDirFileEntry,
 } from "wxt";
-import tsConfigPaths from "vite-tsconfig-paths";
+import { makeUrls } from "./src/utils/make-url.js";
 
-const makeManifest: UserManifestFn = ({ browser, mode }) => {
-  const manifest: UserManifest = {
-    name: "치즈스트림",
-    description: "치지직의 방송들을 한 화면으로 편하게 시청하세요.",
-    permissions: ["cookies", "notifications"],
-    host_permissions: makeUrls(
-      [
-        "https://naver.com/",
-        "https://chzzk.naver.com/*",
-        "https://api.chzzk.naver.com/*",
+const manifest: UserManifestFn = ({ mode }) => ({
+  name: "치즈스트림",
+  description: "치지직의 방송들을 한 화면으로 편하게 시청하세요.",
+  permissions: ["cookies", "notifications"],
+  host_permissions: makeUrls(
+    [
+      "https://naver.com/",
+      "https://chzzk.naver.com/*",
+      "https://api.chzzk.naver.com/*",
+      "https://chzstream.app/*",
+      "https://preview.chzstream.app/*",
+    ],
+    mode
+  ),
+  web_accessible_resources: [
+    {
+      resources: ["chzzk-xhr.js"],
+      matches: ["https://chzzk.naver.com/*"],
+    },
+    {
+      resources: ["website-flag.js"],
+      matches: [
+        "http://localhost/*",
         "https://chzstream.app/*",
         "https://preview.chzstream.app/*",
       ],
-      mode
-    ),
-    web_accessible_resources: [
-      {
-        resources: ["chzzk-xhr.js"],
-        matches: ["https://chzzk.naver.com/*"],
-      },
-      {
-        resources: ["website-test.js"],
-        matches: [
-          "http://localhost/*",
-          "https://chzstream.app/*",
-          "https://preview.chzstream.app/*",
-        ],
-      },
-    ],
-  };
-
-  // Firefox
-  if (browser === "firefox") {
-    manifest.browser_specific_settings = {
-      gecko: {
-        id: "{c0a25716-f499-47e7-8ebc-f0c688bba0c0}",
-      },
-    };
-  }
-
-  return manifest;
-};
+    },
+  ],
+});
 
 export default defineConfig({
   extensionApi: "chrome",
   modules: ["@wxt-dev/module-react"],
   srcDir: "src",
-  manifest: makeManifest,
+  manifest,
   hooks: {
     "prepare:types": modifyTsConfig,
   },
