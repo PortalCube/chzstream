@@ -147,7 +147,7 @@ const Title = styled.div`
   
   ${Mixin.block.less.small(css`
     font-size: 14px;
-    gap: 8px;
+    gap: 5px;
   `)}
 `;
 
@@ -155,7 +155,6 @@ const Row = styled.div`
   max-width: 100%;
 
   display: flex;
-  align-items: center;
   white-space: pre-wrap;
 
   font-weight: 800;
@@ -189,12 +188,10 @@ const Description = styled.p`
   
   ${Mixin.block.less.medium(css`
     font-size: 12px;
-    line-height: 14px;
   `)}
   
   ${Mixin.block.less.small(css`
     font-size: 10px;
-    line-height: 12px;
   `)}
 `;
 
@@ -202,8 +199,8 @@ const KEYWORDS: Record<string, KeywordProps> = {
   offline: {
     text: "오프라인",
     icon: OfflineIcon,
-    textColor: "rgb(200, 200, 200)",
-    backgroundColor: "rgb(68, 68, 68)",
+    textColor: "rgb(142, 142, 142)",
+    backgroundColor: "rgb(56, 56, 56)",
   },
   adult: {
     text: "연령 제한 방송",
