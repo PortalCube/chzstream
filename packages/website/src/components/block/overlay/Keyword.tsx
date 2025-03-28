@@ -16,32 +16,41 @@ const Container = styled.span<ContainerProps>`
   align-items: center;
   justify-content: center;
 
+  line-height: 0;
+  transform: scale(0.9) rotate(${({ $rotation }) => $rotation}deg);
+
   ${Mixin.block.greater.extraLarge(css`
-    padding: 6px 12px;
+    padding: 12px;
     margin: -6px -8px;
+    border-radius: 16px;
   `)}
 
   ${Mixin.block.less.extraLarge(css`
-    padding: 6px 10px;
+    padding: 10px;
     margin: -6px -6px;
+    border-radius: 12px;
   `)}
   
   ${Mixin.block.less.large(css`
-    padding: 4px 8px;
+    padding: 8px;
     margin: -4px -4px;
+    border-radius: 10px;
   `)}
   
   ${Mixin.block.less.medium(css`
-    padding: 4px 4px;
-    margin: -4px -4px;
+    padding: 0px 6px;
+    margin: -4px -3px;
+    border-radius: 8px;
   `)}
   
   ${Mixin.block.less.small(css`
-    padding: 2px 4px;
-    margin: -2px -2px;
+    padding: 0px 4px;
+    margin: -3px -2px;
+    margin-bottom: 0px;
+    border-radius: 6px;
   `)}
 
-  transform: scale(0.9) rotate(${({ $rotation }) => $rotation}deg);
+ 
 
   & > svg {
     ${Mixin.block.greater.extraLarge(css`
