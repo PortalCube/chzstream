@@ -127,23 +127,21 @@ export function useBlockDrop(block: Block) {
   const copyDragBlock = useSetAtom(copyDragBlockAtom);
 
   const onDrop = useCallback(
-    (mode: "swap" | "copy"): React.DragEventHandler => {
-      return (event) => {
-        // DnD API 미지원
-        if (event.dataTransfer === null) return;
+    (mode: "swap" | "copy", event: React.DragEvent) => {
+      // DnD API 미지원
+      if (event.dataTransfer === null) return;
 
-        event.preventDefault();
+      event.preventDefault();
 
-        // dataTransfer에서 DragItem 가져오기
-        const dragItem = getDragItem(event);
-        if (dragItem === null) return;
+      // dataTransfer에서 DragItem 가져오기
+      const dragItem = getDragItem(event);
+      if (dragItem === null) return;
 
-        if (mode === "swap") {
-          swapDragBlock(block, dragItem);
-        } else if (mode === "copy") {
-          copyDragBlock(block, dragItem);
-        }
-      };
+      if (mode === "swap") {
+        swapDragBlock(block, dragItem);
+      } else if (mode === "copy") {
+        copyDragBlock(block, dragItem);
+      }
     },
     [block]
   );

@@ -4,7 +4,12 @@ import {
   layoutModeAtom,
   nextBlockIdAtom,
 } from "@web/librarys/app.ts";
-import { Block, BlockChannel, BlockPosition } from "@web/librarys/block.ts";
+import {
+  Block,
+  BlockChannel,
+  BlockPosition,
+  BlockStatus,
+} from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import {
   defaultMixerItemAtom,
@@ -25,8 +30,13 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
   const block: Block = {
     id: nextBlockId,
     type: "stream",
-    // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
-    status: isRestrictedMode,
+    status: {
+      droppable: true,
+      refresh: false,
+      enabled: false,
+      loading: isRestrictedMode === false, // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
+      error: null,
+    },
     position: position,
     channel: null,
     mixer: {
@@ -40,8 +50,6 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
     },
-    needRefresh: false,
-    lock: true,
   };
 
   set(blockListAtom, (prev) => [...prev, block]);
@@ -100,6 +108,21 @@ export const modifyBlockAtom = atom(
   }
 );
 
+export const modifyBlockStatusAtom = atom(
+  null,
+  (_get, set, id: number, status: Partial<BlockStatus>) => {
+    set(blockListAtom, (prev) => {
+      const index = prev.findIndex((item) => item.id === id);
+
+      if (index === -1) {
+        throw new Error(`Block not found: ${id}`);
+      }
+
+      prev[index].status = { ...prev[index].status, ...status };
+    });
+  }
+);
+
 export const updateBlockAtom = atom(
   null,
   (_get, set, id: number, update: (block: WritableDraft<Block>) => void) => {
@@ -115,10 +138,21 @@ export const updateBlockAtom = atom(
   }
 );
 
-export const activateBlockAtom = atom(null, (_get, set) => {
-  set(blockListAtom, (prev) =>
-    prev.map((item) => ({ ...item, status: true, needRefresh: false }))
-  );
+export const activateBlockAtom = atom(null, (get, set) => {
+  const isRestrictedMode = get(messageClientAtom) === null;
+  set(blockListAtom, (prev) => {
+    prev.forEach((item) => {
+      if (item.channel === null) return;
+      if (item.status.enabled) return;
+
+      item.status = {
+        ...item.status,
+        enabled: true,
+        loading: isRestrictedMode === false,
+        error: null,
+      };
+    });
+  });
 });
 
 export const swapBlockAtom = atom(

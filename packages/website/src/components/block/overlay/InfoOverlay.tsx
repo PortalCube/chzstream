@@ -5,7 +5,6 @@ import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
 import Channel from "@web/components/block/overlay/Channel.tsx";
-import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import Keyword, {
   KeywordProps,
 } from "@web/components/block/overlay/Keyword.tsx";
@@ -218,6 +217,8 @@ type Info = {
 
 type Template = (string | ElementInfo)[];
 
+type InfoType = null | "loading" | "offline" | "adult" | "error" | "no-channel";
+
 const INFOS: Info[] = [
   {
     id: "offline",
@@ -248,7 +249,7 @@ const INFOS: Info[] = [
 ];
 
 type ElementInfo = {
-  type: "none" | "channel" | "keyword";
+  type: null | "channel" | "keyword";
 } & Record<string, unknown>;
 
 function getElementInfo(token: string[]): ElementInfo {
@@ -270,7 +271,7 @@ function getElementInfo(token: string[]): ElementInfo {
   }
 
   return {
-    type: "none",
+    type: null,
   };
 }
 
@@ -330,19 +331,27 @@ function render(info: Info) {
   );
 }
 
-function InfoOverlay({ type }: InfoOverlayProps) {
+function InfoOverlay({}: InfoOverlayProps) {
   const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
   const layoutMode = useAtomValue(layoutModeAtom);
   const removeBlock = useSetAtom(removeBlockAtom);
-  const { id } = useContext(BlockContext);
+  const { id, channel, status } = useContext(BlockContext);
+
+  const type: InfoType = useMemo(() => {
+    if (channel === null) return "no-channel";
+    if (status.loading) return null;
+    if (status.error !== null) return status.error;
+
+    return null;
+  }, [channel, status]);
 
   const isShow = useMemo(
-    () => layoutMode === "view" && type !== "none",
+    () => layoutMode === "view" && type !== null,
     [layoutMode, type]
   );
 
   const content = useMemo(() => {
-    if (type === "none") {
+    if (type === null) {
       return null;
     }
 
@@ -386,8 +395,6 @@ function InfoOverlay({ type }: InfoOverlayProps) {
   );
 }
 
-type InfoOverlayProps = {
-  type: InfoType;
-};
+type InfoOverlayProps = {};
 
 export default InfoOverlay;

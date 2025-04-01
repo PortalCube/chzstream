@@ -1,10 +1,11 @@
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import Spinner from "@web/components/block/Spinner.tsx";
 import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockContext } from "@web/librarys/context.ts";
 
 const randomRange = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
@@ -62,20 +63,21 @@ const Container = styled.div<{ $delay: number }>`
     display: none;
   }
 
-  &.load {
+  &.disable {
     opacity: 0;
     pointer-events: none;
   }
 `;
 
-function LoadingOverlay({ loaded }: LoadingOverlayProps) {
+function LoadingOverlay({}: LoadingOverlayProps) {
+  const block = useContext(BlockContext);
   const layoutMode = useAtomValue(layoutModeAtom);
 
   const [delay] = useState(randomRange(-2000, 0));
 
   const className = classNames({
     hidden: layoutMode === "modify",
-    load: loaded,
+    disable: block.status.loading === false,
   });
 
   const onDragEnter: React.DragEventHandler = (event) => {
@@ -99,8 +101,6 @@ function LoadingOverlay({ loaded }: LoadingOverlayProps) {
   );
 }
 
-type LoadingOverlayProps = {
-  loaded: boolean;
-};
+type LoadingOverlayProps = {};
 
 export default LoadingOverlay;

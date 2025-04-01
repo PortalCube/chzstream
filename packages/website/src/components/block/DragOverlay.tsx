@@ -112,7 +112,6 @@ const ItemText = styled.div`
 
 function DragOverlay({}: LoadingOverlayProps) {
   const block = useContext(BlockContext);
-  const { lock } = block;
   const ref = useRef<HTMLDivElement>(null);
   const layoutMode = useAtomValue(layoutModeAtom);
   const dragStatus = useAtomValue(dragStatusAtom);
@@ -156,7 +155,7 @@ function DragOverlay({}: LoadingOverlayProps) {
       event.preventDefault();
       setActive(false);
       setSelection(0);
-      onDrop(mode)(event);
+      onDrop(mode, event);
     };
   };
 
@@ -168,7 +167,7 @@ function DragOverlay({}: LoadingOverlayProps) {
       onDragLeave={onContainerDragLeave}
       className={classNames({
         "modify-mode": layoutMode === "modify",
-        disable: lock === false,
+        disable: block.status.droppable === false,
         show: active || selection !== 0,
       })}
     >

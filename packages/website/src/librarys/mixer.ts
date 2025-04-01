@@ -90,7 +90,7 @@ export const setupMixerAtom = atom(null, (_get, set) => {
   set(blockListAtom, (draft) => {
     draft.forEach((item) => {
       if (item.type !== "stream") return;
-      if (item.status === false) return;
+      if (item.status.enabled === false) return;
 
       item.mixer.volume = item.player.volume;
       item.mixer.quality = item.player.quality;

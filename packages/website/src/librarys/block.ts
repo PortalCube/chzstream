@@ -39,16 +39,31 @@ export type BlockPlayer = {
   muted: boolean;
 };
 
+export type BlockStatus = {
+  // 블록에 Drag & Drop 요소를 드롭할 수 있는가?
+  droppable: boolean;
+
+  // 블록을 새로고침 해야하는가?
+  refresh: boolean;
+
+  // 블록 iframe에 src를 할당하여 표시하는가?
+  enabled: boolean;
+
+  // 블록 iframe 위에 로딩 오버레이를 표시해야 하는가?
+  loading: boolean;
+
+  // 블록이 에러를 표시하는가?
+  error: null | "adult" | "offline" | "error";
+};
+
 export type Block = {
   id: number;
   type: BlockType;
-  status: boolean;
+  status: BlockStatus;
   position: BlockPosition;
   channel: BlockChannel | null;
   mixer: BlockMixer;
   player: BlockPlayer;
-  needRefresh: boolean; // 새로고침 플래그 -- 나중에 event 방식으로 교체?
-  lock: boolean; // DnD 전용 플래그 -- true: 컨트롤러 이벤트 잠금, dnd 활성화 / false: 컨트롤러 이벤트 활성화, dnd 비활성화
 };
 
 export type PreviewBlockStatus = "create" | "modify" | "inactive";

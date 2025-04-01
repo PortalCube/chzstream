@@ -2,7 +2,10 @@ import ButtonMenuItem from "@web/components/block-context-menu/ButtonMenuItem.ts
 import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
-import { modifyBlockAtom, removeBlockAtom } from "@web/librarys/layout.ts";
+import {
+  modifyBlockStatusAtom,
+  removeBlockAtom,
+} from "@web/librarys/layout.ts";
 import { useSetAtom } from "jotai";
 import { useCallback, useContext, useMemo } from "react";
 import {
@@ -31,7 +34,7 @@ function ButtonMenu() {
   const block = useContext(BlockContextMenuContext);
 
   const removeBlock = useSetAtom(removeBlockAtom);
-  const modifyBlock = useSetAtom(modifyBlockAtom);
+  const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
 
   const { id } = useMemo(() => {
@@ -68,7 +71,7 @@ function ButtonMenu() {
 
   const refresh = useCallback(() => {
     clearBlockContextMenu();
-    modifyBlock({ id, needRefresh: true });
+    modifyBlockStatus(id, { refresh: true });
   }, [id]);
 
   const makeFullscreen = useCallback(() => {

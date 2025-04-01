@@ -2,7 +2,6 @@ import { RequestMessage } from "@chzstream/message";
 import DragOverlay from "@web/components/block/DragOverlay.tsx";
 import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
 import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
-import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
 import ViewBlock from "@web/components/block/ViewBlock.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
@@ -11,12 +10,12 @@ import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import { dragStatusAtom } from "@web/librarys/drag-and-drop.ts";
-import { modifyBlockAtom } from "@web/librarys/layout.ts";
+import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 
 const popinAnimation = keyframes`
@@ -53,7 +52,7 @@ const Container = styled.div`
 `;
 
 function Block({ block, gridRef }: BlockProps) {
-  const { id, status, position, channel } = block;
+  const { id, position } = block;
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
@@ -63,29 +62,11 @@ function Block({ block, gridRef }: BlockProps) {
     blockContextMenuOptionsAtom
   );
 
-  const modifyBlock = useSetAtom(modifyBlockAtom);
+  const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
   const dragStatus = useAtomValue(dragStatusAtom);
 
-  const [loaded, setLoaded] = useState(false);
-  const [infoType, setInfoType] = useState<InfoType>("none");
-
-  useEffect(() => {
-    if (messageClient === null) {
-      // 제한 모드
-      setLoaded(true);
-      setInfoType("none");
-    } else if (channel === null) {
-      // 채널이 없음
-      setLoaded(true);
-      setInfoType("no-channel");
-    } else if (status === false) {
-      // 아직 로딩 안됨
-      setLoaded(false);
-      setInfoType("none");
-    }
-  }, [messageClient, status, channel]);
-
+  // TODO: useMessageListenerAtom 만들기 (1)
   useEffect(() => {
     if (messageClient === null) return;
 
@@ -151,6 +132,7 @@ function Block({ block, gridRef }: BlockProps) {
     };
   }, [messageClient, id, mouseIsTop, ref, gridRef, blockContextMenuOptions]);
 
+  // TODO: useMessageListenerAtom 만들기 (2)
   useEffect(() => {
     if (messageClient === null) return;
 
@@ -165,27 +147,23 @@ function Block({ block, gridRef }: BlockProps) {
 
       // 플레이어가 준비됨
       if (data.type === "ready") {
-        setLoaded(true);
-        setInfoType("none");
+        modifyBlockStatus(id, { loading: false, error: null });
         applyPlayerControl(id);
       }
 
       // 플레이어가 종료됨
       if (data.type === "end") {
-        setLoaded(true);
-        setInfoType("offline");
+        modifyBlockStatus(id, { loading: false, error: "offline" });
       }
 
       // 성인 제한으로 인해 재생 불가
       if (data.type === "adult") {
-        setLoaded(true);
-        setInfoType("adult");
+        modifyBlockStatus(id, { loading: false, error: "adult" });
       }
 
       // 오류로 인해 재생 불가
       if (data.type === "error") {
-        setLoaded(true);
-        setInfoType("error");
+        modifyBlockStatus(id, { loading: false, error: "error" });
       }
     };
 
@@ -194,7 +172,7 @@ function Block({ block, gridRef }: BlockProps) {
     return () => {
       messageClient.remove("player-status", listener);
     };
-  }, [messageClient, id, applyPlayerControl]);
+  }, [messageClient, id]);
 
   const onContextMenu: React.MouseEventHandler = (event) => {
     // Ctrl키를 누른 경우, 원래 메뉴를 표시
@@ -215,11 +193,11 @@ function Block({ block, gridRef }: BlockProps) {
 
   const onPointerEnter: React.PointerEventHandler = () => {
     if (dragStatus !== "none") return;
-    modifyBlock({ id, lock: false });
+    modifyBlockStatus(id, { droppable: false });
   };
 
   const onPointerLeave: React.PointerEventHandler = () => {
-    modifyBlock({ id, lock: true });
+    modifyBlockStatus(id, { droppable: true });
   };
 
   const className = classNames({ "modify-mode": layoutMode === "modify" });
@@ -237,10 +215,10 @@ function Block({ block, gridRef }: BlockProps) {
         onContextMenu={onContextMenu}
       >
         <DragOverlay />
-        <InfoOverlay type={infoType} />
-        <LoadingOverlay loaded={loaded} />
+        <InfoOverlay />
+        <LoadingOverlay />
         <EditBlock />
-        <ViewBlock loaded={loaded} />
+        <ViewBlock />
       </Container>
     </BlockContext.Provider>
   );
