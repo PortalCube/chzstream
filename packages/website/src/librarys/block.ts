@@ -7,10 +7,7 @@ import { MdForum, MdSmartDisplay } from "react-icons/md";
 
 export type Store = ReturnType<typeof createStore>;
 
-export enum BlockType {
-  Stream = "steam",
-  Chat = "chat",
-}
+export type BlockType = "stream" | "chat";
 
 export type BlockPosition = {
   top: number;
@@ -26,6 +23,7 @@ export type BlockChannel = {
   thumbnailUrl: string;
   iconUrl: string;
   lastUpdate: number | null;
+  liveStatus: boolean;
 };
 
 export type BlockMixer = {
@@ -41,55 +39,66 @@ export type BlockPlayer = {
   muted: boolean;
 };
 
+export type BlockStatus = {
+  // 블록에 Drag & Drop 요소를 드롭할 수 있는가?
+  droppable: boolean;
+
+  // 블록을 새로고침 해야하는가?
+  refresh: boolean;
+
+  // 블록 iframe에 src를 할당하여 표시하는가?
+  enabled: boolean;
+
+  // 블록 iframe 위에 로딩 오버레이를 표시해야 하는가?
+  loading: boolean;
+
+  // 블록이 에러를 표시하는가?
+  error: null | "adult" | "offline" | "error";
+};
+
 export type Block = {
   id: number;
   type: BlockType;
-  status: boolean;
-  lock: boolean;
+  status: BlockStatus;
   position: BlockPosition;
   channel: BlockChannel | null;
   mixer: BlockMixer;
   player: BlockPlayer;
 };
 
-export enum PreviewBlockStatus {
-  Create = "create", // 생성 모드
-  Modify = "modify", // 수정 모드
-  Inactive = "inactive", // 비활성화
-}
+export type PreviewBlockStatus = "create" | "modify" | "inactive";
 
-export enum PreviewBlockHandle {
-  TopLeft = "top-left",
-  Top = "top",
-  TopRight = "top-right",
-  Left = "left",
-  Right = "right",
-  BottomLeft = "bottom-left",
-  Bottom = "bottom",
-  BottomRight = "bottom-right",
-}
+export type PreviewBlockHandle =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right"
+  | "top"
+  | "right"
+  | "bottom"
+  | "left";
 
 export type PreviewBlock = {
   status: PreviewBlockStatus;
-  position: BlockPosition;
+  position: BlockPosition | null;
   linkedBlockId: number | null;
   handle: PreviewBlockHandle | null;
 };
 
 export function getBlockTypeName(type: BlockType) {
   switch (type) {
-    case BlockType.Stream:
+    case "stream":
       return BLOCK_TYPE_STREAM_NAME;
-    case BlockType.Chat:
+    case "chat":
       return BLOCK_TYPE_CHAT_NAME;
   }
 }
 
 export function getBlockTypeIcon(type: BlockType) {
   switch (type) {
-    case BlockType.Stream:
+    case "stream":
       return MdSmartDisplay;
-    case BlockType.Chat:
+    case "chat":
       return MdForum;
   }
 }

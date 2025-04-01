@@ -1,6 +1,8 @@
 import { HeartbeatMessage } from "./heartbeat.ts";
 import { IframePointerMoveMessage } from "./iframe-event/iframe-pointer-move.ts";
+import { IframePointerDownMessage } from "./iframe-event/iframe-pointer-down.ts";
 import { IframeKeyDownMessage } from "./iframe-event/iframe-key-down.ts";
+import { IframeContextMenuMessage } from "./iframe-event/iframe-contextmenu.ts";
 import { PlayerStatusMessage } from "./status/player-status.ts";
 import { StreamGetChannelMessage } from "./stream/get-channel.ts";
 import { StreamGetLiveListMessage } from "./stream/get-live-list.ts";
@@ -18,7 +20,9 @@ export const PAYLOAD_MAP = {
 
   /* Iframe Event */
   "iframe-pointer-move": IframePointerMoveMessage,
+  "iframe-pointer-down": IframePointerDownMessage,
   "iframe-key-down": IframeKeyDownMessage,
+  "iframe-contextmenu": IframeContextMenuMessage,
 
   /* Stream */
   "stream-get-channel": StreamGetChannelMessage,

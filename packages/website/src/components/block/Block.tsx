@@ -1,25 +1,21 @@
 import { RequestMessage } from "@chzstream/message";
+import DragOverlay from "@web/components/block/DragOverlay.tsx";
 import EditBlock from "@web/components/block/edit-block/EditBlock.tsx";
 import LoadingOverlay from "@web/components/block/LoadingOverlay.tsx";
-import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import InfoOverlay from "@web/components/block/overlay/InfoOverlay.tsx";
 import ViewBlock from "@web/components/block/ViewBlock.tsx";
-import { layoutSizeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
-import type { Block } from "@web/librarys/block.ts";
-import { BlockType } from "@web/librarys/block.ts";
-import { BlockContext } from "@web/librarys/context.ts";
-import {
-  activateBlockAtom,
-  fetchChzzkChannelAtom,
-  modifyBlockAtom,
-  swapBlockAtom,
-} from "@web/librarys/layout.ts";
-import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
-import { GRID_SIZE_HEIGHT } from "@web/scripts/constants.ts";
-import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
+import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts";
+import type { Block } from "@web/librarys/block.ts";
+import { BlockContext } from "@web/librarys/context.ts";
+import { dragStatusAtom } from "@web/librarys/drag-and-drop.ts";
+import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
+import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
+import { getGridStyle } from "@web/scripts/grid-layout.ts";
+import classNames from "classnames";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 
 const popinAnimation = keyframes`
@@ -47,40 +43,30 @@ const Container = styled.div`
   animation-name: ${popinAnimation};
   animation-duration: 200ms;
   animation-timing-function: ease-out;
+
+  &.modify-mode {
+    transition-property: left, top, right, bottom;
+    transition-duration: 100ms;
+    transition-timing-function: ease-out;
+  }
 `;
 
-function Block({ block }: BlockProps) {
-  const { id, type, status, position, channel } = block;
+function Block({ block, gridRef }: BlockProps) {
+  const { id, position } = block;
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
-  const setMouseTop = useSetAtom(mouseIsTopAtom);
+  const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
+  const layoutMode = useAtomValue(layoutModeAtom);
 
-  const modifyBlock = useSetAtom(modifyBlockAtom);
-  const activateBlock = useSetAtom(activateBlockAtom);
-  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
-  const swapBlock = useSetAtom(swapBlockAtom);
+  const [blockContextMenuOptions, setBlockContextMenuOptions] = useAtom(
+    blockContextMenuOptionsAtom
+  );
+
+  const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
+  const dragStatus = useAtomValue(dragStatusAtom);
 
-  const [loaded, setLoaded] = useState(false);
-  const [infoType, setInfoType] = useState<InfoType>(InfoType.None);
-  const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
-
-  useEffect(() => {
-    if (messageClient === null) {
-      // 제한 모드
-      setLoaded(true);
-      setInfoType(InfoType.None);
-    } else if (channel === null) {
-      // 채널이 없음
-      setLoaded(true);
-      setInfoType(InfoType.NoChannel);
-    } else if (status === false) {
-      // 아직 로딩 안됨
-      setLoaded(false);
-      setInfoType(InfoType.None);
-    }
-  }, [messageClient, status, channel]);
-
+  // TODO: useMessageListenerAtom 만들기 (1)
   useEffect(() => {
     if (messageClient === null) return;
 
@@ -100,17 +86,53 @@ function Block({ block }: BlockProps) {
       const data = message.data;
 
       const y = data.clientY + ref.current.offsetTop;
-      const area = (window.document.body.clientHeight / GRID_SIZE_HEIGHT) * 0.5;
-      setMouseTop(y < area);
+
+      if (mouseIsTop) {
+        setMouseTop(y < 110);
+      } else {
+        setMouseTop(y < 10);
+      }
+    };
+
+    const onIframeContextMenu = (
+      message: RequestMessage<"iframe-contextmenu">
+    ) => {
+      if (ref === null || ref.current === null) {
+        return;
+      }
+
+      const websiteId = messageClient.id.id;
+
+      if (message.sender.type !== "content") return;
+      if (message.sender.websiteId !== websiteId) return;
+      if (message.sender.blockId !== id) return;
+
+      const data = message.data;
+
+      const gridTop = gridRef.current?.offsetTop ?? 0;
+
+      if (gridRef.current === null) return;
+
+      if (blockContextMenuOptions === null) {
+        const x = data.clientX + ref.current.offsetLeft;
+        const y = data.clientY + ref.current.offsetTop + gridTop;
+
+        setBlockContextMenuOptions({ id, x, y });
+      } else {
+        setBlockContextMenuOptions(null);
+      }
     };
 
     messageClient.on("iframe-pointer-move", onIframePointerMove);
+    messageClient.on("iframe-contextmenu", onIframeContextMenu);
 
     return () => {
       messageClient.remove("iframe-pointer-move", onIframePointerMove);
+      messageClient.remove("iframe-contextmenu", onIframeContextMenu);
     };
-  }, [messageClient, id, setMouseTop, ref]);
+  }, [messageClient, id, mouseIsTop, ref, gridRef, blockContextMenuOptions]);
 
+  // TODO: useMessageListenerAtom 만들기 (2)
   useEffect(() => {
     if (messageClient === null) return;
 
@@ -125,27 +147,23 @@ function Block({ block }: BlockProps) {
 
       // 플레이어가 준비됨
       if (data.type === "ready") {
-        setLoaded(true);
-        setInfoType(InfoType.None);
+        modifyBlockStatus(id, { loading: false, error: null });
         applyPlayerControl(id);
       }
 
       // 플레이어가 종료됨
       if (data.type === "end") {
-        setLoaded(true);
-        setInfoType(InfoType.Offline);
+        modifyBlockStatus(id, { loading: false, error: "offline" });
       }
 
       // 성인 제한으로 인해 재생 불가
       if (data.type === "adult") {
-        setLoaded(true);
-        setInfoType(InfoType.Adult);
+        modifyBlockStatus(id, { loading: false, error: "adult" });
       }
 
       // 오류로 인해 재생 불가
       if (data.type === "error") {
-        setLoaded(true);
-        setInfoType(InfoType.Error);
+        modifyBlockStatus(id, { loading: false, error: "error" });
       }
     };
 
@@ -154,75 +172,53 @@ function Block({ block }: BlockProps) {
     return () => {
       messageClient.remove("player-status", listener);
     };
-  }, [messageClient, id, applyPlayerControl]);
+  }, [messageClient, id]);
 
-  const onPointerLeave: React.PointerEventHandler = () => {
-    modifyBlock({ id, lock: true });
-  };
-
-  const onDrop: React.DragEventHandler = async (event) => {
-    if (event.dataTransfer === null) return;
+  const onContextMenu: React.MouseEventHandler = (event) => {
+    // Ctrl키를 누른 경우, 원래 메뉴를 표시
+    if (event.ctrlKey === true) return;
 
     event.preventDefault();
 
-    const json = JSON.parse(event.dataTransfer.getData("application/json"));
-
-    if (json._isChannel === true) {
-      await fetchChzzkChannel(id, json.uuid);
-    } else if (json._isBlock === true) {
-      if (position === null) {
-        return;
-      }
-
-      const data = json as {
-        _isBlock: true;
-        block: Block;
-      };
-
-      if (id === data.block.id) {
-        return;
-      }
-
-      if (data.block.channel === null) {
-        return;
-      }
-
-      if (data.block.position === null) {
-        return;
-      }
-
-      if (type === BlockType.Chat && data.block.type === BlockType.Stream) {
-        modifyBlock({ id, channel: data.block.channel });
-        activateBlock();
-
-        setLoaded(false);
-        setInfoType(InfoType.None);
-      } else {
-        swapBlock(id, data.block.id);
-      }
+    if (blockContextMenuOptions === null) {
+      setBlockContextMenuOptions({
+        id,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    } else {
+      setBlockContextMenuOptions(null);
     }
   };
 
-  const preventDragHandler: React.DragEventHandler = (event) => {
-    event.preventDefault();
+  const onPointerEnter: React.PointerEventHandler = () => {
+    if (dragStatus !== "none") return;
+    modifyBlockStatus(id, { droppable: false });
   };
 
-  const style = getGridStyle(position, gridWidth, gridHeight);
+  const onPointerLeave: React.PointerEventHandler = () => {
+    modifyBlockStatus(id, { droppable: true });
+  };
+
+  const className = classNames({ "modify-mode": layoutMode === "modify" });
+
+  const style = getGridStyle(position);
 
   return (
     <BlockContext.Provider value={block}>
       <Container
         ref={ref}
         style={style}
+        className={className}
+        onPointerEnter={onPointerEnter}
         onPointerLeave={onPointerLeave}
-        onDrop={onDrop}
-        onDragEnter={preventDragHandler}
-        onDragOver={preventDragHandler}
+        onContextMenu={onContextMenu}
       >
-        <InfoOverlay type={infoType} />
-        <LoadingOverlay loaded={loaded} />
+        <DragOverlay />
+        <InfoOverlay />
+        <LoadingOverlay />
         <EditBlock />
-        <ViewBlock loaded={loaded} />
+        <ViewBlock />
       </Container>
     </BlockContext.Provider>
   );
@@ -230,6 +226,7 @@ function Block({ block }: BlockProps) {
 
 type BlockProps = {
   block: Block;
+  gridRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export default Block;

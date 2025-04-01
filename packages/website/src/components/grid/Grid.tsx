@@ -7,18 +7,13 @@ import {
   layoutSizeAtom,
   previewBlockAtom,
 } from "@web/librarys/app.ts";
-import { PreviewBlockStatus } from "@web/librarys/block.ts";
 import {
   beginPreviewAtom,
   endPreviewAtom,
   moveModifyPreviewAtom,
   movePreviewAtom,
 } from "@web/librarys/layout-preview.ts";
-import {
-  LayoutMode,
-  modifyBlockAtom,
-  pushBlockAtom,
-} from "@web/librarys/layout.ts";
+import { modifyBlockAtom, pushBlockAtom } from "@web/librarys/layout.ts";
 import {
   GRID_SIZE_HEIGHT,
   GRID_SIZE_WIDTH,
@@ -34,13 +29,12 @@ const Container = styled.div`
   width: 100%;
   flex-grow: 1;
 
+  z-index: 0;
+
   background-color: #1f1f1f;
 
-  display: grid;
-  grid-template-columns: repeat(${GRID_SIZE_WIDTH}, 1fr);
-  grid-template-rows: repeat(${GRID_SIZE_HEIGHT}, 1fr);
-
-  transition: background 200ms;
+  position: relative;
+  transition: background-color 200ms;
 
   overflow: hidden;
 
@@ -97,17 +91,17 @@ function Grid() {
   const moveModifyBlockPreview = useSetAtom(moveModifyPreviewAtom);
 
   const className = classNames({
-    "view-mode": layoutMode === LayoutMode.View,
+    "view-mode": layoutMode === "view",
   });
 
   const blockElements: React.ReactNode[] = blockList.map((block) => (
-    <Block key={block.id} block={block} />
+    <Block key={block.id} block={block} gridRef={ref} />
   ));
 
   const onPointerDown: React.PointerEventHandler = (event) => {
     if (event.target !== event.currentTarget) return;
     if (event.button !== 0) return;
-    if (layoutMode !== LayoutMode.Modify) return;
+    if (layoutMode !== "modify") return;
     if (ref.current == null) return;
 
     const { clientX, clientY } = event;
@@ -129,15 +123,16 @@ function Grid() {
       };
 
       const onPointerMove = (event: PointerEvent) => {
-        if (previewBlock.status === PreviewBlockStatus.Inactive) return;
+        if (previewBlock.status === "inactive") return;
+        if (previewBlock.position === null) return;
 
         const { clientX, clientY } = event;
         const [x, y] = getGridPosition(ref.current, clientX, clientY);
 
-        if (previewBlock.status === PreviewBlockStatus.Create) {
+        if (previewBlock.status === "create") {
           movePreview(x, y);
         } else if (
-          previewBlock.status === PreviewBlockStatus.Modify &&
+          previewBlock.status === "modify" &&
           previewBlock.linkedBlockId !== null
         ) {
           moveModifyBlockPreview(x, y);
@@ -150,9 +145,14 @@ function Grid() {
 
       const onPointerUp = (event: PointerEvent) => {
         if (event.button !== 0) return;
-        if (previewBlock.status === PreviewBlockStatus.Inactive) return;
+        if (previewBlock.status === "inactive") return;
 
-        if (previewBlock.status === PreviewBlockStatus.Modify) {
+        if (previewBlock.status === "modify") {
+          endPreview();
+          return;
+        }
+
+        if (previewBlock.position === null) {
           endPreview();
           return;
         }

@@ -71,13 +71,13 @@ const Line = styled.div`
 
 function getLineClass(direction: PreviewBlockHandle) {
   switch (direction) {
-    case PreviewBlockHandle.Top:
+    case "top":
       return "horizontal";
-    case PreviewBlockHandle.Right:
+    case "right":
       return "vertical";
-    case PreviewBlockHandle.Bottom:
+    case "bottom":
       return "horizontal";
-    case PreviewBlockHandle.Left:
+    case "left":
       return "vertical";
     default:
       return "horizontal";
@@ -88,7 +88,8 @@ function LineHandle({ direction }: LineHandleProps) {
   const block = useContext(BlockContext);
   const beginModifyPreview = useSetAtom(beginModifyPreviewAtom);
 
-  const onPointerDown: React.PointerEventHandler = () => {
+  const onPointerDown: React.PointerEventHandler = (event) => {
+    if (event.button !== 0) return;
     beginModifyPreview(block, direction);
   };
 

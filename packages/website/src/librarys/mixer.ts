@@ -1,7 +1,7 @@
 import { RequestPayload } from "@chzstream/message";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { blockListAtom } from "@web/librarys/app.ts";
-import { BlockMixer, BlockType } from "@web/librarys/block.ts";
+import { BlockMixer } from "@web/librarys/block.ts";
 import {
   getStoragePlayerMuted,
   getStoragePlayerQuality,
@@ -46,7 +46,7 @@ export const soloBlockIdAtom = atom<number | null>(null);
 export const mixerItemsAtom = atom<MixerItem[]>((get) => {
   const blockList = get(blockListAtom);
   return blockList
-    .filter((block) => block.type === BlockType.Stream)
+    .filter((block) => block.type === "stream")
     .map((block) => ({
       id: block.id,
       name: block.channel?.name ?? "채널 없음",
@@ -89,8 +89,8 @@ export const loadDefaultMixerAtom = atom(null, async (_get, set) => {
 export const setupMixerAtom = atom(null, (_get, set) => {
   set(blockListAtom, (draft) => {
     draft.forEach((item) => {
-      if (item.type !== BlockType.Stream) return;
-      if (item.status === false) return;
+      if (item.type !== "stream") return;
+      if (item.status.enabled === false) return;
 
       item.mixer.volume = item.player.volume;
       item.mixer.quality = item.player.quality;

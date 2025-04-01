@@ -207,13 +207,13 @@ function BottomLeftCornerHandle({
 
 function getComponent(direction: PreviewBlockHandle | null) {
   switch (direction) {
-    case PreviewBlockHandle.TopLeft:
+    case "top-left":
       return TopLeftCornerHandle;
-    case PreviewBlockHandle.TopRight:
+    case "top-right":
       return TopRightCornerHandle;
-    case PreviewBlockHandle.BottomRight:
+    case "bottom-right":
       return BottomRightCornerHandle;
-    case PreviewBlockHandle.BottomLeft:
+    case "bottom-left":
       return BottomLeftCornerHandle;
     default:
       return TopLeftCornerHandle;
@@ -225,7 +225,8 @@ function CornerHandle({ direction }: CornerHandleProps) {
   const Component = getComponent(direction);
   const beginModifyPreview = useSetAtom(beginModifyPreviewAtom);
 
-  const onPointerDown: React.PointerEventHandler = () => {
+  const onPointerDown: React.PointerEventHandler = (event) => {
+    if (event.button !== 0) return;
     beginModifyPreview(block, direction);
   };
 

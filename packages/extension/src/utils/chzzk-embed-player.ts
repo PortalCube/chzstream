@@ -183,7 +183,7 @@ function registerVideoLoadedEvent() {
     loaded = true;
   };
 
-  if (videoElement.readyState === 4) {
+  if (videoElement.readyState >= 3) {
     emit();
   } else {
     videoElement.addEventListener("loadeddata", emit, { once: true });

@@ -1,10 +1,9 @@
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { previewBlockAtom } from "@web/librarys/app.ts";
+import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
-import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
-import { layoutSizeAtom, previewBlockAtom } from "@web/librarys/app.ts";
-import { PreviewBlockStatus } from "@web/librarys/block.ts";
-import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import styled from "styled-components";
 
 const Container = styled.div<{ $dpr: number }>`
@@ -19,7 +18,9 @@ const Container = styled.div<{ $dpr: number }>`
   background-color: rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 0 32px rgba(255, 255, 255, 0.1);
 
-  transition: opacity 100ms;
+  transition-property: opacity, left, top, right, bottom;
+  transition-duration: 100ms;
+  transition-timing-function: ease-out;
 
   z-index: 1;
 
@@ -31,17 +32,13 @@ const Container = styled.div<{ $dpr: number }>`
 
 function BlockPreview() {
   const previewBlock = useAtomValue(previewBlockAtom);
-  const [gridWidth, gridHeight] = useAtomValue(layoutSizeAtom);
   const { status, position } = previewBlock;
 
   const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
-  const style = useMemo(
-    () => getGridStyle(position, gridWidth, gridHeight),
-    [position, gridWidth, gridHeight]
-  );
+  const style = useMemo(() => getGridStyle(position), [position]);
   const className = classNames({
-    hidden: status !== PreviewBlockStatus.Create,
+    hidden: status !== "create",
   });
 
   return (

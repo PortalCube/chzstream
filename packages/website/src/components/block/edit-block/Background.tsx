@@ -1,10 +1,9 @@
 import classNames from "classnames";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import LogoImage from "@web/assets/logo.png";
 import { BlockContext } from "@web/librarys/context";
 
-import { BlockType } from "@web/librarys/block.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -129,14 +128,21 @@ const Logo = styled.img`
 function Background({}: BackgroundProps) {
   const { type, channel } = useContext(BlockContext);
 
+  const [error, setError] = useState(false);
+
   const thumbnailUrl = channel?.thumbnailUrl ?? "";
   const iconUrl = channel?.iconUrl ?? "";
   const name = channel?.name ?? "알 수 없는 채널";
 
-  const showThumbnail = type === BlockType.Stream && thumbnailUrl !== "";
+  useEffect(() => {
+    setError(false);
+  }, [thumbnailUrl]);
+
+  const showThumbnail =
+    type === "stream" && thumbnailUrl !== "" && error === false;
   const showBlur = iconUrl !== "";
   const showPlaceholder =
-    channel === null || (type === BlockType.Stream && thumbnailUrl === "");
+    channel === null || (type === "stream" && (thumbnailUrl === "" || error));
 
   const thumbnailClass = classNames({
     hidden: showThumbnail === false,
@@ -144,18 +150,23 @@ function Background({}: BackgroundProps) {
 
   const blurClass = classNames({
     hidden: showBlur === false,
-    thumbnail: type === BlockType.Stream,
+    thumbnail: type === "stream",
   });
 
   const placeholderClass = classNames({
     hidden: showPlaceholder === false,
-    thumbnail: channel !== null || type === BlockType.Stream,
+    thumbnail: channel !== null || type === "stream",
   });
 
   return (
     <Container>
       <Blur className={blurClass} src={iconUrl} alt={name} />
-      <Thumbnail className={thumbnailClass} src={thumbnailUrl} alt={name} />
+      <Thumbnail
+        className={thumbnailClass}
+        src={thumbnailUrl}
+        alt={name}
+        onError={() => setError(true)}
+      />
       <Placeholder className={placeholderClass}>
         <Logo src={LogoImage} />
       </Placeholder>

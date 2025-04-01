@@ -1,11 +1,10 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
-import { BlockType } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context";
-import { LayoutMode } from "@web/librarys/layout.ts";
+import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
@@ -34,12 +33,7 @@ const Container = styled.iframe`
     display: none;
   }
 
-  &.lock {
-    /* pointer-events: none; */
-  }
-
   &.loading {
-    visibility: hidden;
     pointer-events: none;
   }
 
@@ -50,9 +44,10 @@ const Container = styled.iframe`
   }
 `;
 
-function ViewBlock({ loaded }: ViewBlockProps) {
+function ViewBlock({}: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
-  const { id, type, status, lock, channel } = useContext(BlockContext);
+  const { id, type, status, channel } = useContext(BlockContext);
+  const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const messageClient = useAtomValue(messageClientAtom);
 
   const src = useMemo((): string => {
@@ -62,12 +57,22 @@ function ViewBlock({ loaded }: ViewBlockProps) {
     }
 
     // 아직 활성화되지 않음
-    if (status === false) {
+    if (status.enabled === false) {
+      return "about:blank";
+    }
+
+    // 새로고침
+    if (status.refresh === true) {
+      modifyBlockStatus(id, {
+        enabled: layoutMode === "view",
+        refresh: false,
+        loading: true,
+      });
       return "about:blank";
     }
 
     const href =
-      type === BlockType.Chat
+      type === "chat"
         ? `https://chzzk.naver.com/live/${channel.uuid}/chat`
         : `https://chzzk.naver.com/live/${channel.uuid}/`;
     const url = new URL(href);
@@ -80,13 +85,12 @@ function ViewBlock({ loaded }: ViewBlockProps) {
     }
 
     return url.toString();
-  }, [messageClient, id, channel, status, type]);
+  }, [messageClient, id, channel, status, type, layoutMode]);
 
   const className = classNames({
-    loading: loaded === false,
-    "modify-mode": layoutMode === LayoutMode.Modify,
-    chat: type === BlockType.Chat,
-    lock,
+    loading: status.loading,
+    "modify-mode": layoutMode === "modify",
+    chat: type === "chat",
   });
 
   return (
@@ -99,8 +103,6 @@ function ViewBlock({ loaded }: ViewBlockProps) {
   );
 }
 
-type ViewBlockProps = {
-  loaded: boolean;
-};
+type ViewBlockProps = {};
 
 export default ViewBlock;

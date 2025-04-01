@@ -1,3 +1,4 @@
+import BlockContextMenu from "@web/components/block-context-menu/BlockContextMenu.tsx";
 import Grid from "@web/components/grid/Grid.tsx";
 import Modal from "@web/components/modal/Modal.tsx";
 import Topbar from "@web/components/topbar/Topbar.tsx";
@@ -9,9 +10,16 @@ import { useRefreshChannel } from "@web/hooks/useRefreshChannel.tsx";
 import { useSafariScrollPrevent } from "@web/hooks/useSafariScrollPrevent.ts";
 import { useShortcutKey } from "@web/hooks/useShortcutKey.tsx";
 import { useStorage } from "@web/hooks/useStorage.tsx";
+import { blockListAtom } from "@web/librarys/app.ts";
 import { loadDefaultMixerAtom } from "@web/librarys/mixer.ts";
+import { PRESET_LIST } from "@web/librarys/preset-data.ts";
+import {
+  createPresetItemAtom,
+  exportPresetListAtom,
+  PresetItemBase,
+} from "@web/librarys/preset.ts";
 import { theme } from "@web/scripts/styled.ts";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import styled, { ThemeProvider } from "styled-components";
 
@@ -28,6 +36,9 @@ const Container = styled.div`
 
 function App() {
   const loadDefaultMixer = useSetAtom(loadDefaultMixerAtom);
+  const createPresetItem = useSetAtom(createPresetItemAtom);
+  const exportPresetList = useSetAtom(exportPresetListAtom);
+  const blockList = useAtomValue(blockListAtom);
 
   useMessageClient();
   useDisplayPixelRatio();
@@ -42,9 +53,39 @@ function App() {
     loadDefaultMixer();
   }, []);
 
+  useEffect(() => {
+    const listener = (event: KeyboardEventInit) => {
+      if (event.key === "F6") {
+        const preset = createPresetItem("16:9");
+        console.log(preset);
+        window.navigator.clipboard.writeText(JSON.stringify(preset, null, 2));
+        return;
+      }
+
+      if (event.key === "F8") {
+        const preset = createPresetItem("16:9");
+        const presetList = exportPresetList(
+          preset.blocks.length === 0 ? PRESET_LIST : [...PRESET_LIST, preset]
+        );
+
+        console.log(presetList);
+        window.navigator.clipboard.writeText(
+          JSON.stringify(presetList, null, 2)
+        );
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+    };
+  }, [blockList]);
+
   return (
     <ThemeProvider theme={theme}>
       <Modal />
+      <BlockContextMenu />
       <Container>
         <Topbar />
         <Grid />

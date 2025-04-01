@@ -8,7 +8,7 @@ import {
   Block,
   BlockChannel,
   BlockPosition,
-  BlockType,
+  BlockStatus,
 } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import {
@@ -20,22 +20,22 @@ import {
 import { WritableDraft } from "immer";
 import { atom } from "jotai";
 
-export enum LayoutMode {
-  View = "view",
-  Modify = "modify",
-}
+export type LayoutMode = "view" | "modify";
 
 export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
   const nextBlockId = get(nextBlockIdAtom);
   const defaultMixerItem = get(defaultMixerItemAtom);
-  const isRestrictedMode = get(messageClientAtom) === null;
 
   const block: Block = {
     id: nextBlockId,
-    type: BlockType.Stream,
-    // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
-    status: isRestrictedMode,
-    lock: true,
+    type: "stream",
+    status: {
+      droppable: true,
+      refresh: false,
+      enabled: false,
+      loading: false,
+      error: null,
+    },
     position: position,
     channel: null,
     mixer: {
@@ -53,6 +53,8 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
 
   set(blockListAtom, (prev) => [...prev, block]);
   set(nextBlockIdAtom, (prev) => prev + 1);
+
+  return block.id;
 });
 
 export const addBlockAtom = atom(null, (get, set, block: Block) => {
@@ -105,6 +107,21 @@ export const modifyBlockAtom = atom(
   }
 );
 
+export const modifyBlockStatusAtom = atom(
+  null,
+  (_get, set, id: number, status: Partial<BlockStatus>) => {
+    set(blockListAtom, (prev) => {
+      const index = prev.findIndex((item) => item.id === id);
+
+      if (index === -1) {
+        throw new Error(`Block not found: ${id}`);
+      }
+
+      prev[index].status = { ...prev[index].status, ...status };
+    });
+  }
+);
+
 export const updateBlockAtom = atom(
   null,
   (_get, set, id: number, update: (block: WritableDraft<Block>) => void) => {
@@ -120,8 +137,21 @@ export const updateBlockAtom = atom(
   }
 );
 
-export const activateBlockAtom = atom(null, (_get, set) => {
-  set(blockListAtom, (prev) => prev.map((item) => ({ ...item, status: true })));
+export const activateBlockAtom = atom(null, (get, set) => {
+  const isRestrictedMode = get(messageClientAtom) === null;
+  set(blockListAtom, (prev) => {
+    prev.forEach((item) => {
+      if (item.channel === null) return;
+      if (item.status.enabled) return;
+
+      item.status = {
+        ...item.status,
+        enabled: true,
+        loading: isRestrictedMode === false,
+        error: null,
+      };
+    });
+  });
 });
 
 export const swapBlockAtom = atom(
@@ -143,12 +173,36 @@ export const swapBlockAtom = atom(
   }
 );
 
+export const setBlockChannelAtom = atom(
+  null,
+  (get, set, id: number, channel: BlockChannel | null) => {
+    const isRestrictedMode = get(messageClientAtom) === null;
+    const layoutMode = get(layoutModeAtom);
+
+    set(updateBlockAtom, id, (block) => {
+      block.channel = channel;
+
+      const loading = block.channel !== null && isRestrictedMode === false;
+      const enabled = layoutMode === "view";
+
+      block.status = {
+        ...block.status,
+        loading,
+        enabled,
+        error: null,
+      };
+
+      console.log({ ...block.status });
+    });
+  }
+);
+
 export const refreshChannelAtom = atom(null, async (get, set) => {
   const date = Date.now();
   const delay = 1000 * 60;
 
   // 시청 중일때는 불필요하게 fetch하지 않음
-  if (get(layoutModeAtom) === LayoutMode.View) return;
+  if (get(layoutModeAtom) === "view") return;
 
   const expiredBlockList = get(blockListAtom).filter((block, index) => {
     if (block.channel === null) return false;
@@ -165,21 +219,18 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
   });
 
   for (const block of expiredBlockList) {
-    await set(fetchChzzkChannelAtom, block.id, block.channel!.uuid);
+    const channel = await set(fetchChzzkChannelAtom, block.channel!.uuid);
+
+    // DONT USE "setBlockChannel" HERE
+    set(modifyBlockAtom, { id: block.id, channel });
   }
 });
 
 export const fetchChzzkChannelAtom = atom(
   null,
-  async (get, set, id: number, uuid: string) => {
+  async (get, _set, uuid: string) => {
     const messageClient = get(messageClientAtom);
     const isRestrictedMode = messageClient === null;
-    const blockList = get(blockListAtom);
-    const block = blockList.find((item) => item.id === id);
-
-    if (block === undefined) {
-      throw new Error(`Block not found: ${id}`);
-    }
 
     const channel: BlockChannel = {
       uuid: uuid,
@@ -188,13 +239,13 @@ export const fetchChzzkChannelAtom = atom(
       thumbnailUrl: "",
       iconUrl: getProfileImageUrl(),
       lastUpdate: null,
+      liveStatus: false,
     };
 
     // 제한 모드 처리
     if (isRestrictedMode) {
       channel.title = "제한 모드에서는 채널 정보를 불러올 수 없습니다";
-      set(modifyBlockAtom, { id, channel });
-      return;
+      return channel;
     }
 
     // 채널 데이터 가져오기
@@ -211,6 +262,7 @@ export const fetchChzzkChannelAtom = atom(
     // 가져온 데이터로 채널 정보 업데이트
     channel.name = data.channelName;
     channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
+    channel.liveStatus = data.liveStatus;
     channel.lastUpdate = Date.now();
 
     // 방송이 켜진 경우, 제목도 업데이트
@@ -225,24 +277,28 @@ export const fetchChzzkChannelAtom = atom(
       channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;
     }
 
-    set(modifyBlockAtom, { id, channel });
+    return channel;
   }
 );
 
 export const activateViewModeAtom = atom(null, (_get, set) => {
-  set(layoutModeAtom, LayoutMode.View);
+  set(layoutModeAtom, "view");
   set(activateBlockAtom);
 });
 
 export const activateEditModeAtom = atom(null, (_get, set) => {
-  set(layoutModeAtom, LayoutMode.Modify);
+  set(layoutModeAtom, "modify");
 });
 
 export const switchLayoutModeAtom = atom(null, (get, set) => {
   const mode = get(layoutModeAtom);
-  if (mode === LayoutMode.View) {
+  if (mode === "view") {
     set(activateEditModeAtom);
-  } else if (mode === LayoutMode.Modify) {
+  } else if (mode === "modify") {
     set(activateViewModeAtom);
   }
+});
+
+export const lockBlockAtom = atom(null, (_get, set) => {
+  set(blockListAtom, (prev) => prev.map((item) => ({ ...item, lock: true })));
 });

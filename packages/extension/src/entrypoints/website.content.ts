@@ -3,10 +3,13 @@ import { createWebsiteRelay } from "@message/index.ts";
 
 export default defineContentScript({
   runAt: "document_start",
-  matches: makeUrls(["https://chzstream.app/*"], import.meta.env.MODE),
+  matches: makeUrls(
+    ["https://chzstream.app/*", "https://preview.chzstream.app/*"],
+    import.meta.env.MODE
+  ),
   async main(_context) {
     createWebsiteRelay();
-    await injectScript("/website-test.js", {
+    await injectScript("/website-flag.js", {
       keepInDom: false,
     });
   },

@@ -14,7 +14,7 @@ import {
 } from "@extension/utils/message/content-client.ts";
 
 export default defineContentScript({
-  // runAt: "document_idle",
+  runAt: "document_start",
   matches: ["https://chzzk.naver.com/live/*"],
   allFrames: true,
   async main(_context) {

@@ -1,11 +1,15 @@
-import { useSetAtom } from "jotai";
-import { useContext, useMemo, useRef } from "react";
-import DragImage from "@web/components/drag/DragImage.tsx";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContext } from "@web/librarys/context";
-import { fetchChzzkChannelAtom } from "@web/librarys/layout.ts";
+import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
+import {
+  fetchChzzkChannelAtom,
+  modifyBlockAtom,
+  setBlockChannelAtom,
+} from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
+import { useSetAtom } from "jotai";
+import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
 const Container = styled.div`
@@ -155,50 +159,36 @@ const Title = styled.p`
 `;
 
 function Channel({}: ChannelProps) {
-  const ref = useRef<HTMLImageElement>(null);
-  const openSearchModal = useSetAtom(openSearchModalAtom);
-  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
   const block = useContext(BlockContext);
   const { id, channel } = block;
+  const openSearchModal = useSetAtom(openSearchModalAtom);
+  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
+  const setBlockChannel = useSetAtom(setBlockChannelAtom);
+  const { dragElement, onDragStart, onDragEnd } = useBlockDrag(block);
 
   const { iconUrl, name, title } = useMemo(() => {
+    const result = {
+      iconUrl: getProfileImageUrl(),
+      name: "채널 없음",
+      title: "여기를 클릭해서 채널을 지정하세요",
+    };
+
     if (channel === null) {
-      return {
-        iconUrl: getProfileImageUrl(),
-        name: "채널 없음",
-        title: "여기를 클릭해서 채널을 지정하세요",
-      };
+      return result;
     }
 
-    return {
-      iconUrl: channel.iconUrl,
-      name: channel.name,
-      title: channel.title,
-    };
+    result.iconUrl = channel.iconUrl;
+    result.name = channel.name;
+    result.title = channel.title;
+
+    return result;
   }, [channel]);
 
   const onClick: React.MouseEventHandler = () => {
-    openSearchModal((channel) => fetchChzzkChannel(id, channel.uuid));
-  };
-
-  const onDragStart: React.DragEventHandler = (event) => {
-    if (event.dataTransfer === null) return false;
-
-    if (channel === null) return false;
-
-    if (ref?.current) {
-      event.dataTransfer.setDragImage(ref.current, 0, 0);
-    }
-
-    event.dataTransfer.effectAllowed = "all";
-    event.dataTransfer.dropEffect = "move";
-
-    const data = JSON.stringify({
-      _isBlock: true,
-      block: block,
+    openSearchModal(async (_channel) => {
+      const channel = await fetchChzzkChannel(_channel.uuid);
+      setBlockChannel(id, channel);
     });
-
-    event.dataTransfer.setData("application/json", data);
   };
 
   return (
@@ -206,8 +196,9 @@ function Channel({}: ChannelProps) {
       draggable={channel !== null}
       onClick={onClick}
       onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
-      <DragImage _ref={ref} src={iconUrl} name={name} />
+      {dragElement}
       <InfoGroup>
         <Icon src={iconUrl} draggable="false" />
         <TextGroup>

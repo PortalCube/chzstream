@@ -1,9 +1,9 @@
-import classNames from "classnames";
-import { useMemo } from "react";
-import { SearchCategory, useSearchModal } from "@web/librarys/search.ts";
-import styled from "styled-components";
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
+import { useSearchModal } from "@web/librarys/search.ts";
+import classNames from "classnames";
+import { useMemo } from "react";
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;
@@ -64,15 +64,15 @@ function SearchDetail({}: SearchDetailProps) {
   const { category, setCategory, recommendResult, channelResult, liveResult } =
     useSearchModal();
   const className = classNames({
-    hidden: category === SearchCategory.Summary,
+    hidden: category === "summary",
   });
 
   const items = useMemo(() => {
-    if (category === SearchCategory.Channel) {
+    if (category === "channel") {
       return channelResult;
     }
 
-    if (category === SearchCategory.Live) {
+    if (category === "live") {
       return liveResult;
     }
 
@@ -83,19 +83,19 @@ function SearchDetail({}: SearchDetailProps) {
     <Container className={className}>
       <Group>
         <Category
-          hidden={category === SearchCategory.Recommend}
+          hidden={category === "recommend"}
           name="채널"
-          active={category === SearchCategory.Channel}
-          onClick={() => setCategory(SearchCategory.Channel)}
+          active={category === "channel"}
+          onClick={() => setCategory("channel")}
         />
         <Category
-          hidden={category === SearchCategory.Recommend}
+          hidden={category === "recommend"}
           name="라이브"
-          active={category === SearchCategory.Live}
-          onClick={() => setCategory(SearchCategory.Live)}
+          active={category === "live"}
+          onClick={() => setCategory("live")}
         />
         <Category
-          hidden={category !== SearchCategory.Recommend}
+          hidden={category !== "recommend"}
           name="인기 라이브"
           interactable={false}
         />

@@ -1,6 +1,10 @@
-import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
+import PresetButton from "@web/components/modal/preset/PresetItem.tsx";
+import { blockListAtom } from "@web/librarys/app.ts";
+import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
+import { PresetItem, presetListAtom } from "@web/librarys/preset.ts";
 import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
+import { useCallback, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -16,9 +20,9 @@ const Container = styled.div`
 
   gap: 16px;
 
-  color: rgba(255, 255, 255, 1);
-  background-color: rgba(31, 31, 31, 1);
-  border: 1px solid rgba(63, 63, 63, 1);
+  color: rgb(255, 255, 255);
+  background-color: rgb(31, 31, 31);
+  border: 1px solid rgb(63, 63, 63);
 
   transition: transform 200ms;
 
@@ -32,20 +36,264 @@ const Title = styled.p`
   padding: 0 8px;
   font-size: 28px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 1);
+  color: rgb(255, 255, 255);
+`;
+
+const Content = styled.div`
+  max-height: 480px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+`;
+
+const List = styled.div`
+  padding-right: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const Section = styled.div`
+  margin-bottom: 32px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 8px;
+`;
+
+const SectionTitle = styled.p`
+  width: 100%;
+  margin-left: 10px;
+
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+`;
+
+const SectionList = styled.div`
+  display: grid;
+  gap: 16px;
+
+  grid-template-columns: repeat(3, 1fr);
+`;
+
+const SectionMenu = styled.div`
+  width: 140px;
+  padding: 4px;
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 4px;
+
+  overflow-y: auto;
+
+  background-color: rgb(36, 36, 36);
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const SectionMenuItem = styled.button`
+  border-radius: 4px;
+  padding: 8px;
+
+  font-size: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  text-align: left;
+  color: rgb(133, 133, 133);
+
+  transition-property: color, background-color;
+  transition-duration: 100ms;
+
+  &.active {
+    color: rgb(255, 255, 255);
+    background-color: rgb(45, 45, 45);
+  }
 `;
 
 function PresetModal({}: PresetModalProps) {
   const modal = useAtomValue(modalAtom);
-  const closeModal = useSetAtom(closeModalAtom);
+  const presetList = useAtomValue(presetListAtom);
+  const ref = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<Map<string, HTMLElement>>(new Map());
+  const [currentSection, setCurrentSection] = useState<number | null>(null);
+
+  // 패널을 열었을 때, 현재 레이아웃에 맞는 섹션으로 스크롤
+  useModalListener((get, _set, newVal, prevVal) => {
+    if (prevVal.type === newVal.type) return;
+    if (newVal.type !== "preset") return;
+
+    // 현재 활성화된 스트리밍 블록의 갯수
+    const channelCount = get(blockListAtom).filter(
+      (item) => item.type === "stream" && item.channel !== null
+    ).length;
+
+    requestAnimationFrame(() => scrollToSection(channelCount));
+  });
+
+  // 주어진 섹션으로 스크롤
+  const scrollToSection = useCallback(
+    (section: number) => {
+      const element = sectionRef.current.get(`section-${section}`);
+      if (element) {
+        element.scrollIntoView();
+        setTimeout(() => setCurrentSection(section), 1);
+      }
+    },
+    [sectionRef]
+  );
 
   const className = classNames({
     disable: modal.type !== "preset",
   });
 
+  const sections = useMemo(() => {
+    const sections: {
+      description: string;
+      streamCount: number;
+      items: PresetItem[];
+    }[] = [];
+
+    presetList.forEach((preset) => {
+      let section = sections.find(
+        (section) => section.streamCount === preset.streamCount
+      );
+
+      if (section === undefined) {
+        section = {
+          description: `채널 ${preset.streamCount}개`,
+          streamCount: preset.streamCount,
+          items: [],
+        };
+
+        sections.push(section);
+      }
+
+      section.items.push(preset);
+    });
+
+    sections.sort((a, b) => a.streamCount - b.streamCount);
+    sections.forEach((section) => {
+      section.items.sort((a, b) => a.chatCount - b.chatCount);
+    });
+
+    return sections;
+  }, [presetList]);
+
+  const menuItems = useMemo(
+    () =>
+      sections.map((section) => {
+        const refCallback = (item: HTMLButtonElement) => {
+          sectionRef.current.set(`menu-${section.streamCount}`, item);
+
+          return () => {
+            sectionRef.current.delete(`menu-${section.streamCount}`);
+          };
+        };
+
+        const onMenuItemClick: React.MouseEventHandler = () => {
+          scrollToSection(section.streamCount);
+        };
+
+        const className = classNames({
+          active: currentSection === section.streamCount,
+        });
+
+        return (
+          <SectionMenuItem
+            key={section.streamCount}
+            ref={refCallback}
+            className={className}
+            onClick={onMenuItemClick}
+          >
+            {section.description}
+          </SectionMenuItem>
+        );
+      }),
+    [sections, currentSection, scrollToSection]
+  );
+
+  const listItems = useMemo(
+    () =>
+      sections.map((section) => {
+        const items = section.items.map((preset, index) => (
+          <PresetButton key={index} preset={preset} />
+        ));
+
+        const refCallback = (item: HTMLDivElement) => {
+          sectionRef.current.set(`section-${section.streamCount}`, item);
+
+          const options = {
+            root: ref.current,
+            threshold: 1,
+          };
+
+          const callback: IntersectionObserverCallback = (
+            entries,
+            _observer
+          ) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setCurrentSection(section.streamCount);
+
+                const element = sectionRef.current.get(
+                  `menu-${section.streamCount}`
+                );
+
+                if (element) {
+                  element.scrollIntoView();
+                }
+              }
+            });
+          };
+
+          const observer = new IntersectionObserver(callback, options);
+          observer.observe(item);
+
+          return () => {
+            sectionRef.current.delete(`section-${section.streamCount}`);
+            observer.disconnect();
+          };
+        };
+
+        return (
+          <Section ref={refCallback} key={section.streamCount}>
+            <SectionTitle>{section.description}</SectionTitle>
+            <SectionList>{items}</SectionList>
+          </Section>
+        );
+      }),
+    [ref, sections]
+  );
+
   return (
     <Container className={className}>
       <Title>프리셋</Title>
+      <Content>
+        <SectionMenu>{menuItems}</SectionMenu>
+        <List ref={ref}>{listItems}</List>
+      </Content>
     </Container>
   );
 }

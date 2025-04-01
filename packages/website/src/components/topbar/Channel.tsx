@@ -1,10 +1,13 @@
-import DragImage from "@web/components/drag/DragImage.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { favoriteChannelsAtom } from "@web/librarys/app.ts";
+import { BlockChannel } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { useChannelDrag } from "@web/librarys/drag-and-drop.ts";
+import { fetchChzzkChannelAtom } from "@web/librarys/layout.ts";
+import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 import classNames from "classnames";
-import { useAtom, useAtomValue } from "jotai";
-import React, { useEffect, useRef, useState } from "react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div<{ $index: number; $gap: number }>`
@@ -51,21 +54,41 @@ const Image = styled.img`
   height: 100%;
 `;
 
+function getDefaultChannel(uuid: string): BlockChannel {
+  return {
+    uuid,
+    name: "알 수 없음",
+    title: "알 수 없음",
+    thumbnailUrl: "",
+    iconUrl: getProfileImageUrl(),
+    lastUpdate: null,
+    liveStatus: false,
+  };
+}
+
 function Channel({ uuid, index, gap }: ChannelProps) {
   const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
   const messageClient = useAtomValue(messageClientAtom);
+  const pushChannelWithDefaultPreset = useSetAtom(
+    pushChannelWithDefaultPresetAtom
+  );
+  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
 
-  const [name, setName] = useState("");
-  const [iconUrl, setIconUrl] = useState("");
-  const [active, setActive] = useState(false);
-  const ref = useRef<HTMLImageElement>(null);
+  const [channel, setChannel] = useState(getDefaultChannel(uuid));
+  const { name, iconUrl, liveStatus, lastUpdate } = channel;
+
+  const { dragElement, onDragStart, onDragEnd } = useChannelDrag(channel);
 
   useEffect(() => {
+    // TODO: Atom으로 분리
     const loadChannelInfo = async () => {
+      const channel: BlockChannel = getDefaultChannel(uuid);
+
+      // 마지막 업데이트로부터 60초 이내인 경우 skip
+      if (lastUpdate !== null && Date.now() - lastUpdate < 60000) return;
+
       if (messageClient === null) {
-        setName("알 수 없음");
-        setIconUrl(getProfileImageUrl());
-        setActive(false);
+        setChannel(channel);
         return;
       }
 
@@ -76,46 +99,31 @@ function Channel({ uuid, index, gap }: ChannelProps) {
       const data = response.data;
 
       if (data === null) {
-        setName("알 수 없음");
-        setIconUrl(getProfileImageUrl());
-        setActive(false);
+        setChannel(channel);
         return;
       }
 
-      setName(data.channelName);
-      setIconUrl(getProfileImageUrl(data.channelImageUrl));
-      setActive(data.liveStatus);
+      channel.name = data.channelName;
+      channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
+      channel.lastUpdate = Date.now();
+      channel.thumbnailUrl = data.liveThumbnailUrl ?? "";
+      channel.title = data.liveTitle ?? "";
+      channel.liveStatus = data.liveStatus;
+
+      setChannel(channel);
     };
 
-    const intervalTimer = setInterval(() => {
-      loadChannelInfo();
-    }, 120000);
-
+    const intervalTimer = setInterval(loadChannelInfo, 3000);
     loadChannelInfo();
 
     return () => {
       clearInterval(intervalTimer);
     };
-  }, [messageClient, uuid]);
+  }, [lastUpdate, messageClient, uuid]);
 
-  const onDragStart: React.DragEventHandler = (event) => {
-    if (event.dataTransfer === null) return;
-
-    if (ref?.current) {
-      event.dataTransfer.setDragImage(ref.current, 0, 0);
-    }
-
-    event.dataTransfer.effectAllowed = "all";
-    event.dataTransfer.dropEffect = "copy";
-
-    const data = JSON.stringify({
-      _isChannel: true,
-      uuid,
-      name,
-      iconUrl,
-    });
-
-    event.dataTransfer.setData("application/json", data);
+  const onClick: React.MouseEventHandler = async () => {
+    const channel = await fetchChzzkChannel(uuid);
+    pushChannelWithDefaultPreset(channel);
   };
 
   const onPointerDown: React.PointerEventHandler = (event) => {
@@ -131,12 +139,14 @@ function Channel({ uuid, index, gap }: ChannelProps) {
     <Container
       $index={index}
       $gap={gap}
-      className={classNames({ active })}
+      className={classNames({ active: liveStatus })}
       draggable={true}
+      onClick={onClick}
       onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       onPointerDown={onPointerDown}
     >
-      <DragImage _ref={ref} src={iconUrl} name={name} />
+      {dragElement}
       <Image src={iconUrl} />
     </Container>
   );

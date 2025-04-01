@@ -1,20 +1,19 @@
-import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useContext } from "react";
-import { MdClose } from "react-icons/md";
-import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
-import { layoutModeAtom } from "@web/librarys/app.ts";
-import { BlockContext } from "@web/librarys/context.ts";
-import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
-import { Mixin } from "@web/scripts/styled.ts";
-import styled, { css } from "styled-components";
 import Background from "@web/components/block/edit-block/Background.tsx";
 import Channel from "@web/components/block/edit-block/Channel.tsx";
 import TypeButton from "@web/components/block/edit-block/TypeButton.tsx";
 import Handle from "@web/components/block/edit-block/handle/Handle.tsx";
+import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
+import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockContext } from "@web/librarys/context.ts";
+import { removeBlockAtom } from "@web/librarys/layout.ts";
+import { Mixin } from "@web/scripts/styled.ts";
+import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useContext } from "react";
+import { MdClose } from "react-icons/md";
+import styled, { css } from "styled-components";
 
 const Container = styled.div<{ $dpr: number }>`
-  /* margin: ${(props) => 4 / props.$dpr + "px"}; */
   --block-margin-base: 4px;
   border-radius: 8px;
   padding: 16px;
@@ -112,7 +111,7 @@ function EditBlock({}: EditBlockProps) {
 
   const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
-  const className = classNames({ "view-mode": layoutMode === LayoutMode.View });
+  const className = classNames({ "view-mode": layoutMode === "view" });
 
   const onRemoveClick = () => {
     removeBlock(id);

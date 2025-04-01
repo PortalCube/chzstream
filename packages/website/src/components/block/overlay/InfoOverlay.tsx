@@ -1,11 +1,10 @@
-import { LayoutMode, removeBlockAtom } from "@web/librarys/layout.ts";
+import { removeBlockAtom } from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
 import styled, { css } from "styled-components";
 
 import Channel from "@web/components/block/overlay/Channel.tsx";
-import { InfoType } from "@web/components/block/overlay/InfoOverlay.ts";
 import Keyword, {
   KeywordProps,
 } from "@web/components/block/overlay/Keyword.tsx";
@@ -147,7 +146,7 @@ const Title = styled.div`
   
   ${Mixin.block.less.small(css`
     font-size: 14px;
-    gap: 8px;
+    gap: 5px;
   `)}
 `;
 
@@ -155,7 +154,6 @@ const Row = styled.div`
   max-width: 100%;
 
   display: flex;
-  align-items: center;
   white-space: pre-wrap;
 
   font-weight: 800;
@@ -189,12 +187,10 @@ const Description = styled.p`
   
   ${Mixin.block.less.medium(css`
     font-size: 12px;
-    line-height: 14px;
   `)}
   
   ${Mixin.block.less.small(css`
     font-size: 10px;
-    line-height: 12px;
   `)}
 `;
 
@@ -202,8 +198,8 @@ const KEYWORDS: Record<string, KeywordProps> = {
   offline: {
     text: "오프라인",
     icon: OfflineIcon,
-    textColor: "rgb(200, 200, 200)",
-    backgroundColor: "rgb(68, 68, 68)",
+    textColor: "rgb(142, 142, 142)",
+    backgroundColor: "rgb(56, 56, 56)",
   },
   adult: {
     text: "연령 제한 방송",
@@ -220,6 +216,8 @@ type Info = {
 };
 
 type Template = (string | ElementInfo)[];
+
+type InfoType = null | "loading" | "offline" | "adult" | "error" | "no-channel";
 
 const INFOS: Info[] = [
   {
@@ -251,7 +249,7 @@ const INFOS: Info[] = [
 ];
 
 type ElementInfo = {
-  type: "none" | "channel" | "keyword";
+  type: null | "channel" | "keyword";
 } & Record<string, unknown>;
 
 function getElementInfo(token: string[]): ElementInfo {
@@ -273,7 +271,7 @@ function getElementInfo(token: string[]): ElementInfo {
   }
 
   return {
-    type: "none",
+    type: null,
   };
 }
 
@@ -333,19 +331,27 @@ function render(info: Info) {
   );
 }
 
-function InfoOverlay({ type }: InfoOverlayProps) {
+function InfoOverlay({}: InfoOverlayProps) {
   const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
   const layoutMode = useAtomValue(layoutModeAtom);
   const removeBlock = useSetAtom(removeBlockAtom);
-  const { id } = useContext(BlockContext);
+  const { id, channel, status } = useContext(BlockContext);
+
+  const type: InfoType = useMemo(() => {
+    if (channel === null) return "no-channel";
+    if (status.loading) return null;
+    if (status.error !== null) return status.error;
+
+    return null;
+  }, [channel, status]);
 
   const isShow = useMemo(
-    () => layoutMode === LayoutMode.View && type !== "none",
+    () => layoutMode === "view" && type !== null,
     [layoutMode, type]
   );
 
   const content = useMemo(() => {
-    if (type === "none") {
+    if (type === null) {
       return null;
     }
 
@@ -389,8 +395,6 @@ function InfoOverlay({ type }: InfoOverlayProps) {
   );
 }
 
-type InfoOverlayProps = {
-  type: InfoType;
-};
+type InfoOverlayProps = {};
 
 export default InfoOverlay;
