@@ -13,11 +13,12 @@ const randomRange = (min: number, max: number) =>
 const spinnerBackgroundAnimation = keyframes`
     0% {
       background-position-x: -15%;
-      box-shadow: inset 0px 0px 32px rgba(255, 255, 255, 0.05);
+    }
+    50% {
+      background-position-x: 115%;
     }
     100% {
-      background-position-x: 115%;
-      box-shadow: inset 0px 0px 48px rgba(255, 255, 255, 0.1);
+      background-position-x: -15%;
     }
 `;
 
@@ -38,8 +39,6 @@ const Container = styled.div<{ $delay: number }>`
 
   gap: 32px;
 
-  transition: opacity 100ms;
-
   color: rgb(150, 150, 150);
   background: linear-gradient(
     90deg,
@@ -51,13 +50,12 @@ const Container = styled.div<{ $delay: number }>`
 
   animation-name: ${spinnerBackgroundAnimation};
   animation-fill-mode: both;
-  animation-duration: 1800ms;
+  animation-duration: 4000ms;
   animation-delay: ${(props) => props.$delay}ms;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
-  animation-direction: alternate;
 
-  opacity: 0.95;
+  opacity: 1;
 
   &.hidden {
     display: none;
