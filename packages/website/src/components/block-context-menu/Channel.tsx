@@ -5,6 +5,7 @@ import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
 import {
   fetchChzzkChannelAtom,
   modifyBlockAtom,
+  setBlockChannelAtom,
 } from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { useSetAtom } from "jotai";
@@ -76,7 +77,7 @@ function Channel() {
   const block = useContext(BlockContextMenuContext);
   const openSearchModal = useSetAtom(openSearchModalAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
-  const modifyBlock = useSetAtom(modifyBlockAtom);
+  const setBlockChannel = useSetAtom(setBlockChannelAtom);
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
 
   const { dragElement, onDragStart, onDragEnd } = useBlockDrag(block);
@@ -112,7 +113,7 @@ function Channel() {
     clearBlockContextMenu();
     openSearchModal(async (_channel) => {
       const channel = await fetchChzzkChannel(_channel.uuid);
-      modifyBlock({ id, channel });
+      setBlockChannel(id, channel);
     });
   };
 

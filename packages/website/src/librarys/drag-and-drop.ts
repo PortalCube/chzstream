@@ -5,6 +5,7 @@ import {
   fetchChzzkChannelAtom,
   lockBlockAtom,
   modifyBlockAtom,
+  setBlockChannelAtom,
   swapBlockAtom,
 } from "@web/librarys/layout.ts";
 import { atom, useSetAtom } from "jotai";
@@ -118,7 +119,7 @@ const copyDragBlockAtom = atom(
   null,
   async (_get, set, block: Block, dragItem: DragItem) => {
     const channel = await set(fetchChzzkChannelAtom, dragItem.channelId);
-    set(modifyBlockAtom, { id: block.id, channel });
+    set(setBlockChannelAtom, block.id, channel);
   }
 );
 

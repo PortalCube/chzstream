@@ -4,6 +4,7 @@ import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
 import {
   fetchChzzkChannelAtom,
   modifyBlockAtom,
+  setBlockChannelAtom,
 } from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
@@ -162,7 +163,7 @@ function Channel({}: ChannelProps) {
   const { id, channel } = block;
   const openSearchModal = useSetAtom(openSearchModalAtom);
   const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
-  const modifyBlock = useSetAtom(modifyBlockAtom);
+  const setBlockChannel = useSetAtom(setBlockChannelAtom);
   const { dragElement, onDragStart, onDragEnd } = useBlockDrag(block);
 
   const { iconUrl, name, title } = useMemo(() => {
@@ -186,7 +187,7 @@ function Channel({}: ChannelProps) {
   const onClick: React.MouseEventHandler = () => {
     openSearchModal(async (_channel) => {
       const channel = await fetchChzzkChannel(_channel.uuid);
-      modifyBlock({ id, channel });
+      setBlockChannel(id, channel);
     });
   };
 

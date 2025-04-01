@@ -1,17 +1,11 @@
-import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import {
-  blockListAtom,
-  layoutModeAtom,
-  nextBlockIdAtom,
-} from "@web/librarys/app.ts";
+import { blockListAtom, layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockChannel, BlockPosition, BlockType } from "@web/librarys/block.ts";
 import {
-  fetchChzzkChannelAtom,
   modifyBlockAtom,
-  modifyBlockStatusAtom,
   pushBlockAtom,
   removeBlockAtom,
+  setBlockChannelAtom,
 } from "@web/librarys/layout.ts";
 import { PRESET_LIST } from "@web/librarys/preset-data.ts";
 import { atom } from "jotai";
@@ -105,11 +99,7 @@ export const applyPresetItemAtom = atom(
       const id = set(pushBlockAtom, streamBlocks[streamIndex++].position);
       const channel = channels.shift();
       if (channel !== undefined) {
-        set(modifyBlockAtom, { id, channel });
-        set(modifyBlockStatusAtom, id, {
-          enabled: layoutMode === "view",
-          loading: isRestrictedMode === false,
-        });
+        set(setBlockChannelAtom, id, channel);
       }
     }
 
@@ -126,9 +116,6 @@ export const applyPresetItemAtom = atom(
 export const pushChannelWithDefaultPresetAtom = atom(
   null,
   async (get, set, channel: BlockChannel) => {
-    const layoutMode = get(layoutModeAtom);
-    const isRestrictedMode = get(messageClientAtom) === null;
-
     const streamBlock = get(blockListAtom).filter(
       (item) => item.type === "stream"
     );
@@ -137,11 +124,7 @@ export const pushChannelWithDefaultPresetAtom = atom(
     const blankStreamBlock = streamBlock.find((item) => item.channel === null);
     if (blankStreamBlock !== undefined) {
       const id = blankStreamBlock.id;
-      set(modifyBlockAtom, { id, channel });
-      set(modifyBlockStatusAtom, id, {
-        enabled: layoutMode === "view",
-        loading: isRestrictedMode === false,
-      });
+      set(setBlockChannelAtom, id, channel);
       return;
     }
 

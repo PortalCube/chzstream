@@ -25,7 +25,6 @@ export type LayoutMode = "view" | "modify";
 export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
   const nextBlockId = get(nextBlockIdAtom);
   const defaultMixerItem = get(defaultMixerItemAtom);
-  const isRestrictedMode = get(messageClientAtom) === null;
 
   const block: Block = {
     id: nextBlockId,
@@ -34,7 +33,7 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       droppable: true,
       refresh: false,
       enabled: false,
-      loading: isRestrictedMode === false, // 제한 모드에서는, loading 이벤트를 감지할 수 없으므로 로딩 완료로 지정
+      loading: false,
       error: null,
     },
     position: position,
@@ -174,6 +173,30 @@ export const swapBlockAtom = atom(
   }
 );
 
+export const setBlockChannelAtom = atom(
+  null,
+  (get, set, id: number, channel: BlockChannel | null) => {
+    const isRestrictedMode = get(messageClientAtom) === null;
+    const layoutMode = get(layoutModeAtom);
+
+    set(updateBlockAtom, id, (block) => {
+      block.channel = channel;
+
+      const loading = block.channel !== null && isRestrictedMode === false;
+      const enabled = layoutMode === "view";
+
+      block.status = {
+        ...block.status,
+        loading,
+        enabled,
+        error: null,
+      };
+
+      console.log({ ...block.status });
+    });
+  }
+);
+
 export const refreshChannelAtom = atom(null, async (get, set) => {
   const date = Date.now();
   const delay = 1000 * 60;
@@ -197,6 +220,8 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
 
   for (const block of expiredBlockList) {
     const channel = await set(fetchChzzkChannelAtom, block.channel!.uuid);
+
+    // DONT USE "setBlockChannel" HERE
     set(modifyBlockAtom, { id: block.id, channel });
   }
 });
