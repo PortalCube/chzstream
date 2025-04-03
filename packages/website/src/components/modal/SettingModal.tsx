@@ -47,8 +47,11 @@ const Version = styled.p`
   color: rgba(200, 200, 200, 1);
 `;
 
-const BUILD_TIMESTAMP = new Date(import.meta.env.VITE_BUILD_TIMESTAMP);
+const BUILD_TIMESTAMP = new Date(
+  import.meta.env.VITE_BUILD_TIMESTAMP
+).toLocaleString();
 const BUILD_COMMIT_SHA = import.meta.env.VITE_BUILD_COMMIT_SHA;
+const BUILD_VERSION = import.meta.env.VITE_BUILD_VERSION;
 
 function SettingModal({}: SettingModalProps) {
   const modal = useAtomValue(modalAtom);
@@ -57,12 +60,14 @@ function SettingModal({}: SettingModalProps) {
     disable: modal.type !== "setting",
   });
 
+  const buildString = [BUILD_VERSION, BUILD_COMMIT_SHA, BUILD_TIMESTAMP].join(
+    " - "
+  );
+
   return (
     <Container className={className}>
       <Title>준비중인 기능입니다</Title>
-      <Version>
-        {BUILD_COMMIT_SHA} - {BUILD_TIMESTAMP.toLocaleString()}
-      </Version>
+      <Version>{buildString}</Version>
     </Container>
   );
 }

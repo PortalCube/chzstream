@@ -10,6 +10,9 @@ export default defineConfig({
     port: 5286,
   },
   define: {
+    "import.meta.env.VITE_BUILD_VERSION": JSON.stringify(
+      process.env.npm_package_version
+    ),
     "import.meta.env.VITE_BUILD_COMMIT_SHA": JSON.stringify(
       execSync("git rev-parse --short HEAD").toString().trim()
     ),

@@ -18,6 +18,7 @@ import {
   exportPresetListAtom,
   PresetItemBase,
 } from "@web/librarys/preset.ts";
+import { printStartupMessage } from "@web/scripts/debug.ts";
 import { theme } from "@web/scripts/styled.ts";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
@@ -33,6 +34,8 @@ const Container = styled.div`
   background-color: #000000;
   color: white;
 `;
+
+printStartupMessage();
 
 function App() {
   const loadDefaultMixer = useSetAtom(loadDefaultMixerAtom);
