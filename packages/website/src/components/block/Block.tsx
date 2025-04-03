@@ -185,6 +185,7 @@ function Block({ block, gridRef }: BlockProps) {
         id,
         x: event.clientX,
         y: event.clientY,
+        contextMenu: true,
       });
     } else {
       setBlockContextMenuOptions(null);
