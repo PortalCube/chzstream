@@ -41,51 +41,27 @@ function ButtonMenu() {
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
 
-  const { id } = useMemo(() => {
-    const result = {
-      id: 0,
-      iconUrl: getProfileImageUrl(),
-      name: "채널 없음",
-      description: "클릭해서 채널 지정",
-      hasChannel: false,
+  const items = useMemo(() => {
+    const id = block?.id ?? 0;
+    const type = block?.type ?? "stream";
+
+    const blockRemove = () => {
+      removeBlock(id);
     };
 
-    if (block === null) {
-      return result;
-    }
+    const refresh = () => {
+      modifyBlockStatus(id, { refresh: true });
+    };
 
-    result.id = block.id;
+    const changeType = () => {
+      const newType = type === "chat" ? "stream" : "chat";
+      modifyBlock({ id, type: newType });
+    };
 
-    if (block.channel === null) {
-      return result;
-    }
+    const makeFullscreen = () => {};
 
-    result.iconUrl = block.channel.iconUrl;
-    result.name = block.channel.name;
-    result.description = "클릭하거나 드래그";
-    result.hasChannel = true;
+    const makeFullscreenWithChat = () => {};
 
-    return result;
-  }, [block]);
-
-  const blockRemove = useCallback(() => {
-    removeBlock(id);
-  }, [id]);
-
-  const refresh = useCallback(() => {
-    modifyBlockStatus(id, { refresh: true });
-  }, [id]);
-
-  const changeType = useCallback(() => {
-    const type = block?.type === "chat" ? "stream" : "chat";
-    modifyBlock({ id, type });
-  }, [id, block]);
-
-  const makeFullscreen = useCallback(() => {}, []);
-
-  const makeFullscreenWithChat = useCallback(() => {}, []);
-
-  const items = useMemo(() => {
     const items = [
       {
         id: "remove",
@@ -142,7 +118,7 @@ function ButtonMenu() {
           }}
         />
       ));
-  }, [block, blockRemove, refresh, makeFullscreen, makeFullscreenWithChat]);
+  }, [block]);
 
   return (
     <Container>
