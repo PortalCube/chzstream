@@ -3,6 +3,7 @@ import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import {
+  modifyBlockAtom,
   modifyBlockStatusAtom,
   removeBlockAtom,
 } from "@web/librarys/layout.ts";
@@ -11,8 +12,10 @@ import { useCallback, useContext, useMemo } from "react";
 import {
   MdChromeReaderMode,
   MdDelete,
+  MdForum,
   MdFullscreen,
   MdRefresh,
+  MdSmartDisplay,
 } from "react-icons/md";
 import styled from "styled-components";
 
@@ -34,6 +37,7 @@ function ButtonMenu() {
   const block = useContext(BlockContextMenuContext);
 
   const removeBlock = useSetAtom(removeBlockAtom);
+  const modifyBlock = useSetAtom(modifyBlockAtom);
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
 
@@ -65,22 +69,21 @@ function ButtonMenu() {
   }, [block]);
 
   const blockRemove = useCallback(() => {
-    clearBlockContextMenu();
     removeBlock(id);
   }, [id]);
 
   const refresh = useCallback(() => {
-    clearBlockContextMenu();
     modifyBlockStatus(id, { refresh: true });
   }, [id]);
 
-  const makeFullscreen = useCallback(() => {
-    clearBlockContextMenu();
-  }, []);
+  const changeType = useCallback(() => {
+    const type = block?.type === "chat" ? "stream" : "chat";
+    modifyBlock({ id, type });
+  }, [id, block]);
 
-  const makeFullscreenWithChat = useCallback(() => {
-    clearBlockContextMenu();
-  }, []);
+  const makeFullscreen = useCallback(() => {}, []);
+
+  const makeFullscreenWithChat = useCallback(() => {}, []);
 
   const items = useMemo(() => {
     const items = [
@@ -95,6 +98,20 @@ function ButtonMenu() {
         icon: MdRefresh,
         title: "블록 새로고침",
         onClick: refresh,
+      },
+      {
+        id: "chat-block",
+        icon: MdForum,
+        title: "채팅 블록으로 변경",
+        onClick: changeType,
+        disable: block?.type === "chat",
+      },
+      {
+        id: "stream-block",
+        icon: MdSmartDisplay,
+        title: "스트리밍 블록으로 변경",
+        onClick: changeType,
+        disable: block?.type === "stream",
       },
       {
         id: "fullscreen",
@@ -119,10 +136,13 @@ function ButtonMenu() {
           key={item.id}
           icon={item.icon}
           title={item.title}
-          onClick={item.onClick}
+          onClick={() => {
+            clearBlockContextMenu();
+            item.onClick();
+          }}
         />
       ));
-  }, [blockRemove, refresh, makeFullscreen, makeFullscreenWithChat]);
+  }, [block, blockRemove, refresh, makeFullscreen, makeFullscreenWithChat]);
 
   return (
     <Container>
