@@ -135,19 +135,27 @@ export function useSearchModal() {
       return;
     }
 
-    const response = await messageClient.request("stream-search-live", {
+    const liveResponse = await messageClient.request("stream-search-live", {
       platform: "chzzk",
       query,
       size: 50,
     });
 
-    const data = response.data.result;
-    if (data === null) {
-      setLiveResult([]);
-      return;
-    }
+    const tagResponse = await messageClient.request("stream-search-tag", {
+      platform: "chzzk",
+      query,
+      size: 50,
+    });
+
+    const data = [...liveResponse.data.result, ...tagResponse.data.result];
 
     const items = data
+      // 중복 제거 & 50개 제한
+      .filter(
+        (item, index, array) =>
+          array.findIndex((el) => el.channelId === item.channelId) === index &&
+          index < 50
+      )
       .sort((a, b) => b.liveViewer - a.liveViewer)
       .map((item) => ({
         uuid: item.channelId,
