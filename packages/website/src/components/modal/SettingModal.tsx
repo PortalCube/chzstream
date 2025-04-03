@@ -41,6 +41,15 @@ const Description = styled.p`
   color: rgba(200, 200, 200, 1);
 `;
 
+const Version = styled.p`
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(200, 200, 200, 1);
+`;
+
+const BUILD_TIMESTAMP = new Date(import.meta.env.VITE_BUILD_TIMESTAMP);
+const BUILD_COMMIT_SHA = import.meta.env.VITE_BUILD_COMMIT_SHA;
+
 function SettingModal({}: SettingModalProps) {
   const modal = useAtomValue(modalAtom);
 
@@ -51,7 +60,9 @@ function SettingModal({}: SettingModalProps) {
   return (
     <Container className={className}>
       <Title>준비중인 기능입니다</Title>
-      <Description>설정 패널은 곧 추가될 예정입니다.</Description>
+      <Version>
+        {BUILD_COMMIT_SHA} - {BUILD_TIMESTAMP.toLocaleString()}
+      </Version>
     </Container>
   );
 }
