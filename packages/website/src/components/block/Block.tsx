@@ -117,7 +117,7 @@ function Block({ block, gridRef }: BlockProps) {
         const x = data.clientX + ref.current.offsetLeft;
         const y = data.clientY + ref.current.offsetTop + gridTop;
 
-        setBlockContextMenuOptions({ id, x, y });
+        setBlockContextMenuOptions({ id, x, y, contextMenu: true });
       } else {
         setBlockContextMenuOptions(null);
       }

@@ -6,6 +6,7 @@ export const blockContextMenuOptionsAtom = atom<{
   id: number;
   x: number;
   y: number;
+  contextMenu: boolean;
 } | null>(null);
 
 export const blockContextMenuAtom = atom<Block | null>((get) => {

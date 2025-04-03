@@ -1,5 +1,8 @@
 import ButtonMenuItem from "@web/components/block-context-menu/ButtonMenuItem.tsx";
-import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
+import {
+  blockContextMenuOptionsAtom,
+  clearBlockContextMenuAtom,
+} from "@web/librarys/block-context-menu.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import {
@@ -7,7 +10,8 @@ import {
   modifyBlockStatusAtom,
   removeBlockAtom,
 } from "@web/librarys/layout.ts";
-import { useSetAtom } from "jotai";
+import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useContext, useMemo } from "react";
 import {
   MdChromeReaderMode,
@@ -31,6 +35,10 @@ const Tip = styled.p`
   font-size: 12px;
   font-weight: 400;
   color: rgb(127, 127, 127);
+
+  &.hidden {
+    display: none;
+  }
 `;
 
 function ButtonMenu() {
@@ -40,6 +48,7 @@ function ButtonMenu() {
   const modifyBlock = useSetAtom(modifyBlockAtom);
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
+  const blockContextMenuOptions = useAtomValue(blockContextMenuOptionsAtom);
 
   const items = useMemo(() => {
     const id = block?.id ?? 0;
@@ -120,10 +129,14 @@ function ButtonMenu() {
       ));
   }, [block]);
 
+  const tipClassName = classNames({
+    hidden: blockContextMenuOptions?.contextMenu === false,
+  });
+
   return (
     <Container>
       {items}
-      <Tip>참고: Ctrl + 우클릭으로 원래 메뉴 열기</Tip>
+      <Tip className={tipClassName}>참고: Ctrl + 우클릭으로 원래 메뉴 열기</Tip>
     </Container>
   );
 }
