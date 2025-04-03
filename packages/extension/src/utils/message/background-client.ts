@@ -48,4 +48,14 @@ export function initializeBackgroundClient() {
       message.sender
     );
   });
+
+  backgroundClient.on("stream-search-tag", async (message) => {
+    const response = await streamClient.searchTag(message.data);
+    backgroundClient.reply(
+      message.id,
+      "stream-search-tag",
+      response,
+      message.sender
+    );
+  });
 }

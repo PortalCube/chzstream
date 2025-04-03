@@ -8,6 +8,7 @@ import { StreamGetChannelMessage } from "./stream/get-channel.ts";
 import { StreamGetLiveListMessage } from "./stream/get-live-list.ts";
 import { StreamSearchChannelMessage } from "./stream/search-channel.ts";
 import { StreamSearchLiveMessage } from "./stream/search-live.ts";
+import { StreamSearchTagMessage } from "./stream/search-tag.ts";
 import { VideoStatusMessage } from "./status/video-status.ts";
 
 export const PAYLOAD_MAP = {
@@ -29,6 +30,7 @@ export const PAYLOAD_MAP = {
   "stream-get-live-list": StreamGetLiveListMessage,
   "stream-search-channel": StreamSearchChannelMessage,
   "stream-search-live": StreamSearchLiveMessage,
+  "stream-search-tag": StreamSearchTagMessage,
 };
 
 type Payload<T extends PayloadType> = (typeof PAYLOAD_MAP)[T];
