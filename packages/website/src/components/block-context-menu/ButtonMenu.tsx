@@ -3,17 +3,18 @@ import {
   blockContextMenuOptionsAtom,
   clearBlockContextMenuAtom,
 } from "@web/librarys/block-context-menu.ts";
-import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import {
   modifyBlockAtom,
   modifyBlockStatusAtom,
+  quickBlockAddAtom,
   removeBlockAtom,
 } from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useCallback, useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import {
+  MdAdd,
   MdChromeReaderMode,
   MdDelete,
   MdForum,
@@ -47,6 +48,8 @@ function ButtonMenu() {
   const removeBlock = useSetAtom(removeBlockAtom);
   const modifyBlock = useSetAtom(modifyBlockAtom);
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
+  const quickBlockAdd = useSetAtom(quickBlockAddAtom);
+
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
   const blockContextMenuOptions = useAtomValue(blockContextMenuOptionsAtom);
 
@@ -97,6 +100,12 @@ function ButtonMenu() {
         title: "스트리밍 블록으로 변경",
         onClick: changeType,
         disable: block?.type === "stream",
+      },
+      {
+        id: "quick-add",
+        icon: MdAdd,
+        title: "빠른 추가",
+        onClick: quickBlockAdd,
       },
       {
         id: "fullscreen",

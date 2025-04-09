@@ -2,11 +2,17 @@ import { RequestMessage } from "@chzstream/message";
 import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
 import MenuButton from "@web/components/topbar/MenuButton.tsx";
 import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
-import { clearBlockAtom, switchLayoutModeAtom } from "@web/librarys/layout.ts";
+import {
+  clearBlockAtom,
+  fetchChzzkChannelAtom,
+  quickBlockAddAtom,
+  switchLayoutModeAtom,
+} from "@web/librarys/layout.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  MdAdd,
   MdEdit,
   MdExpandLess,
   MdExpandMore,
@@ -26,9 +32,11 @@ import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import {
   openMixerModalAtom,
   openPresetModalAtom,
+  openSearchModalAtom,
   openSettingModalAtom,
 } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
+import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 
 const Header = styled.div`
   width: 100%;
@@ -94,6 +102,7 @@ function Topbar() {
   const layoutMode = useAtomValue(layoutModeAtom);
   const clearBlock = useSetAtom(clearBlockAtom);
   const switchLayoutMode = useSetAtom(switchLayoutModeAtom);
+  const quickBlockAdd = useSetAtom(quickBlockAddAtom);
 
   const openSettingModal = useSetAtom(openSettingModalAtom);
   const openMixerModal = useSetAtom(openMixerModalAtom);
@@ -190,6 +199,13 @@ function Topbar() {
         Icon: MdViewQuilt,
         text: "프리셋",
         onClick: openPresetModal,
+        filter: ["modify", "view"],
+      },
+      {
+        key: "quick-add",
+        Icon: MdAdd,
+        text: "빠른 추가",
+        onClick: quickBlockAdd,
         filter: ["modify", "view"],
       },
       {

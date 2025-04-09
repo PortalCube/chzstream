@@ -17,6 +17,8 @@ import {
   soloBlockIdAtom,
   updateMuteAtom,
 } from "@web/librarys/mixer.ts";
+import { openSearchModalAtom } from "@web/librarys/modal.ts";
+import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 import { WritableDraft } from "immer";
 import { atom } from "jotai";
 
@@ -301,4 +303,11 @@ export const switchLayoutModeAtom = atom(null, (get, set) => {
 
 export const lockBlockAtom = atom(null, (_get, set) => {
   set(blockListAtom, (prev) => prev.map((item) => ({ ...item, lock: true })));
+});
+
+export const quickBlockAddAtom = atom(null, (_get, set) => {
+  set(openSearchModalAtom, async (result) => {
+    const channel = await set(fetchChzzkChannelAtom, result.uuid);
+    set(pushChannelWithDefaultPresetAtom, channel);
+  });
 });
