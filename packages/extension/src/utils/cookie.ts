@@ -21,7 +21,8 @@ const targetCookies = [
 
 const TOP_LEVEL_DOMAINS = [
   "https://chzstream.app",
-  "https://preview.chzstream.app/*",
+  "https://preview.chzstream.app/",
+  "https://*.chzstream.pages.dev/",
   "http://localhost:5286",
 ];
 

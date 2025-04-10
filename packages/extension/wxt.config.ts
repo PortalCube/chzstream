@@ -19,6 +19,7 @@ const manifest: UserManifestFn = ({ mode }) => ({
       "https://api.chzzk.naver.com/*",
       "https://chzstream.app/*",
       "https://preview.chzstream.app/*",
+      "https://*.chzstream.pages.dev/*",
     ],
     mode
   ),
@@ -33,6 +34,7 @@ const manifest: UserManifestFn = ({ mode }) => ({
         "http://localhost/*",
         "https://chzstream.app/*",
         "https://preview.chzstream.app/*",
+        "https://*.chzstream.pages.dev/*",
       ],
     },
   ],
