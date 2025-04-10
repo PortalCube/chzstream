@@ -8,6 +8,7 @@ import styled from "styled-components";
 
 const Slider = styled(ButtonMenuSlider)`
   padding: 6px 8px;
+  padding-top: 0;
 `;
 
 function ZoomLevel({}: ZoomLevelProps) {

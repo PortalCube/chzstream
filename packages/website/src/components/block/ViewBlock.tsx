@@ -2,7 +2,6 @@ import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockContext } from "@web/librarys/context";
 import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
-import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
