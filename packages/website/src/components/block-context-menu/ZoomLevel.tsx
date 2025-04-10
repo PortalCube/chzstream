@@ -27,9 +27,9 @@ function ZoomLevel({}: ZoomLevelProps) {
     icon: MdZoomIn,
     value: zoom,
     displayValue,
-    min: 0.75,
+    min: 0.5,
     max: 1.5,
-    step: 0.25,
+    step: 0.1,
     onInput,
   };
 
