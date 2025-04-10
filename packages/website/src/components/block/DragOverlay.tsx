@@ -25,7 +25,7 @@ const Container = styled.div`
   }
 
   overflow: hidden;
-  z-index: 1;
+  z-index: 2;
 
   display: flex;
   align-items: center;
