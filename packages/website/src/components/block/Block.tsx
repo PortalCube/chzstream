@@ -52,7 +52,7 @@ const Container = styled.div`
 `;
 
 function Block({ block, gridRef }: BlockProps) {
-  const { id, position } = block;
+  const { id, position, zoom } = block;
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
@@ -114,8 +114,8 @@ function Block({ block, gridRef }: BlockProps) {
       if (gridRef.current === null) return;
 
       if (blockContextMenuOptions === null) {
-        const x = data.clientX + ref.current.offsetLeft;
-        const y = data.clientY + ref.current.offsetTop + gridTop;
+        const x = data.clientX * zoom + ref.current.offsetLeft;
+        const y = data.clientY * zoom + ref.current.offsetTop + gridTop;
 
         setBlockContextMenuOptions({ id, x, y, contextMenu: true });
       } else {

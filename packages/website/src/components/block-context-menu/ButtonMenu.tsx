@@ -1,4 +1,5 @@
 import ButtonMenuItem from "@web/components/block-context-menu/ButtonMenuItem.tsx";
+import ZoomLevel from "@web/components/block-context-menu/ZoomLevel.tsx";
 import {
   blockContextMenuOptionsAtom,
   clearBlockContextMenuAtom,
@@ -144,6 +145,7 @@ function ButtonMenu() {
 
   return (
     <Container>
+      <ZoomLevel />
       {items}
       <Tip className={tipClassName}>참고: Ctrl + 우클릭으로 원래 메뉴 열기</Tip>
     </Container>

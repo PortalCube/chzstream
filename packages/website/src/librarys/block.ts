@@ -64,6 +64,7 @@ export type Block = {
   channel: BlockChannel | null;
   mixer: BlockMixer;
   player: BlockPlayer;
+  zoom: number;
 };
 
 export type PreviewBlockStatus = "create" | "modify" | "inactive";

@@ -51,6 +51,7 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
     },
+    zoom: 1,
   };
 
   set(blockListAtom, (prev) => [...prev, block]);
