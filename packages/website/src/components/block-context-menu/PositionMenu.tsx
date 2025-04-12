@@ -46,7 +46,8 @@ const Button = styled.button`
   }
 
   &.selected {
-    background-color: rgb(63, 63, 63);
+    color: rgb(24, 24, 24);
+    background-color: rgb(220, 220, 220);
   }
 `;
 
