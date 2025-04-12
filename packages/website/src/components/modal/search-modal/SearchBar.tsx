@@ -1,18 +1,19 @@
+import { searchQueryAtom, submitSearchAtom } from "@web/librarys/search.ts";
 import classNames from "classnames";
+import { useAtom, useSetAtom } from "jotai";
 import { useRef, useState } from "react";
 import { MdClose, MdSearch } from "react-icons/md";
-import { useSearchModal } from "@web/librarys/search";
 import styled from "styled-components";
 
 const Container = styled.div`
-  width: 100%;
-
   padding: 6px 12px;
   border-radius: 8px;
 
   box-sizing: border-box;
 
   background-color: rgba(51, 51, 51, 1);
+
+  flex-grow: 1;
 
   display: flex;
   gap: 8px;
@@ -89,7 +90,10 @@ const Button = styled.button`
 
 function SearchBar({}: SearchBarProps) {
   const ref = useRef<HTMLInputElement>(null);
-  const { query, setQuery, search, showRecommend } = useSearchModal();
+
+  const [query, setQuery] = useAtom(searchQueryAtom);
+  const submitSearch = useSetAtom(submitSearchAtom);
+
   const [isFocus, setFocus] = useState(false);
 
   const className = classNames({
@@ -120,12 +124,13 @@ function SearchBar({}: SearchBarProps) {
 
   const onKeyDown: React.KeyboardEventHandler = (event) => {
     if (event.key === "Enter") {
-      search();
+      submitSearch();
     }
   };
 
   const onClearClick: React.MouseEventHandler = () => {
-    showRecommend();
+    setQuery("");
+    submitSearch();
   };
 
   return (

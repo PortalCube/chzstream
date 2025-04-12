@@ -1,11 +1,10 @@
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { SearchItemResult, selectItemAtom } from "@web/librarys/search.ts";
+import { formatFollowerCount } from "@web/scripts/format.ts";
 import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { MdVerified } from "react-icons/md";
-import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
-import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
-import { SearchItemType } from "@web/librarys/search.ts";
-import { formatFollowerCount } from "@web/scripts/format.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -25,11 +24,17 @@ const Container = styled.div`
   gap: 12px;
 
   cursor: pointer;
-
-  transition: background-color 100ms;
+  transition:
+    background-color 100ms,
+    box-shadow 100ms;
 
   &:hover {
     background-color: rgba(63, 63, 63, 1);
+  }
+
+  &.selected {
+    background-color: rgba(79, 220, 152, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   }
 `;
 
@@ -129,9 +134,9 @@ const ChannelFollower = styled.span`
 `;
 
 function SearchChannelItem({ item }: SearchItemProps) {
-  const modal = useAtomValue(modalAtom);
-  const closeModal = useSetAtom(closeModalAtom);
-  const className = classNames({});
+  const selectItem = useSetAtom(selectItemAtom);
+
+  const className = classNames({ selected: item.selected });
 
   const verifiedClassName = classNames({
     hidden: item.verified === false,
@@ -152,8 +157,7 @@ function SearchChannelItem({ item }: SearchItemProps) {
   );
 
   const onClick: React.MouseEventHandler = () => {
-    modal.callback?.(item);
-    closeModal();
+    selectItem(item);
   };
 
   return (
@@ -173,7 +177,7 @@ function SearchChannelItem({ item }: SearchItemProps) {
 }
 
 export type SearchItemProps = {
-  item: SearchItemType;
+  item: SearchItemResult;
 };
 
 export default SearchChannelItem;

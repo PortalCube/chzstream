@@ -1,7 +1,13 @@
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
-import { SearchItemType, useSearchModal } from "@web/librarys/search.ts";
+import {
+  searchCategoryAtom,
+  channelResultAtom,
+  liveResultAtom,
+  SearchItemResult,
+} from "@web/librarys/search.ts";
 import classNames from "classnames";
+import { useAtom, useAtomValue } from "jotai";
 import { useMemo } from "react";
 import styled from "styled-components";
 
@@ -31,26 +37,28 @@ const Group = styled.div`
 `;
 
 function SearchDetail({}: SearchDetailProps) {
-  const { category, setCategory, recommendResult, channelResult, liveResult } =
-    useSearchModal();
+  const [category, setCategory] = useAtom(searchCategoryAtom);
+  const liveResult = useAtomValue(liveResultAtom);
+  const channelResult = useAtomValue(channelResultAtom);
+
   const className = classNames({
     hidden: category === "summary",
   });
 
   const { items, type } = useMemo<{
-    items: SearchItemType[];
+    items: SearchItemResult[];
     type: "channel" | "live";
   }>(() => {
     if (category === "channel") {
       return { items: channelResult, type: "channel" };
     }
 
-    if (category === "live") {
+    if (category === "live" || category === "recommend") {
       return { items: liveResult, type: "live" };
     }
 
-    return { items: recommendResult, type: "live" };
-  }, [category, channelResult, liveResult, recommendResult]);
+    return { items: [], type: "channel" };
+  }, [category, channelResult, liveResult]);
 
   return (
     <Container className={className}>

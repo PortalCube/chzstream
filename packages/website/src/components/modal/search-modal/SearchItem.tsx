@@ -1,6 +1,6 @@
 import SearchChannelItem from "@web/components/modal/search-modal/SearchChannelItem.tsx";
 import SearchLiveItem from "@web/components/modal/search-modal/SearchLiveItem.tsx";
-import { SearchItemType } from "@web/librarys/search.ts";
+import { SearchItemResult, SearchItemType } from "@web/librarys/search.ts";
 import { useMemo } from "react";
 
 function SearchItem({ item, type }: SearchItemProps) {
@@ -16,7 +16,7 @@ function SearchItem({ item, type }: SearchItemProps) {
 }
 
 export type SearchItemProps = {
-  item: SearchItemType;
+  item: SearchItemResult;
   type: "channel" | "live";
 };
 

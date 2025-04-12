@@ -1,7 +1,12 @@
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
-import { useSearchModal } from "@web/librarys/search.ts";
+import {
+  searchCategoryAtom,
+  channelResultAtom,
+  liveResultAtom,
+} from "@web/librarys/search.ts";
 import classNames from "classnames";
+import { useAtom, useAtomValue } from "jotai";
 import { MdNavigateNext } from "react-icons/md";
 import styled from "styled-components";
 
@@ -63,7 +68,11 @@ const Spliter = styled.div`
 `;
 
 function SearchSummary({}: SearchSummaryProps) {
-  const { channelResult, liveResult, category, setCategory } = useSearchModal();
+  const [category, setCategory] = useAtom(searchCategoryAtom);
+
+  const channelResult = useAtomValue(channelResultAtom);
+  const liveResult = useAtomValue(liveResultAtom);
+
   const className = classNames({
     hidden: category !== "summary",
   });

@@ -3,7 +3,6 @@ import { BlockContext } from "@web/librarys/context";
 import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
 import {
   fetchChzzkChannelAtom,
-  modifyBlockAtom,
   setBlockChannelAtom,
 } from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
@@ -185,10 +184,14 @@ function Channel({}: ChannelProps) {
   }, [channel]);
 
   const onClick: React.MouseEventHandler = () => {
-    openSearchModal(async (_channel) => {
-      const channel = await fetchChzzkChannel(_channel.uuid);
-      setBlockChannel(id, channel);
-    });
+    openSearchModal(
+      async (channels) => {
+        const uuid = channels[0].uuid;
+        const channel = await fetchChzzkChannel(uuid);
+        setBlockChannel(id, channel);
+      },
+      { allowMultiSelect: false }
+    );
   };
 
   return (

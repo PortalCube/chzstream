@@ -307,8 +307,10 @@ export const lockBlockAtom = atom(null, (_get, set) => {
 });
 
 export const quickBlockAddAtom = atom(null, (_get, set) => {
-  set(openSearchModalAtom, async (result) => {
-    const channel = await set(fetchChzzkChannelAtom, result.uuid);
-    set(pushChannelWithDefaultPresetAtom, channel);
+  set(openSearchModalAtom, async (channels) => {
+    for (const item of channels) {
+      const channel = await set(fetchChzzkChannelAtom, item.uuid);
+      set(pushChannelWithDefaultPresetAtom, channel);
+    }
   });
 });

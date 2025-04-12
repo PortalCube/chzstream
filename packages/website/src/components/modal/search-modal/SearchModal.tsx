@@ -1,10 +1,17 @@
+import MultiSelect from "@web/components/modal/search-modal/MultiSelect.tsx";
+import MultiSelectCheckBox from "@web/components/modal/search-modal/MultiSelectCheckBox.tsx";
 import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
 import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
 import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
 import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
-import { useSearchModal } from "@web/librarys/search.ts";
+import {
+  clearSelectedItemsAtom,
+  searchQueryAtom,
+  setMultiSelectAtom,
+  submitSearchAtom,
+} from "@web/librarys/search.ts";
 import classNames from "classnames";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -36,16 +43,31 @@ const Container = styled.div`
   }
 `;
 
+const Header = styled.div`
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
 function SearchModal({}: SearchModalProps) {
   const modal = useAtomValue(modalAtom);
 
-  const { setQuery, showRecommend } = useSearchModal();
+  const setQuery = useSetAtom(searchQueryAtom);
+  const submitSearch = useSetAtom(submitSearchAtom);
+  const setMultiSelect = useSetAtom(setMultiSelectAtom);
 
+  // 검색 모달이 열리면 초기 값으로 설정
   useModalListener((_get, _set, newVal, prevVal) => {
     if (prevVal.type === newVal.type) return;
     if (newVal.type !== "search") return;
+
+    // 다중 선택을 꺼짐으로 변경경
+    setMultiSelect(false);
+
+    // 쿼리 초기화
     setQuery("");
-    showRecommend();
+    submitSearch();
   });
 
   const className = classNames({
@@ -54,9 +76,13 @@ function SearchModal({}: SearchModalProps) {
 
   return (
     <Container className={className}>
-      <SearchBar />
+      <Header>
+        <SearchBar />
+        <MultiSelectCheckBox />
+      </Header>
       <SearchSummary />
       <SearchDetail />
+      <MultiSelect />
     </Container>
   );
 }

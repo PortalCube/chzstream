@@ -1,11 +1,16 @@
-import classNames from "classnames";
-import { useEffect, useMemo, useState } from "react";
-import { useModalListener } from "@web/librarys/modal.ts";
-import { SearchItemType, useSearchModal } from "@web/librarys/search.ts";
-import styled from "styled-components";
 import Pagination from "@web/components/modal/search-modal/Pagination.tsx";
 import SearchItem from "@web/components/modal/search-modal/SearchItem";
 import SearchMessage from "@web/components/modal/search-modal/SearchMessage.tsx";
+import { useModalListener } from "@web/librarys/modal.ts";
+import {
+  searchCategoryAtom,
+  SearchItemResult,
+  SearchItemType,
+} from "@web/librarys/search.ts";
+import classNames from "classnames";
+import { useAtomValue } from "jotai";
+import { useEffect, useMemo, useState } from "react";
+import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;
@@ -48,7 +53,7 @@ const List = styled.div`
 `;
 
 function SearchList({ items, type, size, preview = false }: SearchListProps) {
-  const { category } = useSearchModal();
+  const category = useAtomValue(searchCategoryAtom);
   const [page, setPage] = useState(1);
   const className = classNames({
     preview: preview && items.length !== 0,
@@ -127,7 +132,7 @@ function SearchList({ items, type, size, preview = false }: SearchListProps) {
 }
 
 type SearchListProps = {
-  items: SearchItemType[];
+  items: SearchItemResult[];
   size?: number;
   preview?: boolean;
   type: "channel" | "live";

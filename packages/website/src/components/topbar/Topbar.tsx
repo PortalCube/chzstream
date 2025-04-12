@@ -4,7 +4,6 @@ import MenuButton from "@web/components/topbar/MenuButton.tsx";
 import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
 import {
   clearBlockAtom,
-  fetchChzzkChannelAtom,
   quickBlockAddAtom,
   switchLayoutModeAtom,
 } from "@web/librarys/layout.ts";
@@ -32,11 +31,9 @@ import { layoutModeAtom, mouseIsTopAtom } from "@web/librarys/app.ts";
 import {
   openMixerModalAtom,
   openPresetModalAtom,
-  openSearchModalAtom,
   openSettingModalAtom,
 } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
-import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 
 const Header = styled.div`
   width: 100%;
