@@ -42,7 +42,7 @@ const Container = styled.iframe<{ $zoom: number }>`
 
 function ViewBlock({}: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
-  const { id, type, status, channel, zoom } = useContext(BlockContext);
+  const { id, type, status, channel, options } = useContext(BlockContext);
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const messageClient = useAtomValue(messageClientAtom);
 
@@ -92,7 +92,7 @@ function ViewBlock({}: ViewBlockProps) {
     <Container
       className={className}
       src={src}
-      $zoom={zoom}
+      $zoom={options.zoom}
       scrolling="no"
       allowFullScreen
     ></Container>

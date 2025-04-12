@@ -7,6 +7,7 @@ import {
 import {
   Block,
   BlockChannel,
+  BlockOptions,
   BlockPosition,
   BlockStatus,
 } from "@web/librarys/block.ts";
@@ -51,7 +52,14 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
     },
-    zoom: 1,
+    options: {
+      zoom: 1.0,
+      objectFit: "contain",
+      objectPosition: {
+        horizontal: "center",
+        vertical: "center",
+      },
+    },
   };
 
   set(blockListAtom, (prev) => [...prev, block]);
@@ -121,6 +129,21 @@ export const modifyBlockStatusAtom = atom(
       }
 
       prev[index].status = { ...prev[index].status, ...status };
+    });
+  }
+);
+
+export const modifyBlockOptionsAtom = atom(
+  null,
+  (_get, set, id: number, options: Partial<BlockOptions>) => {
+    set(blockListAtom, (prev) => {
+      const index = prev.findIndex((item) => item.id === id);
+
+      if (index === -1) {
+        throw new Error(`Block not found: ${id}`);
+      }
+
+      prev[index].options = { ...prev[index].options, ...options };
     });
   }
 );
@@ -317,3 +340,31 @@ export const quickBlockAddAtom = atom(null, (_get, set) => {
     set(pushChannelWithDefaultPresetAtom, channels);
   });
 });
+
+export const sendBlockOptionsAtom = atom(
+  null,
+  async (get, _set, id: number) => {
+    const messageClient = get(messageClientAtom);
+    if (messageClient === null) return;
+
+    const blockList = get(blockListAtom);
+    const block = blockList.find((item) => item.id === id);
+
+    if (block === undefined) return;
+
+    const websiteId = messageClient.id.id;
+
+    messageClient.send(
+      "video-style",
+      {
+        objectFit: block.options.objectFit,
+        objectPosition: block.options.objectPosition,
+      },
+      {
+        type: "content",
+        websiteId: websiteId,
+        blockId: id,
+      }
+    );
+  }
+);

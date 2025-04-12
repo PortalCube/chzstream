@@ -1,6 +1,6 @@
 import ButtonMenuSlider from "@web/components/block-context-menu/ButtonMenuSlider";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
-import { modifyBlockAtom } from "@web/librarys/layout.ts";
+import { modifyBlockOptionsAtom } from "@web/librarys/layout.ts";
 import { useSetAtom } from "jotai";
 import { useContext } from "react";
 import { MdZoomIn } from "react-icons/md";
@@ -13,15 +13,15 @@ const Slider = styled(ButtonMenuSlider)`
 
 function ZoomLevel({}: ZoomLevelProps) {
   const block = useContext(BlockContextMenuContext);
-  const modifyBlock = useSetAtom(modifyBlockAtom);
+  const modifyBlockOptions = useSetAtom(modifyBlockOptionsAtom);
 
   const id = block?.id ?? 0;
-  const zoom = block?.zoom ?? 1.0;
+  const zoom = block?.options.zoom ?? 1.0;
 
   const displayValue = zoom.toFixed(2) + "x";
 
   const onInput = (value: number) => {
-    modifyBlock({ id, zoom: value });
+    modifyBlockOptions(id, { zoom: value });
   };
 
   const options = {
