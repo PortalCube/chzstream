@@ -5,7 +5,6 @@ import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
 import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
 import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
 import {
-  clearSelectedItemsAtom,
   searchQueryAtom,
   setMultiSelectAtom,
   submitSearchAtom,
