@@ -37,11 +37,11 @@ function ChannelGroup() {
 
   const onAddButtonClick: React.MouseEventHandler = () => {
     openSearchModal((channels) => {
-      for (const channel of channels) {
-        if (favoriteChannels.includes(channel.uuid) === false) {
-          setFavoriteChannels([...favoriteChannels, channel.uuid]);
-        }
-      }
+      const items = channels
+        .filter((channel) => favoriteChannels.includes(channel.uuid) === false)
+        .map((channel) => channel.uuid);
+
+      setFavoriteChannels([...favoriteChannels, ...items]);
     });
   };
 
