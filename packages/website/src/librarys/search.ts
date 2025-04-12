@@ -8,9 +8,11 @@ export type SearchItemType = {
   uuid: string;
   title: string;
   description: string;
-  profileImage: string | null;
+  channelImage: string | null;
+  thumbnailImage: string | null;
   countPrefix: string;
   count: number;
+  liveStatus: boolean;
   verified: boolean;
 };
 
@@ -89,9 +91,11 @@ export function useSearchModal() {
       uuid: item.channelId,
       title: item.channelName,
       description: item.liveTitle ?? "",
-      profileImage: item.channelImageUrl ?? "",
+      channelImage: item.channelImageUrl,
+      thumbnailImage: item.liveThumbnailUrl,
       countPrefix: "시청자",
       count: item.liveViewer,
+      liveStatus: true,
       verified: item.channelVerified,
     }));
 
@@ -120,9 +124,11 @@ export function useSearchModal() {
       uuid: item.channelId,
       title: item.channelName,
       description: item.channelDescription,
-      profileImage: item.channelImageUrl,
+      channelImage: item.channelImageUrl,
+      thumbnailImage: null,
       countPrefix: "팔로우",
       count: item.channelFollower,
+      liveStatus: item.liveStatus,
       verified: item.channelVerified,
     }));
 
@@ -149,6 +155,9 @@ export function useSearchModal() {
 
     const data = [...liveResponse.data.result, ...tagResponse.data.result];
 
+    console.log(liveResponse.data);
+    console.log(tagResponse.data);
+
     const items = data
       // 중복 제거 & 50개 제한
       .filter(
@@ -161,9 +170,11 @@ export function useSearchModal() {
         uuid: item.channelId,
         title: item.channelName,
         description: item.liveTitle ?? "",
-        profileImage: item.channelImageUrl ?? "",
+        channelImage: item.channelImageUrl,
+        thumbnailImage: item.liveThumbnailUrl,
         countPrefix: "시청자",
         count: item.liveViewer,
+        liveStatus: true,
         verified: item.channelVerified,
       }));
 
@@ -175,11 +186,13 @@ export function useSearchModal() {
       setChannelResult([
         {
           uuid: uuid,
-          title: "알 수 없는 채널",
-          description: `아이디: ${uuid}`,
-          profileImage: null,
+          title: `치지직 UUID ${uuid}`,
+          description: `제한 모드에서는 채널의 정보를 가져올 수 없습니다.`,
+          channelImage: null,
+          thumbnailImage: null,
           countPrefix: "팔로우",
           count: 0,
+          liveStatus: false,
           verified: false,
         },
       ]);
@@ -201,9 +214,11 @@ export function useSearchModal() {
         uuid: data.channelId,
         title: data.channelName,
         description: data.channelDescription,
-        profileImage: data.channelImageUrl,
+        channelImage: data.channelImageUrl,
+        thumbnailImage: data.liveThumbnailUrl,
         countPrefix: "팔로우",
         count: data.channelFollower,
+        liveStatus: data.liveStatus,
         verified: data.channelVerified,
       },
     ];

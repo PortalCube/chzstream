@@ -1,20 +1,32 @@
 import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
-import SearchResult from "@web/components/modal/search-modal/SearchResult.tsx";
-import { modalAtom } from "@web/librarys/modal.ts";
+import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
+import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
+import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
+import { useSearchModal } from "@web/librarys/search.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import styled from "styled-components";
 
 const Container = styled.div`
-  max-width: 600px;
+  max-width: 700px;
+  min-height: 780px;
   width: 100%;
+  padding: 16px;
+
+  border: 1px solid rgba(63, 63, 63, 1);
+  border-radius: 8px;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  gap: 16px;
 
-  gap: 12px;
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(31, 31, 31, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  box-sizing: border-box;
 
   transition: transform 200ms;
 
@@ -24,26 +36,17 @@ const Container = styled.div`
   }
 `;
 
-const Title = styled.p`
-  margin-left: 2px;
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 1);
-`;
-
-const Hint = styled.p`
-  margin-left: 2px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-
-  color: rgba(159, 159, 159, 1);
-  font-size: 14px;
-  font-weight: 600;
-`;
-
 function SearchModal({}: SearchModalProps) {
   const modal = useAtomValue(modalAtom);
+
+  const { setQuery, showRecommend } = useSearchModal();
+
+  useModalListener((_get, _set, newVal, prevVal) => {
+    if (prevVal.type === newVal.type) return;
+    if (newVal.type !== "search") return;
+    setQuery("");
+    showRecommend();
+  });
 
   const className = classNames({
     disable: modal.type !== "search",
@@ -51,9 +54,9 @@ function SearchModal({}: SearchModalProps) {
 
   return (
     <Container className={className}>
-      <Title>채널 검색</Title>
       <SearchBar />
-      <SearchResult />
+      <SearchSummary />
+      <SearchDetail />
     </Container>
   );
 }

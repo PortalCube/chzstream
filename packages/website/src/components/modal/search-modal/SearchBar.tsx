@@ -6,16 +6,13 @@ import styled from "styled-components";
 
 const Container = styled.div`
   width: 100%;
-  height: 48px;
 
   padding: 6px 12px;
   border-radius: 8px;
 
   box-sizing: border-box;
 
-  border: 1px solid rgba(63, 63, 63, 1);
-  background-color: rgba(31, 31, 31, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  background-color: rgba(51, 51, 51, 1);
 
   display: flex;
   gap: 8px;
@@ -31,6 +28,17 @@ const Container = styled.div`
   &.focus {
     outline: 2px solid rgba(128, 128, 128, 1);
   }
+`;
+
+const SearchIcon = styled(MdSearch)`
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(128, 128, 128, 1);
 `;
 
 const Input = styled.input`
@@ -92,10 +100,14 @@ function SearchBar({}: SearchBarProps) {
     hidden: query === "",
   });
 
-  const onClick: React.MouseEventHandler = (event) => {
-    if (event.target === event.currentTarget && ref.current !== null) {
-      ref.current.focus();
-    }
+  const onClick = (strict: boolean = false) => {
+    return (event: React.MouseEvent) => {
+      if (strict && event.target !== event.currentTarget) return;
+
+      if (ref.current !== null) {
+        ref.current.focus();
+      }
+    };
   };
 
   const onInput: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -103,9 +115,7 @@ function SearchBar({}: SearchBarProps) {
   };
 
   const onFocusChange = (value: boolean) => {
-    return () => {
-      setFocus(value);
-    };
+    return () => setFocus(value);
   };
 
   const onKeyDown: React.KeyboardEventHandler = (event) => {
@@ -118,15 +128,12 @@ function SearchBar({}: SearchBarProps) {
     showRecommend();
   };
 
-  const onSearchClick: React.MouseEventHandler = () => {
-    search();
-  };
-
   return (
-    <Container className={className} onClick={onClick}>
+    <Container className={className} onClick={onClick(true)}>
+      <SearchIcon onClick={onClick(false)} />
       <Input
         type="text"
-        placeholder="채널 이름, 라이브 제목, UUID로 검색해보세요"
+        placeholder="채널 이름, 라이브 제목, UUID로 검색…"
         value={query}
         ref={ref}
         onInput={onInput}
@@ -136,9 +143,6 @@ function SearchBar({}: SearchBarProps) {
       />
       <Button onClick={onClearClick} className={clearClassName}>
         <MdClose size={24} />
-      </Button>
-      <Button onClick={onSearchClick}>
-        <MdSearch size={24} />
       </Button>
     </Container>
   );

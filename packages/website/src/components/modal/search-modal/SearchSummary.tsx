@@ -10,6 +10,8 @@ const Container = styled.div`
 
   box-sizing: border-box;
 
+  flex-grow: 1;
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -75,7 +77,7 @@ function SearchSummary({}: SearchSummaryProps) {
           <MdNavigateNext size={24} />
         </MoreButton>
       </Section>
-      <SearchList preview size={4} items={channelResult} />
+      <SearchList preview size={3} items={channelResult} type="channel" />
       <Spliter />
       <Section>
         <Category name="라이브" interactable={false} />
@@ -84,7 +86,7 @@ function SearchSummary({}: SearchSummaryProps) {
           <MdNavigateNext size={24} />
         </MoreButton>
       </Section>
-      <SearchList preview size={4} items={liveResult} />
+      <SearchList preview size={6} items={liveResult} type="live" />
     </Container>
   );
 }

@@ -4,7 +4,7 @@ import { useModalListener } from "@web/librarys/modal.ts";
 import { SearchItemType, useSearchModal } from "@web/librarys/search.ts";
 import styled from "styled-components";
 import Pagination from "@web/components/modal/search-modal/Pagination.tsx";
-import SearchItem from "@web/components/modal/search-modal/SearchItem.tsx";
+import SearchItem from "@web/components/modal/search-modal/SearchItem";
 import SearchMessage from "@web/components/modal/search-modal/SearchMessage.tsx";
 
 const Container = styled.div`
@@ -12,12 +12,18 @@ const Container = styled.div`
 
   box-sizing: border-box;
 
+  flex-grow: 1;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 
   gap: 16px;
+
+  &.preview {
+    flex-grow: 0;
+  }
 `;
 
 const List = styled.div`
@@ -25,26 +31,58 @@ const List = styled.div`
 
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 
-  gap: 8px;
+  gap: 6px;
+
+  &.live {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px 6px;
+  }
+
+  &.hidden {
+    display: none;
+  }
 `;
 
-function SearchList({ items, size = 10, preview = false }: SearchListProps) {
+function SearchList({ items, type, size, preview = false }: SearchListProps) {
   const { category } = useSearchModal();
   const [page, setPage] = useState(1);
-  const className = classNames({});
-  const maxPage = Math.ceil(items.length / size);
+  const className = classNames({
+    preview: preview && items.length !== 0,
+  });
+  const listClassName = classNames({
+    live: type === "live",
+    hidden: items.length === 0,
+  });
+
+  const itemCount = useMemo(() => {
+    if (size !== undefined) {
+      return size;
+    } else if (type === "live") {
+      return 9;
+    } else if (type === "channel") {
+      return 10;
+    }
+
+    return 9;
+  }, [type, size]);
+
+  const maxPage = Math.ceil(items.length / itemCount);
 
   const showPagination = items.length !== 0 && preview === false;
 
   const elements = useMemo(
     () =>
       items
-        .filter((_, index) => index >= (page - 1) * size && index < page * size)
-        .map((item) => <SearchItem key={item.uuid} item={item} />),
-    [items, size, page]
+        .filter(
+          (_, index) =>
+            index >= (page - 1) * itemCount && index < page * itemCount
+        )
+        .map((item) => <SearchItem key={item.uuid} item={item} type={type} />),
+    [items, itemCount, page]
   );
 
   const onNextClick = () => {
@@ -75,10 +113,8 @@ function SearchList({ items, size = 10, preview = false }: SearchListProps) {
 
   return (
     <Container className={className}>
-      <List>
-        {elements}
-        <SearchMessage show={items.length === 0} />
-      </List>
+      <List className={listClassName}>{elements}</List>
+      <SearchMessage show={items.length === 0} />
       <Pagination
         page={page}
         maxPage={maxPage}
@@ -94,6 +130,7 @@ type SearchListProps = {
   items: SearchItemType[];
   size?: number;
   preview?: boolean;
+  type: "channel" | "live";
 };
 
 export default SearchList;
