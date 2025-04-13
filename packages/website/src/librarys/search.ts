@@ -231,7 +231,9 @@ export const searchUuidAtom = atom(null, async (get, set, uuid: string) => {
       type: "channel",
       selected: false,
     };
-    set(searchResultAtom, (prev) => prev.unshift(unknownItem));
+    set(searchResultAtom, (prev) => {
+      prev.unshift(unknownItem);
+    });
     return;
   }
 
@@ -261,7 +263,9 @@ export const searchUuidAtom = atom(null, async (get, set, uuid: string) => {
     selected: false,
   };
 
-  set(searchResultAtom, (prev) => prev.unshift(item));
+  set(searchResultAtom, (prev) => {
+    prev.unshift(item);
+  });
 });
 
 // 사용자가 선택한 채널을 선택된 채널 목록에 추가합니다. 다중 선택이 비활성화 되어있는 경우 그대로 modal을 종료합니다.
