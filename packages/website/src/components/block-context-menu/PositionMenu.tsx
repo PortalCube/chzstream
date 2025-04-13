@@ -1,10 +1,11 @@
+import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import {
   modifyBlockOptionsAtom,
   sendBlockOptionsAtom,
 } from "@web/librarys/layout.ts";
 import classNames from "classnames";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useContext } from "react";
 import {
   MdAlignHorizontalLeft,
@@ -116,6 +117,7 @@ function PositionMenu() {
   const block = useContext(BlockContextMenuContext);
   const modifyBlockOptions = useSetAtom(modifyBlockOptionsAtom);
   const sendBlockOptions = useSetAtom(sendBlockOptionsAtom);
+  const messageClient = useAtomValue(messageClientAtom);
 
   const onPositionClick = (
     item: ObjectPositionItem
@@ -197,7 +199,7 @@ function PositionMenu() {
   ));
 
   const className = classNames({
-    hidden: block?.type !== "stream",
+    hidden: block?.type !== "stream" || messageClient === null,
   });
 
   return (

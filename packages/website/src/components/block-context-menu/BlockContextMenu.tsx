@@ -174,6 +174,7 @@ function BlockContextMenu() {
   const mixer = useMemo(() => {
     if (blockContextMenu === null) return null;
     if (blockContextMenu.type !== "stream") return null;
+    if (messageClient === null) return null;
 
     return (
       <>
@@ -183,7 +184,7 @@ function BlockContextMenu() {
         <Divider />
       </>
     );
-  }, [blockContextMenu]);
+  }, [messageClient, blockContextMenu]);
 
   return (
     <BlockContextMenuContext value={blockContextMenu}>
