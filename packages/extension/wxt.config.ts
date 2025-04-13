@@ -11,7 +11,7 @@ import { makeUrls } from "./src/utils/make-url.js";
 const manifest: UserManifestFn = ({ mode }) => ({
   name: "치즈스트림",
   description: "치지직의 방송들을 한 화면으로 편하게 시청하세요.",
-  permissions: ["cookies", "notifications"],
+  permissions: ["cookies"],
   host_permissions: makeUrls(
     [
       "https://naver.com/",
@@ -19,6 +19,7 @@ const manifest: UserManifestFn = ({ mode }) => ({
       "https://api.chzzk.naver.com/*",
       "https://chzstream.app/*",
       "https://preview.chzstream.app/*",
+      "https://*.chzstream.pages.dev/*",
     ],
     mode
   ),
@@ -33,6 +34,7 @@ const manifest: UserManifestFn = ({ mode }) => ({
         "http://localhost/*",
         "https://chzstream.app/*",
         "https://preview.chzstream.app/*",
+        "https://*.chzstream.pages.dev/*",
       ],
     },
   ],
@@ -53,6 +55,12 @@ export default defineConfig({
     server: {
       port: 5287,
     },
+  },
+  zip: {
+    name: "chzstream-extension",
+    sourcesRoot: "../..",
+    includeSources: ["packages/{website,url}/tsconfig.?({node,app}.)json"],
+    excludeSources: ["packages/{website,url}/**/*"],
   },
   vite: () => ({
     plugins: [tsConfigPaths()],

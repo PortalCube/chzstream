@@ -4,7 +4,11 @@ import { createWebsiteRelay } from "@message/index.ts";
 export default defineContentScript({
   runAt: "document_start",
   matches: makeUrls(
-    ["https://chzstream.app/*", "https://preview.chzstream.app/*"],
+    [
+      "https://chzstream.app/*",
+      "https://preview.chzstream.app/*",
+      "https://*.chzstream.pages.dev/*",
+    ],
     import.meta.env.MODE
   ),
   async main(_context) {

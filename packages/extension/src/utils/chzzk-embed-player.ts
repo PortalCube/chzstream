@@ -345,7 +345,7 @@ export function waitForPlayerControl(
   });
 }
 
-export async function setPlayerControl(data: RequestPayload<"video-status">) {
+export function setPlayerControl(data: RequestPayload<"video-status">) {
   const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
   if (videoElement === null) return;
 
@@ -366,6 +366,14 @@ export async function setPlayerControl(data: RequestPayload<"video-status">) {
   if (data.muted !== undefined) {
     setMuted(data.muted);
   }
+}
+
+export function setVideoStyle(data: RequestPayload<"video-style">) {
+  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
+  if (videoElement === null) return;
+
+  videoElement.style.objectFit = data.objectFit;
+  videoElement.style.objectPosition = `${data.objectPosition.horizontal} ${data.objectPosition.vertical}`;
 }
 
 function extractQualityValue(element: HTMLLIElement) {

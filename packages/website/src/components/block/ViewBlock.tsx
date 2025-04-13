@@ -2,7 +2,6 @@ import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockContext } from "@web/librarys/context";
 import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
-import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
@@ -19,7 +18,7 @@ const resizeMixin = (scale: number) => {
   `;
 };
 
-const Container = styled.iframe`
+const Container = styled.iframe<{ $zoom: number }>`
   width: 100%;
   height: 100%;
   flex-flow: wrap;
@@ -37,16 +36,13 @@ const Container = styled.iframe`
     pointer-events: none;
   }
 
-  &.chat {
-    ${Mixin.block.less.small(css`
-      ${resizeMixin(0.75)}
-    `)}
-  }
+  // zoom level
+  ${(props) => resizeMixin(props.$zoom)}
 `;
 
 function ViewBlock({}: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
-  const { id, type, status, channel } = useContext(BlockContext);
+  const { id, type, status, channel, options } = useContext(BlockContext);
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const messageClient = useAtomValue(messageClientAtom);
 
@@ -90,13 +86,13 @@ function ViewBlock({}: ViewBlockProps) {
   const className = classNames({
     loading: status.loading,
     "modify-mode": layoutMode === "modify",
-    chat: type === "chat",
   });
 
   return (
     <Container
       className={className}
       src={src}
+      $zoom={options.zoom}
       scrolling="no"
       allowFullScreen
     ></Container>

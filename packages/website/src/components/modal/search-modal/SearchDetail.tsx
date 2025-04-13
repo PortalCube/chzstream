@@ -1,7 +1,13 @@
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
-import { useSearchModal } from "@web/librarys/search.ts";
+import {
+  searchCategoryAtom,
+  channelResultAtom,
+  liveResultAtom,
+  SearchItemResult,
+} from "@web/librarys/search.ts";
 import classNames from "classnames";
+import { useAtom, useAtomValue } from "jotai";
 import { useMemo } from "react";
 import styled from "styled-components";
 
@@ -9,6 +15,8 @@ const Container = styled.div`
   width: 100%;
 
   box-sizing: border-box;
+
+  flex-grow: 1;
 
   display: flex;
   flex-direction: column;
@@ -28,56 +36,29 @@ const Group = styled.div`
   justify-content: center;
 `;
 
-const MoreButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  background: none;
-  border: none;
-  border-radius: 4px;
-
-  font-size: 16px;
-  font-weight: 500;
-
-  color: rgba(127, 127, 127, 1);
-
-  cursor: pointer;
-
-  transition: color 100ms;
-
-  &:hover {
-    color: rgba(180, 180, 180, 1);
-  }
-`;
-
-const Spliter = styled.div`
-  width: 100%;
-  height: 1px;
-
-  background-color: rgba(72, 72, 72, 1);
-`;
-
 function SearchDetail({}: SearchDetailProps) {
-  const { category, setCategory, recommendResult, channelResult, liveResult } =
-    useSearchModal();
+  const [category, setCategory] = useAtom(searchCategoryAtom);
+  const liveResult = useAtomValue(liveResultAtom);
+  const channelResult = useAtomValue(channelResultAtom);
+
   const className = classNames({
     hidden: category === "summary",
   });
 
-  const items = useMemo(() => {
+  const { items, type } = useMemo<{
+    items: SearchItemResult[];
+    type: "channel" | "live";
+  }>(() => {
     if (category === "channel") {
-      return channelResult;
+      return { items: channelResult, type: "channel" };
     }
 
-    if (category === "live") {
-      return liveResult;
+    if (category === "live" || category === "recommend") {
+      return { items: liveResult, type: "live" };
     }
 
-    return recommendResult;
-  }, [category, channelResult, liveResult, recommendResult]);
+    return { items: [], type: "channel" };
+  }, [category, channelResult, liveResult]);
 
   return (
     <Container className={className}>
@@ -100,7 +81,7 @@ function SearchDetail({}: SearchDetailProps) {
           interactable={false}
         />
       </Group>
-      <SearchList items={items} />
+      <SearchList items={items} type={type} />
     </Container>
   );
 }

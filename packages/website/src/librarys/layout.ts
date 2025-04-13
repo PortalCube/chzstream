@@ -7,6 +7,7 @@ import {
 import {
   Block,
   BlockChannel,
+  BlockOptions,
   BlockPosition,
   BlockStatus,
 } from "@web/librarys/block.ts";
@@ -17,6 +18,8 @@ import {
   soloBlockIdAtom,
   updateMuteAtom,
 } from "@web/librarys/mixer.ts";
+import { openSearchModalAtom } from "@web/librarys/modal.ts";
+import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 import { WritableDraft } from "immer";
 import { atom } from "jotai";
 
@@ -48,6 +51,14 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
       volume: defaultMixerItem.mixer.volume,
       quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
+    },
+    options: {
+      zoom: 1.0,
+      objectFit: "contain",
+      objectPosition: {
+        horizontal: "center",
+        vertical: "center",
+      },
     },
   };
 
@@ -118,6 +129,21 @@ export const modifyBlockStatusAtom = atom(
       }
 
       prev[index].status = { ...prev[index].status, ...status };
+    });
+  }
+);
+
+export const modifyBlockOptionsAtom = atom(
+  null,
+  (_get, set, id: number, options: Partial<BlockOptions>) => {
+    set(blockListAtom, (prev) => {
+      const index = prev.findIndex((item) => item.id === id);
+
+      if (index === -1) {
+        throw new Error(`Block not found: ${id}`);
+      }
+
+      prev[index].options = { ...prev[index].options, ...options };
     });
   }
 );
@@ -302,3 +328,43 @@ export const switchLayoutModeAtom = atom(null, (get, set) => {
 export const lockBlockAtom = atom(null, (_get, set) => {
   set(blockListAtom, (prev) => prev.map((item) => ({ ...item, lock: true })));
 });
+
+export const quickBlockAddAtom = atom(null, (_get, set) => {
+  set(openSearchModalAtom, async (_channels) => {
+    const channels: BlockChannel[] = [];
+
+    for (const item of _channels) {
+      channels.push(await set(fetchChzzkChannelAtom, item.uuid));
+    }
+
+    set(pushChannelWithDefaultPresetAtom, channels);
+  });
+});
+
+export const sendBlockOptionsAtom = atom(
+  null,
+  async (get, _set, id: number) => {
+    const messageClient = get(messageClientAtom);
+    if (messageClient === null) return;
+
+    const blockList = get(blockListAtom);
+    const block = blockList.find((item) => item.id === id);
+
+    if (block === undefined) return;
+
+    const websiteId = messageClient.id.id;
+
+    messageClient.send(
+      "video-style",
+      {
+        objectFit: block.options.objectFit,
+        objectPosition: block.options.objectPosition,
+      },
+      {
+        type: "content",
+        websiteId: websiteId,
+        blockId: id,
+      }
+    );
+  }
+);

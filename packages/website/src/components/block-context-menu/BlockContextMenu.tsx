@@ -4,6 +4,7 @@ import Channel from "@web/components/block-context-menu/Channel.tsx";
 import MixerItem from "@web/components/block-context-menu/MixerItem.tsx";
 import MixerQuality from "@web/components/block-context-menu/MixerQuality.tsx";
 import MixerVolume from "@web/components/block-context-menu/MixerVolume.tsx";
+import PositionMenu from "@web/components/block-context-menu/PositionMenu.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { blockListAtom } from "@web/librarys/app.ts";
 import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts";
@@ -65,6 +66,18 @@ function BlockContextMenu() {
     if (blockContextMenuOptions === null) return;
     if (ref.current === null) return;
 
+    const find = blockList.find(
+      (block) => block.id === blockContextMenuOptions.id
+    );
+    if (find === undefined) return;
+
+    setBlockContextMenu(find);
+  }, [ref, blockList, blockContextMenuOptions]);
+
+  useEffect(() => {
+    if (blockContextMenuOptions === null) return;
+    if (ref.current === null) return;
+
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
 
@@ -87,14 +100,7 @@ function BlockContextMenu() {
       left: x,
       top: y,
     });
-
-    const find = blockList.find(
-      (block) => block.id === blockContextMenuOptions.id
-    );
-    if (find === undefined) return;
-
-    setBlockContextMenu(find);
-  }, [ref, blockList, blockContextMenuOptions]);
+  }, [ref, blockContextMenuOptions, blockContextMenu]);
 
   const onContextMenu: React.MouseEventHandler = (event) => {
     event.preventDefault();
@@ -168,6 +174,7 @@ function BlockContextMenu() {
   const mixer = useMemo(() => {
     if (blockContextMenu === null) return null;
     if (blockContextMenu.type !== "stream") return null;
+    if (messageClient === null) return null;
 
     return (
       <>
@@ -177,7 +184,7 @@ function BlockContextMenu() {
         <Divider />
       </>
     );
-  }, [blockContextMenu]);
+  }, [messageClient, blockContextMenu]);
 
   return (
     <BlockContextMenuContext value={blockContextMenu}>
@@ -189,6 +196,7 @@ function BlockContextMenu() {
       >
         <Channel />
         {mixer}
+        <PositionMenu />
         <ButtonMenu />
       </Container>
     </BlockContextMenuContext>

@@ -56,6 +56,15 @@ export type BlockStatus = {
   error: null | "adult" | "offline" | "error";
 };
 
+export type BlockOptions = {
+  zoom: number;
+  objectFit: "contain" | "cover" | "fill";
+  objectPosition: {
+    horizontal: "left" | "center" | "right";
+    vertical: "top" | "center" | "bottom";
+  };
+};
+
 export type Block = {
   id: number;
   type: BlockType;
@@ -64,6 +73,7 @@ export type Block = {
   channel: BlockChannel | null;
   mixer: BlockMixer;
   player: BlockPlayer;
+  options: BlockOptions;
 };
 
 export type PreviewBlockStatus = "create" | "modify" | "inactive";

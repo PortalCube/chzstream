@@ -4,13 +4,14 @@ import TypeButton from "@web/components/block/edit-block/TypeButton.tsx";
 import Handle from "@web/components/block/edit-block/handle/Handle.tsx";
 import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
 import { layoutModeAtom } from "@web/librarys/app.ts";
+import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import { removeBlockAtom } from "@web/librarys/layout.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import classNames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useContext } from "react";
-import { MdClose } from "react-icons/md";
+import { useContext, useRef } from "react";
+import { MdClose, MdMenu } from "react-icons/md";
 import styled, { css } from "styled-components";
 
 const Container = styled.div<{ $dpr: number }>`
@@ -43,7 +44,7 @@ const Container = styled.div<{ $dpr: number }>`
   }
 `;
 
-const IconGroup = styled.div`
+const ButtonGroup = styled.div`
   position: absolute;
 
   transition:
@@ -62,7 +63,14 @@ const IconGroup = styled.div`
   gap: 16px;
 `;
 
-const RemoveButton = styled.button`
+const IconButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+
+  align-items: center;
+`;
+
+const IconButton = styled.button`
   border: none;
   border-radius: 4px;
   padding: 4px;
@@ -71,16 +79,12 @@ const RemoveButton = styled.button`
   align-items: center;
   justify-content: center;
 
-  color: rgba(255, 255, 255, 1);
   cursor: pointer;
 
+  color: rgba(255, 255, 255, 1);
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
-  background-color: rgb(207, 58, 61);
 
   transition: background-color 100ms;
-  &:hover {
-    background-color: rgb(234, 72, 75);
-  }
 
   & > svg {
     transition:
@@ -97,17 +101,36 @@ const RemoveButton = styled.button`
       height: 20px;
     `)}
 
-    ${Mixin.block.less.small(css`
+  ${Mixin.block.less.small(css`
       width: 16px;
       height: 16px;
     `)}
   }
 `;
 
+const RemoveButton = styled(IconButton)`
+  background-color: rgb(207, 58, 61);
+
+  &:hover {
+    background-color: rgb(234, 72, 75);
+  }
+`;
+
+const MenuButton = styled(IconButton)`
+  background-color: rgb(34, 34, 34);
+
+  &:hover {
+    background-color: rgb(48, 48, 48);
+  }
+`;
+
 function EditBlock({}: EditBlockProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  const { id } = useContext(BlockContext);
   const layoutMode = useAtomValue(layoutModeAtom);
   const removeBlock = useSetAtom(removeBlockAtom);
-  const { id } = useContext(BlockContext);
+  const setBlockContextMenuOptions = useSetAtom(blockContextMenuOptionsAtom);
 
   const displayPixelRatio = useAtomValue(displayPixelRatioAtom);
 
@@ -117,16 +140,34 @@ function EditBlock({}: EditBlockProps) {
     removeBlock(id);
   };
 
+  const onMenuClick = () => {
+    if (ref.current === null) return;
+
+    const { left, bottom } = ref.current.getBoundingClientRect();
+
+    setBlockContextMenuOptions({
+      id,
+      x: left,
+      y: bottom + 8,
+      contextMenu: false,
+    });
+  };
+
   return (
     <Container className={className} $dpr={displayPixelRatio}>
       <Background />
       <Handle />
-      <IconGroup>
+      <ButtonGroup>
         <TypeButton />
-        <RemoveButton onClick={onRemoveClick}>
-          <MdClose />
-        </RemoveButton>
-      </IconGroup>
+        <IconButtonGroup>
+          <MenuButton onClick={onMenuClick} ref={ref}>
+            <MdMenu />
+          </MenuButton>
+          <RemoveButton onClick={onRemoveClick}>
+            <MdClose />
+          </RemoveButton>
+        </IconButtonGroup>
+      </ButtonGroup>
       <Channel />
     </Container>
   );

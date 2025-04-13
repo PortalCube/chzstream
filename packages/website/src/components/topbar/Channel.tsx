@@ -123,7 +123,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
 
   const onClick: React.MouseEventHandler = async () => {
     const channel = await fetchChzzkChannel(uuid);
-    pushChannelWithDefaultPreset(channel);
+    pushChannelWithDefaultPreset([channel]);
   };
 
   const onPointerDown: React.PointerEventHandler = (event) => {

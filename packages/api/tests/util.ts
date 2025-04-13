@@ -16,7 +16,7 @@ export const TEST_CHANNELS = [
   },
 ];
 
-export const TEST_DELAY = 200;
+export const TEST_DELAY = 500;
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

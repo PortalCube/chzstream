@@ -1,13 +1,13 @@
-import { useAtom, useSetAtom } from "jotai";
-import { useMemo } from "react";
-import { MdAdd, MdRefresh } from "react-icons/md";
+import Channel from "@web/components/topbar/Channel.tsx";
+import ChannelButton from "@web/components/topbar/ChannelButton.tsx";
 import { favoriteChannelsAtom } from "@web/librarys/app.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "@web/scripts/storage.ts";
 import { Mixin } from "@web/scripts/styled.ts";
+import { useAtom, useSetAtom } from "jotai";
+import { useMemo } from "react";
+import { MdAdd, MdRefresh } from "react-icons/md";
 import styled, { css } from "styled-components";
-import Channel from "@web/components/topbar/Channel.tsx";
-import ChannelButton from "@web/components/topbar/ChannelButton.tsx";
 
 const Container = styled.div`
   display: flex;
@@ -36,10 +36,12 @@ function ChannelGroup() {
   ));
 
   const onAddButtonClick: React.MouseEventHandler = () => {
-    openSearchModal((channel) => {
-      if (favoriteChannels.includes(channel.uuid) === false) {
-        setFavoriteChannels([...favoriteChannels, channel.uuid]);
-      }
+    openSearchModal((channels) => {
+      const items = channels
+        .filter((channel) => favoriteChannels.includes(channel.uuid) === false)
+        .map((channel) => channel.uuid);
+
+      setFavoriteChannels([...favoriteChannels, ...items]);
     });
   };
 

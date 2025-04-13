@@ -1,7 +1,12 @@
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
-import { useSearchModal } from "@web/librarys/search.ts";
+import {
+  searchCategoryAtom,
+  channelResultAtom,
+  liveResultAtom,
+} from "@web/librarys/search.ts";
 import classNames from "classnames";
+import { useAtom, useAtomValue } from "jotai";
 import { MdNavigateNext } from "react-icons/md";
 import styled from "styled-components";
 
@@ -9,6 +14,8 @@ const Container = styled.div`
   width: 100%;
 
   box-sizing: border-box;
+
+  flex-grow: 1;
 
   display: flex;
   flex-direction: column;
@@ -61,7 +68,11 @@ const Spliter = styled.div`
 `;
 
 function SearchSummary({}: SearchSummaryProps) {
-  const { channelResult, liveResult, category, setCategory } = useSearchModal();
+  const [category, setCategory] = useAtom(searchCategoryAtom);
+
+  const channelResult = useAtomValue(channelResultAtom);
+  const liveResult = useAtomValue(liveResultAtom);
+
   const className = classNames({
     hidden: category !== "summary",
   });
@@ -75,7 +86,7 @@ function SearchSummary({}: SearchSummaryProps) {
           <MdNavigateNext size={24} />
         </MoreButton>
       </Section>
-      <SearchList preview size={4} items={channelResult} />
+      <SearchList preview size={3} items={channelResult} type="channel" />
       <Spliter />
       <Section>
         <Category name="라이브" interactable={false} />
@@ -84,7 +95,7 @@ function SearchSummary({}: SearchSummaryProps) {
           <MdNavigateNext size={24} />
         </MoreButton>
       </Section>
-      <SearchList preview size={4} items={liveResult} />
+      <SearchList preview size={6} items={liveResult} type="live" />
     </Container>
   );
 }

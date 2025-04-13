@@ -36,6 +36,8 @@ const Container = styled.div<{ $dpr: number }>`
   align-items: center;
   justify-content: center;
 
+  z-index: 1;
+
   ${Mixin.block.greater.extraLarge(css`
     padding: 48px 36px;
     gap: 16px;

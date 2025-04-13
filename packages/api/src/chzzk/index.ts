@@ -15,3 +15,7 @@ export type {
   ChzzkSearchLiveResponse,
   ChzzkSearchLiveOptions,
 } from "@api/chzzk/endpoints/search-live.ts";
+export type {
+  ChzzkSearchTagResponse,
+  ChzzkSearchTagOptions,
+} from "@api/chzzk/endpoints/search-tag.ts";

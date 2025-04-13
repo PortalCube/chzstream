@@ -1,4 +1,4 @@
-import MixerSlider from "@web/components/block-context-menu/MixerSlider.tsx";
+import ButtonMenuSlider from "@web/components/block-context-menu/ButtonMenuSlider";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import { setQualityAtom, updateQualityAtom } from "@web/librarys/mixer.ts";
 import { useSetAtom } from "jotai";
@@ -38,18 +38,17 @@ function MixerQuality({}: MixerQualityProps) {
     updateQuality(id);
   };
 
-  return (
-    <MixerSlider
-      icon={MdSmartDisplay}
-      value={quality}
-      displayValue={displayValue}
-      min={STEP_MIN}
-      max={STEP_MAX}
-      step={1}
-      scrollStep={1}
-      onInput={onInput}
-    />
-  );
+  const options = {
+    icon: MdSmartDisplay,
+    value: quality,
+    displayValue,
+    min: STEP_MIN,
+    max: STEP_MAX,
+    step: 1,
+    onInput,
+  };
+
+  return <ButtonMenuSlider options={options} />;
 }
 
 type MixerQualityProps = {};

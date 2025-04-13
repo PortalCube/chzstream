@@ -115,34 +115,48 @@ export const applyPresetItemAtom = atom(
 
 export const pushChannelWithDefaultPresetAtom = atom(
   null,
-  async (get, set, channel: BlockChannel) => {
-    const streamBlock = get(blockListAtom).filter(
-      (item) => item.type === "stream"
+  async (get, set, channels: BlockChannel[]) => {
+    // 비어있는 스트리밍 블록을 찾고, 존재하면 그 블록에 채널을 넣기
+    const blankStreamBlocks = get(blockListAtom).filter(
+      (item) => item.type === "stream" && item.channel === null
     );
 
-    // 비어있는 스트리밍 블록을 찾고, 존재하면 그 블록에 채널을 넣기
-    const blankStreamBlock = streamBlock.find((item) => item.channel === null);
-    if (blankStreamBlock !== undefined) {
-      const id = blankStreamBlock.id;
+    channels.splice(0, blankStreamBlocks.length).forEach((channel, index) => {
+      const id = blankStreamBlocks[index].id;
       set(setBlockChannelAtom, id, channel);
-      return;
-    }
+    });
+
+    if (channels.length === 0) return;
 
     // 현재 활성화 블록 갯수 체크
-    const channelCount = streamBlock.filter(
-      (item) => item.channel !== null
+    const channelCount = get(blockListAtom).filter(
+      (item) => item.type === "stream" && item.channel !== null
     ).length;
 
-    // 활성화 블록 갯수 + 1개 블록을 갖는 프리셋을 찾기
-    const preset = get(presetListAtom).find(
-      (item) => item.streamCount === channelCount + 1 && item.chatCount === 0
-    );
+    // 활성화 블록 갯수 + n개 블록을 갖는 프리셋을 찾기
+
+    let preset: PresetItem | undefined;
+
+    let i = 1;
+    while (i <= channels.length) {
+      // 프리셋을 찾기 위해, 현재 활성화된 블록 갯수 + n개 블록을 갖는 프리셋을 찾기
+      const find = get(presetListAtom).find(
+        (item) => item.streamCount === channelCount + i && item.chatCount === 0
+      );
+
+      if (find === undefined) {
+        break;
+      }
+
+      preset = find;
+      i++;
+    }
 
     // 프리셋이 존재하지 않으면, 아무것도 안함
     if (preset === undefined) return;
 
     // 프리셋이 존재한다면, 전달받은 채널과 함께 적용
-    set(applyPresetItemAtom, preset, [channel]);
+    set(applyPresetItemAtom, preset, channels);
   }
 );
 

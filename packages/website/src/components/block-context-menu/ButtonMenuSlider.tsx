@@ -112,18 +112,20 @@ const Text = styled.p`
   }
 `;
 
-function MixerSlider({
-  icon: Icon,
-  value,
-  displayValue,
-  min,
-  max,
-  step,
-  scrollStep = 1,
-  mute = false,
-  onInput,
-  onIconClick,
-}: MixerSliderProps) {
+function ButtonMenuSlider({ options, className }: ButtonMenuSliderProps) {
+  const {
+    icon: Icon,
+    value,
+    displayValue,
+    min,
+    max,
+    step,
+    scrollStep = step,
+    mute = false,
+    onInput,
+    onIconClick,
+  } = options;
+
   const percentage = useMemo(
     () => ((value - min) / (max - min)) * 100,
     [value, min, max]
@@ -171,7 +173,7 @@ function MixerSlider({
   });
 
   return (
-    <Container>
+    <Container className={className}>
       <IconButton className={iconButtonClassNames} onClick={onIconClick}>
         <Icon />
       </IconButton>
@@ -194,17 +196,20 @@ function MixerSlider({
   );
 }
 
-type MixerSliderProps = {
-  icon: React.ElementType;
-  value: number;
-  displayValue: string;
-  min: number;
-  max: number;
-  step: number;
-  scrollStep?: number;
-  mute?: boolean;
-  onInput: (value: number) => void;
-  onIconClick?: React.MouseEventHandler;
+type ButtonMenuSliderProps = {
+  options: {
+    icon: React.ElementType;
+    value: number;
+    displayValue: string;
+    min: number;
+    max: number;
+    step: number;
+    scrollStep?: number;
+    mute?: boolean;
+    onInput: (value: number) => void;
+    onIconClick?: React.MouseEventHandler;
+  };
+  className?: string;
 };
 
-export default MixerSlider;
+export default ButtonMenuSlider;

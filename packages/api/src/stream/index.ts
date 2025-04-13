@@ -23,3 +23,8 @@ export type {
   StreamSearchLiveResponse,
   StreamSearchLiveOptions,
 } from "@api/stream/endpoints/search-live.ts";
+
+export type {
+  StreamSearchTagResponse,
+  StreamSearchTagOptions,
+} from "@api/stream/endpoints/search-tag.ts";

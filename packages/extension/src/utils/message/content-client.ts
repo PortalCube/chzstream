@@ -6,6 +6,7 @@ import {
   RequestPayload,
   ResponsePayload,
 } from "@chzstream/message";
+import { setVideoStyle } from "@extension/utils/chzzk-embed-player.ts";
 
 export let contentClient: ContentClient;
 
@@ -25,6 +26,7 @@ export async function initializeClientMessage() {
 
   // 이벤트 리스너 등록
   contentClient.on("video-status", onPlayerControlMessage);
+  contentClient.on("video-style", onVideoStyleMessage);
 }
 
 export function send<T extends PayloadType>(type: T, data: RequestPayload<T>) {
@@ -55,4 +57,8 @@ export function reply<T extends PayloadType>(
 
 function onPlayerControlMessage(message: RequestMessage<"video-status">) {
   setPlayerControl(message.data);
+}
+
+function onVideoStyleMessage(message: RequestMessage<"video-style">) {
+  setVideoStyle(message.data);
 }

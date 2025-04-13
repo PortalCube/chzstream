@@ -1,4 +1,4 @@
-import MixerSlider from "@web/components/block-context-menu/MixerSlider.tsx";
+import ButtonMenuSlider from "@web/components/block-context-menu/ButtonMenuSlider";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import {
   setMuteAtom,
@@ -99,20 +99,20 @@ function MixerVolume({}: MixerVolumeProps) {
     }
   };
 
-  return (
-    <MixerSlider
-      icon={icon}
-      value={volume}
-      displayValue={displayValue}
-      min={0}
-      max={100}
-      step={1}
-      scrollStep={5}
-      mute={mute}
-      onInput={onInput}
-      onIconClick={onIconClick}
-    />
-  );
+  const options = {
+    icon,
+    value: volume,
+    displayValue,
+    min: 0,
+    max: 100,
+    step: 1,
+    scrollStep: 5,
+    mute,
+    onInput,
+    onIconClick,
+  };
+
+  return <ButtonMenuSlider options={options} />;
 }
 
 type MixerVolumeProps = {};

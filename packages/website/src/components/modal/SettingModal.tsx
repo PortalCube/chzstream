@@ -41,6 +41,18 @@ const Description = styled.p`
   color: rgba(200, 200, 200, 1);
 `;
 
+const Version = styled.p`
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(200, 200, 200, 1);
+`;
+
+const BUILD_TIMESTAMP = new Date(
+  import.meta.env.VITE_BUILD_TIMESTAMP
+).toLocaleString();
+const BUILD_COMMIT_SHA = import.meta.env.VITE_BUILD_COMMIT_SHA;
+const BUILD_VERSION = import.meta.env.VITE_BUILD_VERSION;
+
 function SettingModal({}: SettingModalProps) {
   const modal = useAtomValue(modalAtom);
 
@@ -48,10 +60,14 @@ function SettingModal({}: SettingModalProps) {
     disable: modal.type !== "setting",
   });
 
+  const buildString = [BUILD_VERSION, BUILD_COMMIT_SHA, BUILD_TIMESTAMP].join(
+    " - "
+  );
+
   return (
     <Container className={className}>
       <Title>준비중인 기능입니다</Title>
-      <Description>설정 패널은 곧 추가될 예정입니다.</Description>
+      <Version>{buildString}</Version>
     </Container>
   );
 }

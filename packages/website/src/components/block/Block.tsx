@@ -10,7 +10,10 @@ import { blockContextMenuOptionsAtom } from "@web/librarys/block-context-menu.ts
 import type { Block } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 import { dragStatusAtom } from "@web/librarys/drag-and-drop.ts";
-import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
+import {
+  modifyBlockStatusAtom,
+  sendBlockOptionsAtom,
+} from "@web/librarys/layout.ts";
 import { applyPlayerControlAtom } from "@web/librarys/mixer.ts";
 import { getGridStyle } from "@web/scripts/grid-layout.ts";
 import classNames from "classnames";
@@ -52,7 +55,7 @@ const Container = styled.div`
 `;
 
 function Block({ block, gridRef }: BlockProps) {
-  const { id, position } = block;
+  const { id, position, options } = block;
   const ref = useRef<HTMLDivElement>(null);
   const messageClient = useAtomValue(messageClientAtom);
   const [mouseIsTop, setMouseTop] = useAtom(mouseIsTopAtom);
@@ -64,6 +67,7 @@ function Block({ block, gridRef }: BlockProps) {
 
   const modifyBlockStatus = useSetAtom(modifyBlockStatusAtom);
   const applyPlayerControl = useSetAtom(applyPlayerControlAtom);
+  const sendBlockOptions = useSetAtom(sendBlockOptionsAtom);
   const dragStatus = useAtomValue(dragStatusAtom);
 
   // TODO: useMessageListenerAtom 만들기 (1)
@@ -114,10 +118,10 @@ function Block({ block, gridRef }: BlockProps) {
       if (gridRef.current === null) return;
 
       if (blockContextMenuOptions === null) {
-        const x = data.clientX + ref.current.offsetLeft;
-        const y = data.clientY + ref.current.offsetTop + gridTop;
+        const x = data.clientX * options.zoom + ref.current.offsetLeft;
+        const y = data.clientY * options.zoom + ref.current.offsetTop + gridTop;
 
-        setBlockContextMenuOptions({ id, x, y });
+        setBlockContextMenuOptions({ id, x, y, contextMenu: true });
       } else {
         setBlockContextMenuOptions(null);
       }
@@ -149,6 +153,7 @@ function Block({ block, gridRef }: BlockProps) {
       if (data.type === "ready") {
         modifyBlockStatus(id, { loading: false, error: null });
         applyPlayerControl(id);
+        sendBlockOptions(id);
       }
 
       // 플레이어가 종료됨
@@ -185,6 +190,7 @@ function Block({ block, gridRef }: BlockProps) {
         id,
         x: event.clientX,
         y: event.clientY,
+        contextMenu: true,
       });
     } else {
       setBlockContextMenuOptions(null);
