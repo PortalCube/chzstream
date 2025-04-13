@@ -105,7 +105,7 @@ function ButtonMenu() {
       {
         id: "quick-add",
         icon: MdAdd,
-        title: "빠른 추가",
+        title: "채널 추가",
         onClick: quickBlockAdd,
       },
       {

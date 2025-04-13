@@ -201,7 +201,7 @@ function Topbar() {
       {
         key: "quick-add",
         Icon: MdAdd,
-        text: "빠른 추가",
+        text: "채널 추가",
         onClick: quickBlockAdd,
         filter: ["modify", "view"],
       },
