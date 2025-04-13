@@ -66,6 +66,18 @@ function BlockContextMenu() {
     if (blockContextMenuOptions === null) return;
     if (ref.current === null) return;
 
+    const find = blockList.find(
+      (block) => block.id === blockContextMenuOptions.id
+    );
+    if (find === undefined) return;
+
+    setBlockContextMenu(find);
+  }, [ref, blockList, blockContextMenuOptions]);
+
+  useEffect(() => {
+    if (blockContextMenuOptions === null) return;
+    if (ref.current === null) return;
+
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
 
@@ -88,14 +100,7 @@ function BlockContextMenu() {
       left: x,
       top: y,
     });
-
-    const find = blockList.find(
-      (block) => block.id === blockContextMenuOptions.id
-    );
-    if (find === undefined) return;
-
-    setBlockContextMenu(find);
-  }, [ref, blockList, blockContextMenuOptions]);
+  }, [ref, blockContextMenuOptions, blockContextMenu]);
 
   const onContextMenu: React.MouseEventHandler = (event) => {
     event.preventDefault();
