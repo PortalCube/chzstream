@@ -68,7 +68,7 @@ function MultiSelectCheckBox({}: MultiSelectCheckBoxProps) {
 
   return (
     <Container className={className} onClick={onClick}>
-      다중 선택
+      여러개 선택
       <Icon size={24} />
     </Container>
   );
