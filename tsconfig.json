@@ -5,6 +5,7 @@
     { "path": "./packages/message" },
     { "path": "./packages/url" },
     { "path": "./packages/website" },
-    { "path": "./packages/extension" }
+    { "path": "./packages/extension" },
+    { "path": "./packages/workers" }
   ]
 }
