@@ -9,6 +9,7 @@
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "test": "vitest",
+    "wrangler": "wrangler",
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
@@ -16,5 +17,8 @@
     "typescript": "^5.8.3",
     "vitest": "~3.0.7",
     "wrangler": "^4.10.0"
+  },
+  "dependencies": {
+    "path-to-regexp": "^8.2.0"
   }
 }
