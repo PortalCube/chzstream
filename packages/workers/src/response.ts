@@ -17,3 +17,11 @@ export function createResponse(
 ) {
   return new Response(response, { status, headers: cors(request) });
 }
+
+export function createNotFoundResponse(request: Request<unknown, unknown>) {
+  return createJSONResponse(request, {
+    status: 404,
+    message: "Resource not found.",
+    body: null,
+  });
+}

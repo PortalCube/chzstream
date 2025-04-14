@@ -1,7 +1,11 @@
 import { defaultRoute, helloRoute } from "./api.ts";
 import { createShareLayout, viewShareLayout } from "./share.ts";
 import { match } from "path-to-regexp";
-import { createJSONResponse, createResponse } from "./response.ts";
+import {
+  createJSONResponse,
+  createNotFoundResponse,
+  createResponse,
+} from "./response.ts";
 
 const routers: Route[] = [
   {
@@ -45,10 +49,6 @@ export default {
       }
     }
 
-    return createJSONResponse(request, {
-      status: 404,
-      message: "Not Found",
-      body: null,
-    });
+    return createNotFoundResponse(request);
   },
 } satisfies ExportedHandler<Env>;

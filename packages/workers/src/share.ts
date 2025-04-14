@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { createJSONResponse } from "./response.ts";
+import { createJSONResponse, createNotFoundResponse } from "./response.ts";
 
 /**
  * 새로운 ID를 생성하고 반환합니다.
@@ -64,15 +64,17 @@ export const viewShareLayout: Endpoint = async (
   ctx,
   params
 ): Promise<Response> => {
-  const results = await env.DB.prepare(
-    "SELECT * FROM shared_layout WHERE id = ?1"
-  )
+  const row = await env.DB.prepare("SELECT * FROM shared_layout WHERE id = ?1")
     .bind(params.id)
     .first();
+
+  if (row === null) {
+    return createNotFoundResponse(request);
+  }
 
   return createJSONResponse(request, {
     status: 200,
     message: "ok",
-    body: results,
+    body: row,
   });
 };
