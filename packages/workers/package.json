@@ -10,6 +10,7 @@
     "start": "wrangler dev",
     "test": "vitest",
     "wrangler": "wrangler",
+    "execute": "wrangler d1 execute chzstream-d1",
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
@@ -19,6 +20,7 @@
     "wrangler": "^4.10.0"
   },
   "dependencies": {
+    "nanoid": "^5.1.5",
     "path-to-regexp": "^8.2.0"
   }
 }

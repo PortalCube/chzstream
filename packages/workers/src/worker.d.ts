@@ -1,10 +1,22 @@
-type RawRoute = ExportedHandlerFetchHandler<Env, unknown>;
+type RawEndpoint = ExportedHandlerFetchHandler<Env, unknown>;
 
-type Route = RawRoute extends (...a: any[]) => infer R
+type Endpoint = RawEndpoint extends (...a: any[]) => infer R
   ? (
       ...a: [
-        ...U: Parameters<RawRoute>,
+        ...U: Parameters<RawEndpoint>,
         params: Partial<Record<string, string | string[]>>,
       ]
     ) => R
   : never;
+
+type Route = {
+  method: "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS";
+  path: string;
+  handler: Endpoint;
+};
+
+type Result = {
+  status: number;
+  message: string;
+  body: unknown;
+};

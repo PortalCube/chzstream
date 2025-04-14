@@ -1,25 +1,23 @@
 import { defaultRoute, helloRoute } from "./api.ts";
-import { createShareLayout, listShareLayout, viewShareLayout } from "./d1.ts";
+import { createShareLayout, viewShareLayout } from "./share.ts";
 import { match } from "path-to-regexp";
+import { createJSONResponse, createResponse } from "./response.ts";
 
-const routers: {
-  method: "GET" | "POST" | "PUT" | "DELETE";
-  path: string;
-  handler: Route;
-}[] = [
+const routers: Route[] = [
   {
-    method: "GET",
-    path: "/d1/create",
+    // CORS preflight request
+    method: "OPTIONS",
+    path: "*path",
+    handler: (request) => createResponse(request, null, 200),
+  },
+  {
+    method: "POST",
+    path: "/share",
     handler: createShareLayout,
   },
   {
     method: "GET",
-    path: "/d1/list",
-    handler: listShareLayout,
-  },
-  {
-    method: "GET",
-    path: "/d1/:id",
+    path: "/share/:id",
     handler: viewShareLayout,
   },
   {
@@ -47,9 +45,10 @@ export default {
       }
     }
 
-    return Response.json(
-      { code: 404, message: "Sorry, we couldn’t find that resource." },
-      { status: 404 }
-    );
+    return createJSONResponse(request, {
+      status: 404,
+      message: "Not Found",
+      body: null,
+    });
   },
 } satisfies ExportedHandler<Env>;

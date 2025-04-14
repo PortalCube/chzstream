@@ -1,0 +1,1 @@
+SELECT * FROM shared_layout;
