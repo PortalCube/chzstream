@@ -11,6 +11,7 @@
     "api": "pnpm -F @chzstream/api",
     "url": "pnpm -F @chzstream/url",
     "msg": "pnpm -F @chzstream/message",
+    "wks": "pnpm -F @chzstream/workers",
     "dev": "pnpm -r dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",

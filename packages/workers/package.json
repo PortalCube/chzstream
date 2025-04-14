@@ -1,0 +1,20 @@
+{
+  "name": "@chzstream/workers",
+  "version": "0.24.0",
+  "type": "module",
+  "author": "PortalCube",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.7.5",
+    "typescript": "^5.8.3",
+    "vitest": "~3.0.7",
+    "wrangler": "^4.10.0"
+  }
+}
