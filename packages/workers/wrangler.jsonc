@@ -10,4 +10,11 @@
   "dev": {
     "port": 5295,
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chzstream-d1",
+      "database_id": "2ea5abef-c49a-4251-b23d-ab7a8395d5b3",
+    },
+  ],
 }
