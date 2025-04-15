@@ -1,4 +1,4 @@
-import { cors } from "./cors.ts";
+import { cors } from "@workers/cors.ts";
 
 export function createJSONResponse(
   request: Request<unknown, unknown>,

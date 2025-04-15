@@ -25,5 +25,5 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo"
   },
   "exclude": ["test"],
-  "include": ["worker-configuration.d.ts", "src/**/*.ts"]
+  "include": ["vite.config.ts", "worker-configuration.d.ts", "src/**/*.ts"]
 }

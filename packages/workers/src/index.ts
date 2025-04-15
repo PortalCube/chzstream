@@ -1,11 +1,7 @@
-import { defaultRoute, helloRoute } from "./api.ts";
-import { createShareLayout, viewShareLayout } from "./share.ts";
+import { defaultRoute, helloRoute } from "@workers/api.ts";
+import { createNotFoundResponse, createResponse } from "@workers/response.ts";
+import { createShareLayout, viewShareLayout } from "@workers/share.ts";
 import { match } from "path-to-regexp";
-import {
-  createJSONResponse,
-  createNotFoundResponse,
-  createResponse,
-} from "./response.ts";
 
 const routers: Route[] = [
   {

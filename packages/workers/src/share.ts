@@ -1,5 +1,8 @@
 import { nanoid } from "nanoid";
-import { createJSONResponse, createNotFoundResponse } from "./response.ts";
+import {
+  createJSONResponse,
+  createNotFoundResponse,
+} from "@workers/response.ts";
 
 /**
  * 새로운 ID를 생성하고 반환합니다.

@@ -1,4 +1,5 @@
-import { createJSONResponse } from "./response.ts";
+import { createJSONResponse } from "@workers/response.ts";
+import { StreamClient } from "@chzstream/api";
 
 export const defaultRoute: Endpoint = async (
   request,
@@ -18,9 +19,15 @@ export const helloRoute: Endpoint = async (
   ctx,
   params
 ): Promise<Response> => {
+  const client = new StreamClient();
+
+  const response = await client.getLiveList({
+    platform: "chzzk",
+  });
+
   return createJSONResponse(request, {
     status: 200,
     message: "ok",
-    body: `Hello, ${params.name}!`,
+    body: response,
   });
 };
