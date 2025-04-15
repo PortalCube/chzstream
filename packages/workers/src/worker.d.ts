@@ -13,6 +13,7 @@ type Route = {
   method: "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS";
   path: string;
   handler: Endpoint;
+  ttl: number | null;
 };
 
 type Result = {
