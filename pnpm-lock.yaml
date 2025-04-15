@@ -243,6 +243,12 @@ importers:
 
   packages/workers:
     dependencies:
+      '@chzstream/api':
+        specifier: workspace:^
+        version: link:../api
+      '@chzstream/url':
+        specifier: workspace:^
+        version: link:../url
       nanoid:
         specifier: ^5.1.5
         version: 5.1.5
