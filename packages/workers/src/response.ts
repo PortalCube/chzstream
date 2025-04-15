@@ -25,3 +25,14 @@ export function createNotFoundResponse(request: Request<unknown, unknown>) {
     body: null,
   });
 }
+
+export function createBadRequestResponse(
+  request: Request<unknown, unknown>,
+  target: string
+) {
+  return createJSONResponse(request, {
+    status: 400,
+    message: `Bad request. "${target}" is not valid.`,
+    body: null,
+  });
+}

@@ -1,16 +1,24 @@
-import { defaultRoute, helloRoute } from "@workers/api.ts";
+import {
+  getChannelRoute,
+  getLiveListRoute,
+  searchChannelRoute,
+  searchLiveRoute,
+  searchTagRoute,
+} from "@workers/api.ts";
 import { createNotFoundResponse, createResponse } from "@workers/response.ts";
 import { createShareLayout, viewShareLayout } from "@workers/share.ts";
 import { match } from "path-to-regexp";
 
 const routers: Route[] = [
+  // CORS preflight request
   {
-    // CORS preflight request
     method: "OPTIONS",
     path: "*path",
     handler: (request) => createResponse(request, null, 200),
     ttl: 60,
   },
+
+  // URL Share endpoints
   {
     method: "POST",
     path: "/share",
@@ -23,17 +31,37 @@ const routers: Route[] = [
     handler: viewShareLayout,
     ttl: 60,
   },
+
+  // API proxy
   {
     method: "GET",
-    path: "/",
-    handler: defaultRoute,
+    path: "/:platform/channel/:channelId",
+    handler: getChannelRoute,
     ttl: 10,
   },
   {
     method: "GET",
-    path: "/:name",
-    handler: helloRoute,
-    ttl: 5,
+    path: "/:platform/live",
+    handler: getLiveListRoute,
+    ttl: 10,
+  },
+  {
+    method: "GET",
+    path: "/:platform/search/channel",
+    handler: searchChannelRoute,
+    ttl: 10,
+  },
+  {
+    method: "GET",
+    path: "/:platform/search/live",
+    handler: searchLiveRoute,
+    ttl: 10,
+  },
+  {
+    method: "GET",
+    path: "/:platform/search/tag",
+    handler: searchTagRoute,
+    ttl: 10,
   },
 ];
 
