@@ -16,7 +16,7 @@ const schema = z.object({
       snippet: z.object({
         title: z.string(),
         description: z.string(),
-        customUrl: z.string().nullable(),
+        customUrl: z.string().optional(),
         publishedAt: z.string(),
         thumbnails: z.object({
           default: z.object({
@@ -39,7 +39,7 @@ const schema = z.object({
           title: z.string(),
           description: z.string(),
         }),
-        country: z.string().nullable(),
+        country: z.string().optional(),
       }),
       contentDetails: z.object({
         relatedPlaylists: z.object({

@@ -1,10 +1,15 @@
 import { ChzzkSearchChannelOptions } from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
 
-export type StreamSearchChannelResponse = {
-  platform: "chzzk";
-  next: Exclude<ChzzkSearchChannelOptions["next"], undefined>;
-} & {
+export type StreamSearchChannelResponse = (
+  | {
+      platform: "chzzk";
+      next: Exclude<ChzzkSearchChannelOptions["next"], undefined>;
+    }
+  | {
+      platform: "youtube";
+    }
+) & {
   result: {
     platform: Platform;
     channelId: string;
@@ -17,10 +22,15 @@ export type StreamSearchChannelResponse = {
   }[];
 };
 
-export type StreamSearchChannelOptions = {
-  platform: "chzzk";
-  next?: ChzzkSearchChannelOptions["next"];
-} & {
+export type StreamSearchChannelOptions = (
+  | {
+      platform: "chzzk";
+      next?: ChzzkSearchChannelOptions["next"];
+    }
+  | {
+      platform: "youtube";
+    }
+) & {
   query: string;
   size?: number;
 };
@@ -36,14 +46,16 @@ export async function searchChannel(
 
   if (options.platform === "chzzk") {
     return searchChannelChzzk.call(this, options);
+  } else if (options.platform === "youtube") {
+    return searchChannelYoutube.call(this, options);
   }
 
-  throw new Error(`Unsupported platform: ${options.platform}`);
+  throw new Error("Unsupported platform");
 }
 
 async function searchChannelChzzk(
   this: StreamClient,
-  options: StreamSearchChannelOptions
+  options: Extract<StreamSearchChannelOptions, { platform: "chzzk" }>
 ): Promise<StreamSearchChannelResponse> {
   const data = await this.chzzkClient.searchChannel(options);
 
@@ -61,4 +73,11 @@ async function searchChannelChzzk(
       liveStatus: item.channel.openLive,
     })),
   };
+}
+
+async function searchChannelYoutube(
+  this: StreamClient,
+  options: Extract<StreamSearchChannelOptions, { platform: "youtube" }>
+): Promise<StreamSearchChannelResponse> {
+  throw new Error("Not implemented");
 }

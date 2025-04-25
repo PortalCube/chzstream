@@ -28,10 +28,9 @@ const CLIENT_OPTIONS = {
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
   },
+  googleApiKey: import.meta.env.GOOGLE_API_KEY,
 };
 
 export const chzzkClient = new ChzzkClient(CLIENT_OPTIONS);
-export const youtubeClient = new YoutubeClient({
-  authKey: import.meta.env.GOOGLE_API_KEY,
-});
+export const youtubeClient = new YoutubeClient(CLIENT_OPTIONS);
 export const streamClient = new StreamClient(CLIENT_OPTIONS);

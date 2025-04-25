@@ -1,10 +1,13 @@
 import { ChzzkGetLiveListOptions } from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
 
-export type StreamGetLiveListResponse = {
-  platform: "chzzk";
-  next: Exclude<ChzzkGetLiveListOptions["next"], undefined>;
-} & {
+export type StreamGetLiveListResponse = (
+  | {
+      platform: "chzzk";
+      next: Exclude<ChzzkGetLiveListOptions["next"], undefined>;
+    }
+  | { platform: "youtube" }
+) & {
   result: {
     platform: Platform;
     channelId: string;
@@ -17,10 +20,13 @@ export type StreamGetLiveListResponse = {
   }[];
 };
 
-export type StreamGetLiveListOptions = {
-  platform: "chzzk";
-  next?: ChzzkGetLiveListOptions["next"];
-} & {
+export type StreamGetLiveListOptions = (
+  | {
+      platform: "chzzk";
+      next?: ChzzkGetLiveListOptions["next"];
+    }
+  | { platform: "youtube" }
+) & {
   size?: number;
 };
 
@@ -30,14 +36,16 @@ export async function getLiveList(
 ): Promise<StreamGetLiveListResponse> {
   if (options.platform === "chzzk") {
     return getLiveListChzzk.call(this, options);
+  } else if (options.platform === "youtube") {
+    return getLiveListYoutube.call(this, options);
   }
 
-  throw new Error(`Unsupported platform: ${options.platform}`);
+  throw new Error("Unsupported platform");
 }
 
 async function getLiveListChzzk(
   this: StreamClient,
-  options: StreamGetLiveListOptions
+  options: Extract<StreamGetLiveListOptions, { platform: "chzzk" }>
 ): Promise<StreamGetLiveListResponse> {
   const data = await this.chzzkClient.getLiveList(options);
 
@@ -55,4 +63,11 @@ async function getLiveListChzzk(
       liveViewer: item.concurrentUserCount,
     })),
   };
+}
+
+async function getLiveListYoutube(
+  this: StreamClient,
+  options: Extract<StreamGetLiveListOptions, { platform: "youtube" }>
+): Promise<StreamGetLiveListResponse> {
+  throw new Error("Not implemented");
 }
