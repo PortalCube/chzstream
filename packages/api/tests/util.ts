@@ -1,4 +1,5 @@
 import { ChzzkClient } from "@api/chzzk/client.ts";
+import { YoutubeClient } from "@api/youtube/client.ts";
 import { StreamClient } from "@api/stream/client.ts";
 
 export const TEST_CHANNELS = [
@@ -30,4 +31,7 @@ const CLIENT_OPTIONS = {
 };
 
 export const chzzkClient = new ChzzkClient(CLIENT_OPTIONS);
+export const youtubeClient = new YoutubeClient({
+  authKey: import.meta.env.GOOGLE_API_KEY,
+});
 export const streamClient = new StreamClient(CLIENT_OPTIONS);
