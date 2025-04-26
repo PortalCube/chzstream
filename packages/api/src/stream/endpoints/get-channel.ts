@@ -8,6 +8,7 @@ export type StreamGetChannelResponse = {
   channelImageUrl: string | null;
   channelFollower: number;
   channelVerified: boolean;
+  liveId: string | null;
   liveStatus: boolean;
   liveTitle: string | null;
   liveThumbnailUrl: string | null;
@@ -21,7 +22,7 @@ export type StreamGetChannelOptions =
     }
   | {
       platform: "youtube";
-      type: "id" | "handle"; // | "video";
+      type: "id" | "handle" | "video";
       value: string;
     };
 
@@ -56,6 +57,7 @@ async function getChannelChzzk(
     channelImageUrl: data.content.channelImageUrl,
     channelFollower: data.content.followerCount,
     channelVerified: data.content.verifiedMark,
+    liveId: null,
     liveStatus: data.content.openLive,
     liveTitle: null,
     liveThumbnailUrl: null,
@@ -65,6 +67,7 @@ async function getChannelChzzk(
   const liveData = await this.chzzkClient.getLive(options.id);
 
   if (liveData.content !== null) {
+    response.liveId = liveData.content.liveId.toString();
     response.liveTitle = liveData.content.liveTitle;
     response.liveThumbnailUrl = liveData.content.liveImageUrl;
     response.liveViewer = liveData.content.concurrentUserCount;
@@ -77,16 +80,20 @@ async function getChannelYoutube(
   this: StreamClient,
   options: Extract<StreamGetChannelOptions, { platform: "youtube" }>
 ): Promise<StreamGetChannelResponse> {
+  if (options.type === "video") {
+    return getChannelYoutubeWithVideo.call(this, options);
+  }
+
   const channelResponse = await this.youtubeClient.getChannel({
     type: options.type,
     value: options.value,
   });
 
-  if (channelResponse.items.length === 0) {
+  if (channelResponse.pageInfo.totalResults === 0) {
     return null;
   }
 
-  const channel = channelResponse.items[0];
+  const channel = channelResponse.items![0];
   const uploadPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
 
   const playlistResponse = await this.youtubeClient.getPlaylistItems({
@@ -154,6 +161,7 @@ async function getChannelYoutube(
     channelImageUrl: channel.snippet.thumbnails.medium.url,
     channelFollower: Number(channel.statistics.subscriberCount),
     channelVerified: false,
+    liveId: stream?.id ?? null,
     liveStatus: stream?.snippet?.liveBroadcastContent === "live",
     liveTitle: stream?.snippet.title ?? null,
     liveThumbnailUrl:
@@ -161,5 +169,47 @@ async function getChannelYoutube(
       stream?.snippet.thumbnails.default?.url ??
       null,
     liveViewer: Number(viewer),
+  };
+}
+
+async function getChannelYoutubeWithVideo(
+  this: StreamClient,
+  options: Extract<StreamGetChannelOptions, { platform: "youtube" }>
+): Promise<StreamGetChannelResponse> {
+  const videoResponse = await this.youtubeClient.getVideos([options.value]);
+
+  if (videoResponse.items.length === 0) {
+    return null;
+  }
+
+  const video = videoResponse.items[0];
+
+  const channelResponse = await this.youtubeClient.getChannel({
+    type: "id",
+    value: video.snippet.channelId,
+  });
+
+  const channel: (typeof channelResponse.items)[0] | undefined =
+    channelResponse.items[0];
+
+  return {
+    platform: "youtube",
+    channelId: channel?.id ?? video.snippet.channelId,
+    channelName: channel?.snippet.title ?? video.snippet.channelTitle,
+    channelDescription: channel?.snippet.description ?? "",
+    channelImageUrl:
+      channel?.snippet.thumbnails.medium.url ??
+      video.snippet.thumbnails.medium.url ??
+      null,
+    channelFollower: Number(channel?.statistics.subscriberCount ?? 0),
+    channelVerified: false,
+    liveId: video.id,
+    liveStatus: video.snippet.liveBroadcastContent === "live",
+    liveTitle: video.snippet.title,
+    liveThumbnailUrl:
+      video.snippet.thumbnails.maxres?.url ??
+      video.snippet.thumbnails.default?.url ??
+      null,
+    liveViewer: Number(video.liveStreamingDetails?.concurrentViewers ?? 0),
   };
 }
