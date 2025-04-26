@@ -1,4 +1,11 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
+import {
+  fetchStreamLiveListAtom,
+  searchStreamChannelAtom,
+  searchStreamLiveAtom,
+  searchStreamTagAtom,
+} from "@web/librarys/api-client.ts";
+import { BlockPlatform } from "@web/librarys/block.ts";
 import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
 import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
 import { atom } from "jotai";
@@ -7,11 +14,13 @@ import { atomWithImmer } from "jotai-immer";
 export type SearchCategory = "summary" | "channel" | "live" | "recommend";
 
 export type SearchItemType = {
-  uuid: string;
+  platform: BlockPlatform;
+  channelId: string;
+  liveId: string | null;
   title: string;
   description: string;
-  channelImage: string | null;
-  thumbnailImage: string | null;
+  channelImageUrl: string | null;
+  liveThumbnailUrl: string | null;
   countPrefix: string;
   count: number;
   liveStatus: boolean;
@@ -22,6 +31,9 @@ export type SearchItemResult = SearchItemType & {
   type: "channel" | "live";
   selected: boolean;
 };
+
+// 검색 플랫폼
+export const searchPlatformAtom = atom<BlockPlatform>("chzzk");
 
 // 검색 query
 export const searchQueryAtom = atom<string>("");
@@ -55,7 +67,7 @@ export const liveResultAtom = atom<SearchItemResult[]>((get) => {
     .filter((item) => item.type === "live")
     .map((item) => ({
       ...item,
-      selected: selectedItems.some((i) => i.uuid === item.uuid),
+      selected: selectedItems.some((i) => i.channelId === item.channelId),
     }));
 });
 
@@ -66,7 +78,7 @@ export const channelResultAtom = atom<SearchItemResult[]>((get) => {
     .filter((item) => item.type === "channel")
     .map((item) => ({
       ...item,
-      selected: selectedItems.some((i) => i.uuid === item.uuid),
+      selected: selectedItems.some((i) => i.channelId === item.channelId),
     }));
 });
 
@@ -109,30 +121,26 @@ export const submitSearchAtom = atom(null, async (get, set) => {
 
 // 라이브 목록을 시청자 내림차순으로 가져와 searchResultAtom에 저장합니다.
 export const searchRecommendLiveAtom = atom(null, async (get, set) => {
-  const messageClient = get(messageClientAtom);
-
-  if (messageClient === null) {
-    set(searchResultAtom, []);
-    return;
-  }
-
-  const response = await messageClient.request("stream-get-live-list", {
-    platform: "chzzk",
+  const platform = get(searchPlatformAtom);
+  const response = await set(fetchStreamLiveListAtom, {
+    platform,
     size: 50,
   });
 
-  const data = response.data.result;
+  const data = response.result;
   if (data === null) {
     set(searchResultAtom, []);
     return;
   }
 
   const items = data.map<SearchItemResult>((item) => ({
-    uuid: item.channelId,
+    platform: item.platform,
+    channelId: item.channelId,
+    liveId: null,
     title: item.channelName,
     description: item.liveTitle ?? "",
-    channelImage: item.channelImageUrl,
-    thumbnailImage: item.liveThumbnailUrl,
+    channelImageUrl: item.channelImageUrl,
+    liveThumbnailUrl: item.liveThumbnailUrl,
     countPrefix: "시청자",
     count: item.liveViewer,
     liveStatus: true,
@@ -146,28 +154,24 @@ export const searchRecommendLiveAtom = atom(null, async (get, set) => {
 
 // 주어진 query로 채널, 라이브, 태그 검색 결과를 가져와 searchResultAtom에 저장합니다.
 export const searchItemAtom = atom(null, async (get, set) => {
-  const messageClient = get(messageClientAtom);
+  const platform = get(searchPlatformAtom);
   const query = get(searchQueryAtom);
 
-  if (messageClient === null) {
-    set(searchResultAtom, []);
-    return;
-  }
-
-  // 채널 검색
-  const channelResponse = await messageClient.request("stream-search-channel", {
-    platform: "chzzk",
+  const channelResponse = await set(searchStreamChannelAtom, {
+    platform,
     query,
     size: 50,
   });
 
-  const channelResults = channelResponse.data.result.map<SearchItemResult>(
+  const channelResults = channelResponse.result.map<SearchItemResult>(
     (item) => ({
-      uuid: item.channelId,
+      platform: item.platform,
+      channelId: item.channelId,
+      liveId: null,
       title: item.channelName,
       description: item.channelDescription,
-      channelImage: item.channelImageUrl,
-      thumbnailImage: null,
+      channelImageUrl: item.channelImageUrl,
+      liveThumbnailUrl: null,
       countPrefix: "팔로우",
       count: item.channelFollower,
       liveStatus: item.liveStatus,
@@ -177,19 +181,19 @@ export const searchItemAtom = atom(null, async (get, set) => {
     })
   );
 
-  const liveResponse = await messageClient.request("stream-search-live", {
+  const liveResponse = await set(searchStreamLiveAtom, {
+    platform,
+    query,
+    size: 50,
+  });
+
+  const tagResponse = await set(searchStreamTagAtom, {
     platform: "chzzk",
     query,
     size: 50,
   });
 
-  const tagResponse = await messageClient.request("stream-search-tag", {
-    platform: "chzzk",
-    query,
-    size: 50,
-  });
-
-  const liveResults = [...liveResponse.data.result, ...tagResponse.data.result]
+  const liveResults = [...liveResponse.result, ...tagResponse.result]
     .filter(
       (item, index, array) =>
         array.findIndex((el) => el.channelId === item.channelId) === index &&
@@ -197,11 +201,13 @@ export const searchItemAtom = atom(null, async (get, set) => {
     )
     .sort((a, b) => b.liveViewer - a.liveViewer)
     .map<SearchItemResult>((item) => ({
-      uuid: item.channelId,
+      platform: item.platform,
+      channelId: item.channelId,
+      liveId: null,
       title: item.channelName,
       description: item.liveTitle ?? "",
-      channelImage: item.channelImageUrl,
-      thumbnailImage: item.liveThumbnailUrl,
+      channelImageUrl: item.channelImageUrl,
+      liveThumbnailUrl: item.liveThumbnailUrl,
       countPrefix: "시청자",
       count: item.liveViewer,
       liveStatus: true,
@@ -219,11 +225,13 @@ export const searchUuidAtom = atom(null, async (get, set, uuid: string) => {
 
   if (messageClient === null) {
     const unknownItem: SearchItemResult = {
-      uuid,
+      platform: "chzzk",
+      channelId: uuid,
+      liveId: null,
       title: `치지직 UUID ${uuid}`,
       description: `제한 모드에서는 채널의 정보를 가져올 수 없습니다.`,
-      channelImage: null,
-      thumbnailImage: null,
+      channelImageUrl: null,
+      liveThumbnailUrl: null,
       countPrefix: "팔로우",
       count: 0,
       liveStatus: false,
@@ -250,11 +258,13 @@ export const searchUuidAtom = atom(null, async (get, set, uuid: string) => {
   const data = response.data;
 
   const item: SearchItemResult = {
-    uuid: data.channelId,
+    platform: data.platform,
+    channelId: data.channelId,
+    liveId: data.liveId,
     title: data.channelName,
     description: data.channelDescription,
-    channelImage: data.channelImageUrl,
-    thumbnailImage: null,
+    channelImageUrl: data.channelImageUrl,
+    liveThumbnailUrl: data.liveThumbnailUrl,
     countPrefix: "팔로우",
     count: data.channelFollower,
     liveStatus: data.liveStatus,
@@ -273,7 +283,7 @@ export const selectItemAtom = atom(null, (get, set, item: SearchItemType) => {
   const isMultiSelect = get(isMultiSelectAtom);
 
   set(selectedItemsAtom, (draft) => {
-    const index = draft.findIndex((i) => i.uuid === item.uuid);
+    const index = draft.findIndex((i) => i.channelId === item.channelId);
     if (index === -1) {
       draft.push(item);
     } else {
@@ -299,7 +309,7 @@ export const removeSelectedItemAtom = atom(
   null,
   (_get, set, item: SearchItemType) => {
     set(selectedItemsAtom, (draft) => {
-      const index = draft.findIndex((i) => i.uuid === item.uuid);
+      const index = draft.findIndex((i) => i.channelId === item.channelId);
       if (index !== -1) {
         draft.splice(index, 1);
       }

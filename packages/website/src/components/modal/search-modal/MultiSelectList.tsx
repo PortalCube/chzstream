@@ -51,7 +51,7 @@ function MultiSelectList({}: MultiSelectListProps) {
 
   const items = [...selectedItems]
     .reverse()
-    .map((item) => <MultiSelectItem key={item.uuid} item={item} />);
+    .map((item) => <MultiSelectItem key={item.channelId} item={item} />);
 
   const emptyClassName = classNames({
     hidden: items.length > 0,

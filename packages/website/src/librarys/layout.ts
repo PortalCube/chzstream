@@ -283,7 +283,10 @@ export const quickBlockAddAtom = atom(null, (_get, set) => {
 
     for (const item of _channels) {
       channels.push(
-        await set(fetchBlockChannelAtom, { platform: "chzzk", id: item.uuid })
+        await set(fetchBlockChannelAtom, {
+          platform: "chzzk",
+          id: item.channelId,
+        })
       );
     }
 

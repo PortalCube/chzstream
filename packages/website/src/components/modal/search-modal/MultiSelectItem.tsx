@@ -69,7 +69,7 @@ function MultiSelectItem({ item }: MultiSelectItemProps) {
   const removeSelectedItem = useSetAtom(removeSelectedItemAtom);
 
   const profileImage = useMemo(
-    () => getProfileImageUrl(item.channelImage),
+    () => getProfileImageUrl(item.channelImageUrl),
     [item]
   );
 

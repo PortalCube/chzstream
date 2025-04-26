@@ -132,11 +132,11 @@ function SearchLiveItem({ item }: SearchItemProps) {
   });
 
   const profileImage = useMemo(
-    () => getProfileImageUrl(item.channelImage),
+    () => getProfileImageUrl(item.channelImageUrl),
     [item]
   );
 
-  const thumbnailUrl = (item.thumbnailImage ?? "").replace("{type}", "320");
+  const thumbnailUrl = (item.liveThumbnailUrl ?? "").replace("{type}", "320");
   const thumbnail = useLoadingImage(thumbnailUrl, loadingImageUrl);
 
   const onClick: React.MouseEventHandler = () => {

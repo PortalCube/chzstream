@@ -1,3 +1,4 @@
+import { StreamGetChannelOptions } from "@api/index.ts";
 import { fetchBlockChannelAtom } from "@web/librarys/api-client";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContext } from "@web/librarys/context";
@@ -184,12 +185,35 @@ function Channel({}: ChannelProps) {
   const onClick: React.MouseEventHandler = () => {
     openSearchModal(
       async (channels) => {
-        const uuid = channels[0].uuid;
-        const channel = await fetchBlockChannel({
-          platform: "chzzk",
-          id: uuid,
-        });
-        setBlockChannel(id, channel);
+        const channel = channels[0];
+
+        let options: StreamGetChannelOptions;
+
+        if (channel.platform === "chzzk") {
+          options = {
+            platform: "chzzk",
+            id: channel.channelId,
+          };
+        } else if (channel.platform === "youtube") {
+          if (channel.liveId !== null) {
+            options = {
+              platform: "youtube",
+              type: "video",
+              value: channel.liveId,
+            };
+          } else {
+            options = {
+              platform: "youtube",
+              type: "id",
+              value: channel.channelId,
+            };
+          }
+        } else {
+          return;
+        }
+
+        const blockChannel = await fetchBlockChannel(options);
+        setBlockChannel(id, blockChannel);
       },
       { allowMultiSelect: false }
     );

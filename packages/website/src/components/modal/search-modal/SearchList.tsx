@@ -86,7 +86,9 @@ function SearchList({ items, type, size, preview = false }: SearchListProps) {
           (_, index) =>
             index >= (page - 1) * itemCount && index < page * itemCount
         )
-        .map((item) => <SearchItem key={item.uuid} item={item} type={type} />),
+        .map((item) => (
+          <SearchItem key={item.channelId} item={item} type={type} />
+        )),
     [items, itemCount, page]
   );
 
