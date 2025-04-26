@@ -62,7 +62,7 @@ function CircleSpinner() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <g>
-          <circle cx="12" cy="12" r="9.5" fill="none" stroke-width="2"></circle>
+          <circle cx="12" cy="12" r="9.5" fill="none" strokeWidth="2"></circle>
         </g>
       </Spinner>
     </Container>
