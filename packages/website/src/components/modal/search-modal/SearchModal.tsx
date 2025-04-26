@@ -3,6 +3,7 @@ import MultiSelectCheckBox from "@web/components/modal/search-modal/MultiSelectC
 import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
 import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
 import SearchLoading from "@web/components/modal/search-modal/SearchLoading.tsx";
+import SearchPlatformDropdown from "@web/components/modal/search-modal/SearchPlatformDropdown.tsx";
 import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
 import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
 import {
@@ -78,6 +79,7 @@ function SearchModal({}: SearchModalProps) {
     <Container className={className}>
       <Header>
         <SearchBar />
+        <SearchPlatformDropdown />
         <MultiSelectCheckBox />
       </Header>
       <SearchSummary />
