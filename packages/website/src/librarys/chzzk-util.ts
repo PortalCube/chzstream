@@ -12,7 +12,7 @@ export function getProfileImageUrl(imageUrl?: unknown): string {
   return imageUrl + "?type=f120_120_na";
 }
 
-export function getChzzkUuid(url: string) {
+export function getChzzkChannelId(url: string) {
   const matchedStrings = url.match(/([0-9a-fA-F]{32,32})/g);
 
   if (matchedStrings === null) {

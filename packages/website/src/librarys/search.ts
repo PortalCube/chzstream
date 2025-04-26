@@ -1,3 +1,4 @@
+import { StreamGetChannelOptions } from "@api/index.ts";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import {
   fetchStreamChannelAtom,
@@ -7,12 +8,18 @@ import {
   searchStreamTagAtom,
 } from "@web/librarys/api-client.ts";
 import { BlockPlatform } from "@web/librarys/block.ts";
-import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
+import { getChzzkChannelId } from "@web/librarys/chzzk-util.ts";
 import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
+import { getYoutubeChannelId } from "@web/librarys/youtube-util.ts";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 
-export type SearchCategory = "summary" | "channel" | "live" | "recommend";
+export type SearchCategory =
+  | "summary"
+  | "channel"
+  | "live"
+  | "recommend"
+  | "youtube-notice";
 
 export type SearchItemType = {
   platform: BlockPlatform;
@@ -102,31 +109,63 @@ export const submitSearchAtom = atom(null, async (get, set) => {
   set(searchResultAtom, []); // 검색 결과 초기화
 
   const query = get(searchQueryAtom);
-  const uuid = getChzzkUuid(query);
+  const platform = get(searchPlatformAtom);
 
   const result: SearchItemResult[] = [];
 
-  if (query === "") {
-    // 인기 라이브 목록 가져오기
-    set(searchCategoryAtom, "recommend");
+  if (platform === "youtube") {
     set(searchLoadingAtom, true);
-
-    const recommendResult = await set(searchRecommendLiveAtom);
-    result.push(...recommendResult);
+    if (query === "") {
+      // 안내 메세지 표시
+      set(searchCategoryAtom, "youtube-notice");
+    } else {
+      // 채널 조회
+      set(searchCategoryAtom, "summary");
+    }
   } else {
-    // 전체 검색
-    set(searchCategoryAtom, "summary");
-    set(searchLoadingAtom, true);
+    if (query === "") {
+      // 인기 라이브 목록 가져오기
+      set(searchCategoryAtom, "recommend");
+      set(searchLoadingAtom, true);
 
-    const totalResult = await set(searchItemAtom);
-    result.push(...totalResult);
+      const recommendResult = await set(searchRecommendLiveAtom);
+      result.push(...recommendResult);
+    } else {
+      // 전체 검색
+      set(searchCategoryAtom, "summary");
+      set(searchLoadingAtom, true);
+
+      const totalResult = await set(searchItemAtom);
+      result.push(...totalResult);
+    }
   }
 
   // uuid 검색
-  if (uuid !== null) {
-    const uuidItem = await set(searchChannelIdAtom, uuid);
-    if (uuidItem !== null) {
-      result.unshift(uuidItem);
+  if (platform === "chzzk") {
+    const chzzkChannelId = getChzzkChannelId(query);
+
+    if (chzzkChannelId !== null) {
+      const item = await set(searchChannelIdAtom, {
+        platform: "chzzk",
+        id: chzzkChannelId,
+      });
+
+      if (item !== null) {
+        result.unshift(item);
+      }
+    }
+  } else if (platform === "youtube") {
+    const youtubeChannelId = getYoutubeChannelId(query);
+
+    if (youtubeChannelId !== null) {
+      const item = await set(searchChannelIdAtom, {
+        ...youtubeChannelId,
+        platform: "youtube",
+      });
+
+      if (item !== null) {
+        result.unshift(item);
+      }
     }
   }
 
@@ -137,6 +176,12 @@ export const submitSearchAtom = atom(null, async (get, set) => {
 // 라이브 목록을 시청자 내림차순으로 가져와 searchResultAtom에 저장합니다.
 export const searchRecommendLiveAtom = atom(null, async (get, set) => {
   const platform = get(searchPlatformAtom);
+
+  // Youtube 일부 기능 미지원
+  if (platform === "youtube") {
+    return [];
+  }
+
   const response = await set(fetchStreamLiveListAtom, {
     platform,
     size: 50,
@@ -170,6 +215,11 @@ export const searchRecommendLiveAtom = atom(null, async (get, set) => {
 export const searchItemAtom = atom(null, async (get, set) => {
   const platform = get(searchPlatformAtom);
   const query = get(searchQueryAtom);
+
+  // Youtube 일부 기능 미지원
+  if (platform === "youtube") {
+    return [];
+  }
 
   const channelResponse = await set(searchStreamChannelAtom, {
     platform,
@@ -236,11 +286,8 @@ export const searchItemAtom = atom(null, async (get, set) => {
 // 주어진 id를 가진 채널을 검색하여 searchResultAtom에 추가합니다.
 export const searchChannelIdAtom = atom(
   null,
-  async (_get, set, uuid: string) => {
-    const response = await set(fetchStreamChannelAtom, {
-      platform: "chzzk",
-      id: uuid,
-    });
+  async (_get, set, options: StreamGetChannelOptions) => {
+    const response = await set(fetchStreamChannelAtom, options);
 
     // 해당 채널이 존재하지 않음
     if (response === null) {
@@ -262,6 +309,17 @@ export const searchChannelIdAtom = atom(
       type: "channel",
       selected: false,
     };
+
+    if (options.platform === "youtube") {
+      if (options.type === "video") {
+        item.type = "live";
+        item.description = response.liveTitle ?? "";
+        item.count = response.liveViewer;
+        item.countPrefix = "시청자";
+      } else {
+        item.countPrefix = "구독자";
+      }
+    }
 
     return item;
   }

@@ -3,7 +3,11 @@ import {
   SearchPlatformDropdownItemType,
 } from "@web/components/modal/search-modal/SearchPlatformDropdown.tsx";
 import SearchPlatformDropdownItem from "@web/components/modal/search-modal/SearchPlatformDropdownItem.tsx";
-import { searchPlatformAtom } from "@web/librarys/search.ts";
+import {
+  searchPlatformAtom,
+  searchQueryAtom,
+  submitSearchAtom,
+} from "@web/librarys/search.ts";
 import classNames from "classnames";
 import { useSetAtom } from "jotai";
 import styled from "styled-components";
@@ -38,6 +42,8 @@ function SearchPlatformDropdownMenu({
   hide,
 }: SearchPlatformDropdownProps) {
   const setSearchPlatform = useSetAtom(searchPlatformAtom);
+  const setQuery = useSetAtom(searchQueryAtom);
+  const submitSearch = useSetAtom(submitSearchAtom);
 
   const className = classNames({
     hidden: !show,
@@ -45,6 +51,8 @@ function SearchPlatformDropdownMenu({
 
   const onItemClick = (item: SearchPlatformDropdownItemType) => {
     setSearchPlatform(item.platform);
+    setQuery("");
+    submitSearch();
     hide();
   };
 
