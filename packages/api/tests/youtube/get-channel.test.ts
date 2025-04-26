@@ -10,7 +10,7 @@ describe("YoutubeClient", () => {
       });
 
       expect(res.pageInfo.totalResults).toBe(1);
-      expect(res.items[0].id).toBe("UCOH52Yqq4-rdLvpt2Unsqsw");
+      expect(res.items?.[0].id).toBe("UCOH52Yqq4-rdLvpt2Unsqsw");
     });
 
     it("channel id", async () => {
@@ -20,7 +20,7 @@ describe("YoutubeClient", () => {
       });
 
       expect(res.pageInfo.totalResults).toBe(1);
-      expect(res.items[0].id).toBe("UCOH52Yqq4-rdLvpt2Unsqsw");
+      expect(res.items?.[0].id).toBe("UCOH52Yqq4-rdLvpt2Unsqsw");
     });
   });
 });

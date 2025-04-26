@@ -107,7 +107,7 @@ async function getChannelYoutube(
 
   const videoResponse = await this.youtubeClient.getVideos(videoIds);
 
-  let stream: (typeof videoResponse.items)[0] | null = null; // TODO
+  let stream: (typeof videoResponse.items)[number] | null = null;
 
   // 진행 중인 라이브 스트림
   const liveStreams = videoResponse.items
@@ -189,8 +189,14 @@ async function getChannelYoutubeWithVideo(
     value: video.snippet.channelId,
   });
 
-  const channel: (typeof channelResponse.items)[0] | undefined =
-    channelResponse.items[0];
+  if (
+    channelResponse.items === undefined ||
+    channelResponse.items.length === 0
+  ) {
+    return null;
+  }
+
+  const channel = channelResponse.items[0];
 
   return {
     platform: "youtube",

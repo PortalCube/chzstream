@@ -16,6 +16,7 @@ describe("StreamClient", () => {
         });
 
         expect(res).not.toBeNull();
+        expect(res?.platform).toBe("chzzk");
         expect(res?.channelId).toBe(id);
       });
     });
@@ -46,7 +47,8 @@ describe("StreamClient", () => {
       });
 
       expect(res).not.toBeNull();
-      expect(res!.channelName).toBe("Lofi Girl");
+      expect(res?.platform).toBe("youtube");
+      expect(res?.channelName).toBe("Lofi Girl");
 
       // 24/7 live stream
       expect(res!.liveStatus).toBe(true);
@@ -60,11 +62,12 @@ describe("StreamClient", () => {
       });
 
       expect(res).not.toBeNull();
-      expect(res!.channelName).toBe("sake L");
+      expect(res?.platform).toBe("youtube");
+      expect(res?.channelName).toBe("sake L");
 
       // 여기 방송하면 세상 멸망함
-      expect(res!.liveStatus).toBe(false);
-      expect(res!.liveTitle).toBeNull();
+      expect(res?.liveStatus).toBe(false);
+      expect(res?.liveTitle).toBeNull();
     });
 
     it("youtube video id", async () => {
@@ -75,9 +78,10 @@ describe("StreamClient", () => {
       });
 
       expect(res).not.toBeNull();
-      expect(res!.channelName).toBe("LCK");
-      expect(res!.liveId).toBe("NsWPXB5Wqzs");
-      expect(res!.liveTitle).toBe("T1 vs BLG | 결승전 | 2024 월드 챔피언십");
+      expect(res?.platform).toBe("youtube");
+      expect(res?.channelName).toBe("LCK");
+      expect(res?.liveId).toBe("NsWPXB5Wqzs");
+      expect(res?.liveTitle).toBe("T1 vs BLG | 결승전 | 2024 월드 챔피언십");
     });
 
     it("youtube null id", async () => {
