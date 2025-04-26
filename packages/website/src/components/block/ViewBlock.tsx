@@ -125,6 +125,7 @@ function ViewBlock({}: ViewBlockProps) {
       src={src}
       $zoom={options.zoom}
       scrolling="no"
+      allow="autoplay; encrypted-media"
       allowFullScreen
     ></Container>
   );
