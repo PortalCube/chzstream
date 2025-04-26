@@ -102,7 +102,8 @@ function ViewBlock({}: ViewBlockProps) {
     }
 
     if (channel.platform === "youtube" && type === "chat") {
-      url.searchParams.set("embed_domain", location.host);
+      url.searchParams.set("embed_domain", location.hostname);
+      url.searchParams.set("dark_theme", "1");
     }
 
     if (messageClient !== null) {
