@@ -29,6 +29,43 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
+export const getYoutubeChannelRoute: Endpoint = async (
+  request,
+  env,
+  ctx,
+  params
+): Promise<Response> => {
+  const { type, value } = params;
+
+  const client = new StreamClient({
+    googleApiKey: env.GOOGLE_API_KEY,
+  });
+
+  if (typeof type !== "string") {
+    return createBadRequestResponse(request, "type");
+  }
+
+  if (["id", "handle", "video"].includes(type) === false) {
+    return createBadRequestResponse(request, "type");
+  }
+
+  if (typeof value !== "string") {
+    return createBadRequestResponse(request, "value");
+  }
+
+  const response = await client.getChannel({
+    platform: "youtube",
+    type: type as "id" | "handle" | "video",
+    value,
+  });
+
+  return createJSONResponse(request, {
+    status: 200,
+    message: "ok",
+    body: response,
+  });
+};
+
 export const getChannelRoute: Endpoint = async (
   request,
   env,

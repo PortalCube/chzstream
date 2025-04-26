@@ -1,6 +1,7 @@
 import {
   getChannelRoute,
   getLiveListRoute,
+  getYoutubeChannelRoute,
   searchChannelRoute,
   searchLiveRoute,
   searchTagRoute,
@@ -33,6 +34,13 @@ const routers: Route[] = [
   },
 
   // API proxy
+  {
+    method: "GET",
+    path: "/youtube/channel/:type/:value",
+    handler: getYoutubeChannelRoute,
+    ttl: 5 * 60, // 5 minutes
+  },
+
   {
     method: "GET",
     path: "/:platform/channel/:channelId",
