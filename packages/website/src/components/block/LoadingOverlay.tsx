@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { useContext, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
-import Spinner from "@web/components/block/Spinner.tsx";
+import BarSpinner from "@web/components/spinner/BarSpinner";
 import { layoutModeAtom } from "@web/librarys/app.ts";
 import { BlockContext } from "@web/librarys/context.ts";
 
@@ -94,7 +94,7 @@ function LoadingOverlay({}: LoadingOverlayProps) {
       onDragEnter={onDragEnter}
       onDragOver={onDragOver}
     >
-      <Spinner />
+      <BarSpinner />
       불러오는 중...
     </Container>
   );

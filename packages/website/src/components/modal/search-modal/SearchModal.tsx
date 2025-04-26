@@ -2,6 +2,7 @@ import MultiSelect from "@web/components/modal/search-modal/MultiSelect.tsx";
 import MultiSelectCheckBox from "@web/components/modal/search-modal/MultiSelectCheckBox.tsx";
 import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
 import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
+import SearchLoading from "@web/components/modal/search-modal/SearchLoading.tsx";
 import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
 import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
 import {

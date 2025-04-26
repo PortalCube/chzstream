@@ -1,11 +1,13 @@
 import Pagination from "@web/components/modal/search-modal/Pagination.tsx";
 import SearchItem from "@web/components/modal/search-modal/SearchItem";
+import SearchLoading from "@web/components/modal/search-modal/SearchLoading.tsx";
 import SearchMessage from "@web/components/modal/search-modal/SearchMessage.tsx";
 import { useModalListener } from "@web/librarys/modal.ts";
 import {
   searchCategoryAtom,
   SearchItemResult,
   SearchItemType,
+  searchLoadingAtom,
 } from "@web/librarys/search.ts";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
@@ -55,6 +57,7 @@ const List = styled.div`
 function SearchList({ items, type, size, preview = false }: SearchListProps) {
   const category = useAtomValue(searchCategoryAtom);
   const [page, setPage] = useState(1);
+  const searchLoading = useAtomValue(searchLoadingAtom);
   const className = classNames({
     preview: preview && items.length !== 0,
   });
@@ -121,7 +124,8 @@ function SearchList({ items, type, size, preview = false }: SearchListProps) {
   return (
     <Container className={className}>
       <List className={listClassName}>{elements}</List>
-      <SearchMessage show={items.length === 0} />
+      <SearchMessage show={items.length === 0 && searchLoading === false} />
+      <SearchLoading />
       <Pagination
         page={page}
         maxPage={maxPage}
