@@ -69,8 +69,8 @@ function ViewBlock({}: ViewBlockProps) {
 
     const href =
       type === "chat"
-        ? `https://chzzk.naver.com/live/${channel.uuid}/chat`
-        : `https://chzzk.naver.com/live/${channel.uuid}/`;
+        ? `https://chzzk.naver.com/live/${channel.channelId}/chat`
+        : `https://chzzk.naver.com/live/${channel.channelId}/`;
     const url = new URL(href);
 
     url.searchParams.set("embed", "true");

@@ -1,9 +1,9 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
+import { fetchBlockChannelAtom } from "@web/librarys/api-client";
 import { favoriteChannelsAtom } from "@web/librarys/app.ts";
 import { BlockChannel } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { useChannelDrag } from "@web/librarys/drag-and-drop.ts";
-import { fetchChzzkChannelAtom } from "@web/librarys/layout.ts";
 import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -56,13 +56,15 @@ const Image = styled.img`
 
 function getDefaultChannel(uuid: string): BlockChannel {
   return {
-    uuid,
-    name: "알 수 없음",
-    title: "알 수 없음",
-    thumbnailUrl: "",
-    iconUrl: getProfileImageUrl(),
-    lastUpdate: null,
+    platform: "chzzk",
+    channelId: uuid,
+    channelName: "알 수 없음",
+    channelImageUrl: getProfileImageUrl(),
+    liveId: null,
     liveStatus: false,
+    liveTitle: "알 수 없음",
+    liveThumbnailUrl: "",
+    lastUpdate: null,
   };
 }
 
@@ -72,10 +74,15 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   const pushChannelWithDefaultPreset = useSetAtom(
     pushChannelWithDefaultPresetAtom
   );
-  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
+  const fetchBlockChannel = useSetAtom(fetchBlockChannelAtom);
 
   const [channel, setChannel] = useState(getDefaultChannel(uuid));
-  const { name, iconUrl, liveStatus, lastUpdate } = channel;
+  const {
+    channelName: name,
+    channelImageUrl: iconUrl,
+    liveStatus,
+    lastUpdate,
+  } = channel;
 
   const { dragElement, onDragStart, onDragEnd } = useChannelDrag(channel);
 
@@ -103,11 +110,11 @@ function Channel({ uuid, index, gap }: ChannelProps) {
         return;
       }
 
-      channel.name = data.channelName;
-      channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
+      channel.channelName = data.channelName;
+      channel.channelImageUrl = getProfileImageUrl(data.channelImageUrl);
       channel.lastUpdate = Date.now();
-      channel.thumbnailUrl = data.liveThumbnailUrl ?? "";
-      channel.title = data.liveTitle ?? "";
+      channel.liveThumbnailUrl = data.liveThumbnailUrl ?? "";
+      channel.liveTitle = data.liveTitle ?? "";
       channel.liveStatus = data.liveStatus;
 
       setChannel(channel);
@@ -122,7 +129,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   }, [lastUpdate, messageClient, uuid]);
 
   const onClick: React.MouseEventHandler = async () => {
-    const channel = await fetchChzzkChannel(uuid);
+    const channel = await fetchBlockChannel({ platform: "chzzk", id: uuid });
     pushChannelWithDefaultPreset([channel]);
   };
 

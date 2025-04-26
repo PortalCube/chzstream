@@ -69,8 +69,8 @@ const Name = styled.span`
 function Channel({}: ChannelProps) {
   const { channel } = useContext(BlockContext);
 
-  const name = channel?.name ?? "알 수 없는 채널";
-  const iconUrl = channel?.iconUrl ?? "";
+  const name = channel?.channelName ?? "알 수 없는 채널";
+  const iconUrl = channel?.channelImageUrl ?? "";
 
   return (
     <Container>

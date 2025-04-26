@@ -1,4 +1,5 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
+import { fetchBlockChannelAtom } from "@web/librarys/api-client";
 import {
   blockListAtom,
   layoutModeAtom,
@@ -11,7 +12,6 @@ import {
   BlockPosition,
   BlockStatus,
 } from "@web/librarys/block.ts";
-import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import {
   defaultMixerItemAtom,
   setSoloAtom,
@@ -245,67 +245,15 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
   });
 
   for (const block of expiredBlockList) {
-    const channel = await set(fetchChzzkChannelAtom, block.channel!.uuid);
+    const channel = await set(fetchBlockChannelAtom, {
+      platform: "chzzk",
+      id: block.channel!.channelId,
+    });
 
     // DONT USE "setBlockChannel" HERE
     set(modifyBlockAtom, { id: block.id, channel });
   }
 });
-
-export const fetchChzzkChannelAtom = atom(
-  null,
-  async (get, _set, uuid: string) => {
-    const messageClient = get(messageClientAtom);
-    const isRestrictedMode = messageClient === null;
-
-    const channel: BlockChannel = {
-      uuid: uuid,
-      name: "알 수 없음",
-      title: "현재 오프라인 상태입니다",
-      thumbnailUrl: "",
-      iconUrl: getProfileImageUrl(),
-      lastUpdate: null,
-      liveStatus: false,
-    };
-
-    // 제한 모드 처리
-    if (isRestrictedMode) {
-      channel.title = "제한 모드에서는 채널 정보를 불러올 수 없습니다";
-      return channel;
-    }
-
-    // 채널 데이터 가져오기
-    const response = await messageClient.request("stream-get-channel", {
-      platform: "chzzk",
-      id: uuid,
-    });
-
-    const data = response.data;
-    if (data === null) {
-      throw new Error(`Channel not found: ${uuid}`);
-    }
-
-    // 가져온 데이터로 채널 정보 업데이트
-    channel.name = data.channelName;
-    channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
-    channel.liveStatus = data.liveStatus;
-    channel.lastUpdate = Date.now();
-
-    // 방송이 켜진 경우, 제목도 업데이트
-    if (data.liveStatus === true) {
-      channel.title = data.liveTitle ?? "";
-    }
-
-    // TODO: CHZZK 전용 코드 --> 추후 수정
-    // 썸네일 이미지가 있는 경우, 이미지 URL 업데이트
-    if (data.liveThumbnailUrl !== null) {
-      const imageUrl = data.liveThumbnailUrl.replace("{type}", "1080");
-      channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;
-    }
-
-    return channel;
-  }
-);
 
 export const activateViewModeAtom = atom(null, (_get, set) => {
   set(layoutModeAtom, "view");
@@ -334,7 +282,9 @@ export const quickBlockAddAtom = atom(null, (_get, set) => {
     const channels: BlockChannel[] = [];
 
     for (const item of _channels) {
-      channels.push(await set(fetchChzzkChannelAtom, item.uuid));
+      channels.push(
+        await set(fetchBlockChannelAtom, { platform: "chzzk", id: item.uuid })
+      );
     }
 
     set(pushChannelWithDefaultPresetAtom, channels);

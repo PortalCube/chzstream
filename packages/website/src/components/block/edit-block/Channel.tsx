@@ -1,10 +1,8 @@
+import { fetchBlockChannelAtom } from "@web/librarys/api-client";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContext } from "@web/librarys/context";
 import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
-import {
-  fetchChzzkChannelAtom,
-  setBlockChannelAtom,
-} from "@web/librarys/layout.ts";
+import { setBlockChannelAtom } from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { Mixin } from "@web/scripts/styled.ts";
 import { useSetAtom } from "jotai";
@@ -161,7 +159,7 @@ function Channel({}: ChannelProps) {
   const block = useContext(BlockContext);
   const { id, channel } = block;
   const openSearchModal = useSetAtom(openSearchModalAtom);
-  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
+  const fetchBlockChannel = useSetAtom(fetchBlockChannelAtom);
   const setBlockChannel = useSetAtom(setBlockChannelAtom);
   const { dragElement, onDragStart, onDragEnd } = useBlockDrag(block);
 
@@ -176,9 +174,9 @@ function Channel({}: ChannelProps) {
       return result;
     }
 
-    result.iconUrl = channel.iconUrl;
-    result.name = channel.name;
-    result.title = channel.title;
+    result.iconUrl = channel.channelImageUrl;
+    result.name = channel.channelName;
+    result.title = channel.liveTitle;
 
     return result;
   }, [channel]);
@@ -187,7 +185,10 @@ function Channel({}: ChannelProps) {
     openSearchModal(
       async (channels) => {
         const uuid = channels[0].uuid;
-        const channel = await fetchChzzkChannel(uuid);
+        const channel = await fetchBlockChannel({
+          platform: "chzzk",
+          id: uuid,
+        });
         setBlockChannel(id, channel);
       },
       { allowMultiSelect: false }

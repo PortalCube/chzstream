@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chzstream/api": "workspace:^",
     "@chzstream/message": "workspace:^",
     "@chzstream/url": "workspace:^",
     "axios": "^1.8.2",

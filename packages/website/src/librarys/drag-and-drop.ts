@@ -1,10 +1,9 @@
 import { DragItem, useDragItem } from "@web/hooks/useDragItem.tsx";
+import { fetchBlockChannelAtom } from "@web/librarys/api-client";
 import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { Block, BlockChannel } from "@web/librarys/block.ts";
 import {
-  fetchChzzkChannelAtom,
   lockBlockAtom,
-  modifyBlockAtom,
   setBlockChannelAtom,
   swapBlockAtom,
 } from "@web/librarys/layout.ts";
@@ -118,7 +117,10 @@ const swapDragBlockAtom = atom(
 const copyDragBlockAtom = atom(
   null,
   async (_get, set, block: Block, dragItem: DragItem) => {
-    const channel = await set(fetchChzzkChannelAtom, dragItem.channelId);
+    const channel = await set(fetchBlockChannelAtom, {
+      platform: "chzzk",
+      id: dragItem.channelId,
+    });
     set(setBlockChannelAtom, block.id, channel);
   }
 );

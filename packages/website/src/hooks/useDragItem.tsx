@@ -93,9 +93,9 @@ export function useDragItem(
       _isChzstreamDragItem: true,
       block: blockId,
       channelPlatform: "chzzk",
-      channelId: channel?.uuid ?? "",
-      channelName: channel?.name ?? "채널 없음",
-      channelImageUrl: channel?.iconUrl ?? getProfileImageUrl(),
+      channelId: channel?.channelId ?? "",
+      channelName: channel?.channelName ?? "채널 없음",
+      channelImageUrl: channel?.channelImageUrl ?? getProfileImageUrl(),
     }),
     [blockId, channel]
   );

@@ -49,7 +49,7 @@ export const mixerItemsAtom = atom<MixerItem[]>((get) => {
     .filter((block) => block.type === "stream")
     .map((block) => ({
       id: block.id,
-      name: block.channel?.name ?? "채널 없음",
+      name: block.channel?.channelName ?? "채널 없음",
       mixer: block.mixer,
     }));
 });
