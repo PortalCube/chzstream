@@ -1,9 +1,10 @@
 import { Block, PreviewBlock } from "@web/librarys/block.ts";
 import { LayoutMode } from "@web/librarys/layout.ts";
+import { FavoriteChannelItem } from "@web/scripts/storage.ts";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 
-export const favoriteChannelsAtom = atom<string[]>([]);
+export const favoriteChannelsAtom = atom<FavoriteChannelItem[]>([]);
 
 export const mouseIsTopAtom = atom<boolean>(false);
 export const layoutModeAtom = atom<LayoutMode>("modify");

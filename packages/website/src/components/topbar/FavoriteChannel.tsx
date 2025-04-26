@@ -1,3 +1,4 @@
+import { StreamGetChannelOptions } from "@api/index.ts";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { fetchBlockChannelAtom } from "@web/librarys/api-client";
 import { favoriteChannelsAtom } from "@web/librarys/app.ts";
@@ -5,6 +6,7 @@ import { BlockChannel } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { useChannelDrag } from "@web/librarys/drag-and-drop.ts";
 import { pushChannelWithDefaultPresetAtom } from "@web/librarys/preset.ts";
+import { FavoriteChannelItem } from "@web/scripts/storage.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import React, { useEffect, useState } from "react";
@@ -54,10 +56,10 @@ const Image = styled.img`
   height: 100%;
 `;
 
-function getDefaultChannel(uuid: string): BlockChannel {
+function getDefaultChannel(item: FavoriteChannelItem): BlockChannel {
   return {
-    platform: "chzzk",
-    channelId: uuid,
+    platform: item.platform,
+    channelId: item.id,
     channelName: "알 수 없음",
     channelImageUrl: getProfileImageUrl(),
     liveId: null,
@@ -68,7 +70,26 @@ function getDefaultChannel(uuid: string): BlockChannel {
   };
 }
 
-function Channel({ uuid, index, gap }: ChannelProps) {
+function getStreamGetChannelOptions(
+  item: FavoriteChannelItem
+): StreamGetChannelOptions {
+  if (item.platform === "chzzk") {
+    return {
+      platform: "chzzk",
+      id: item.id,
+    };
+  } else if (item.platform === "youtube") {
+    return {
+      platform: "youtube",
+      type: "id",
+      value: item.id,
+    };
+  } else {
+    throw new Error("Unsupported platform");
+  }
+}
+
+function FavoriteChannel({ item, index, gap }: FavoriteChannelProps) {
   const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
   const messageClient = useAtomValue(messageClientAtom);
   const pushChannelWithDefaultPreset = useSetAtom(
@@ -76,7 +97,7 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   );
   const fetchBlockChannel = useSetAtom(fetchBlockChannelAtom);
 
-  const [channel, setChannel] = useState(getDefaultChannel(uuid));
+  const [channel, setChannel] = useState(getDefaultChannel(item));
   const {
     channelName: name,
     channelImageUrl: iconUrl,
@@ -87,37 +108,14 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   const { dragElement, onDragStart, onDragEnd } = useChannelDrag(channel);
 
   useEffect(() => {
-    // TODO: Atom으로 분리
     const loadChannelInfo = async () => {
-      const channel: BlockChannel = getDefaultChannel(uuid);
-
       // 마지막 업데이트로부터 60초 이내인 경우 skip
       if (lastUpdate !== null && Date.now() - lastUpdate < 60000) return;
 
-      if (messageClient === null) {
-        setChannel(channel);
-        return;
-      }
-
-      const response = await messageClient.request("stream-get-channel", {
-        platform: "chzzk",
-        id: uuid,
-      });
-      const data = response.data;
-
-      if (data === null) {
-        setChannel(channel);
-        return;
-      }
-
-      channel.channelName = data.channelName;
-      channel.channelImageUrl = getProfileImageUrl(data.channelImageUrl);
-      channel.lastUpdate = Date.now();
-      channel.liveThumbnailUrl = data.liveThumbnailUrl ?? "";
-      channel.liveTitle = data.liveTitle ?? "";
-      channel.liveStatus = data.liveStatus;
-
-      setChannel(channel);
+      const blockChannel = await fetchBlockChannel(
+        getStreamGetChannelOptions(item)
+      );
+      setChannel(blockChannel);
     };
 
     const intervalTimer = setInterval(loadChannelInfo, 3000);
@@ -126,18 +124,25 @@ function Channel({ uuid, index, gap }: ChannelProps) {
     return () => {
       clearInterval(intervalTimer);
     };
-  }, [lastUpdate, messageClient, uuid]);
+  }, [lastUpdate, messageClient, item]);
 
   const onClick: React.MouseEventHandler = async () => {
-    const channel = await fetchBlockChannel({ platform: "chzzk", id: uuid });
-    pushChannelWithDefaultPreset([channel]);
+    const blockChannel = await fetchBlockChannel(
+      getStreamGetChannelOptions(item)
+    );
+    pushChannelWithDefaultPreset([blockChannel]);
   };
 
   const onPointerDown: React.PointerEventHandler = (event) => {
     if (event.button === 2) {
       const isDelete = confirm(`${name} 채널을 즐겨찾기에서 삭제할까요?`);
       if (isDelete) {
-        setFavoriteChannels(favoriteChannels.filter((item) => item !== uuid));
+        setFavoriteChannels(
+          favoriteChannels.filter(
+            (element) =>
+              !(item.id === element.id && item.platform === element.platform)
+          )
+        );
       }
     }
   };
@@ -159,10 +164,10 @@ function Channel({ uuid, index, gap }: ChannelProps) {
   );
 }
 
-type ChannelProps = {
-  uuid: string;
+type FavoriteChannelProps = {
+  item: FavoriteChannelItem;
   index: number;
   gap: number;
 };
 
-export default Channel;
+export default FavoriteChannel;

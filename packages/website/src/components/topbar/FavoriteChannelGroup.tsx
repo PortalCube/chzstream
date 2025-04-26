@@ -1,5 +1,5 @@
-import Channel from "@web/components/topbar/Channel.tsx";
-import ChannelButton from "@web/components/topbar/ChannelButton.tsx";
+import FavoriteChannel from "@web/components/topbar/FavoriteChannel.tsx";
+import FavoriteChannelButton from "@web/components/topbar/FavoriteChannelButton.tsx";
 import { favoriteChannelsAtom } from "@web/librarys/app.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { FAVOTIRE_CHANNELS_INITIAL_DATA } from "@web/scripts/storage.ts";
@@ -22,7 +22,7 @@ const Container = styled.div`
   `)}
 `;
 
-function ChannelGroup() {
+function FavoriteChannelGroup() {
   const [favoriteChannels, setFavoriteChannels] = useAtom(favoriteChannelsAtom);
   const openSearchModal = useSetAtom(openSearchModalAtom);
 
@@ -32,14 +32,28 @@ function ChannelGroup() {
   );
 
   const channelElements = favoriteChannels.map((item, index) => (
-    <Channel key={item} uuid={item} index={index} gap={gap} />
+    <FavoriteChannel
+      key={`${item.id}-${item.platform}`}
+      item={item}
+      index={index}
+      gap={gap}
+    />
   ));
 
   const onAddButtonClick: React.MouseEventHandler = () => {
     openSearchModal((channels) => {
       const items = channels
-        .filter((channel) => favoriteChannels.includes(channel.uuid) === false)
-        .map((channel) => channel.uuid);
+        .filter(
+          (channel) =>
+            favoriteChannels.includes({
+              platform: channel.platform,
+              id: channel.channelId,
+            }) === false
+        )
+        .map((channel) => ({
+          platform: channel.platform,
+          id: channel.channelId,
+        }));
 
       setFavoriteChannels([...favoriteChannels, ...items]);
     });
@@ -55,10 +69,18 @@ function ChannelGroup() {
   return (
     <Container>
       {channelElements}
-      <ChannelButton icon={MdAdd} onClick={onAddButtonClick} gap={gap} />
-      <ChannelButton icon={MdRefresh} onClick={onResetButtonClick} gap={gap} />
+      <FavoriteChannelButton
+        icon={MdAdd}
+        onClick={onAddButtonClick}
+        gap={gap}
+      />
+      <FavoriteChannelButton
+        icon={MdRefresh}
+        onClick={onResetButtonClick}
+        gap={gap}
+      />
     </Container>
   );
 }
 
-export default ChannelGroup;
+export default FavoriteChannelGroup;

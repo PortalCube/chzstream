@@ -1,5 +1,5 @@
 import { RequestMessage } from "@chzstream/message";
-import ChannelGroup from "@web/components/topbar/ChannelGroup.tsx";
+import FavoriteChannelGroup from "@web/components/topbar/FavoriteChannelGroup";
 import MenuButton from "@web/components/topbar/MenuButton.tsx";
 import { isFullscreenAtom } from "@web/hooks/useFullscreenDetect.tsx";
 import {
@@ -263,7 +263,7 @@ function Topbar() {
       onPointerMove={(event) => event.stopPropagation()}
     >
       <Title src={LogoImage} alt="chzstream" />
-      <ChannelGroup />
+      <FavoriteChannelGroup />
       <MenuGroup>{buttons}</MenuGroup>
     </Header>
   );
