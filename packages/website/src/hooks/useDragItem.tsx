@@ -1,5 +1,5 @@
 import { displayPixelRatioAtom } from "@web/hooks/useDisplayPixelRatio.tsx";
-import { Block, BlockChannel } from "@web/librarys/block.ts";
+import { Block, BlockChannel, BlockPlatform } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useRef } from "react";
@@ -73,10 +73,11 @@ const Description = styled.p<{ $dpr: number }>`
 export type DragItem = {
   _isChzstreamDragItem: true;
   block: number | null;
-  channelPlatform: "chzzk"; // TODO
+  platform: BlockPlatform; // TODO
   channelId: string;
   channelName: string;
   channelImageUrl: string;
+  liveId: string | null;
 };
 
 // Note: Windows에서는 DragImage가 300x300을 초과하면 방사형 투명도 그라데이션이 적용됨
@@ -92,10 +93,11 @@ export function useDragItem(
     () => ({
       _isChzstreamDragItem: true,
       block: blockId,
-      channelPlatform: "chzzk",
+      platform: channel?.platform ?? "chzzk",
       channelId: channel?.channelId ?? "",
       channelName: channel?.channelName ?? "채널 없음",
       channelImageUrl: channel?.channelImageUrl ?? getProfileImageUrl(),
+      liveId: channel?.liveId ?? null,
     }),
     [blockId, channel]
   );

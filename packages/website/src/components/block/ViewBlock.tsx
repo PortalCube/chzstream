@@ -1,5 +1,6 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { layoutModeAtom } from "@web/librarys/app.ts";
+import { BlockChannel } from "@web/librarys/block.ts";
 import { BlockContext } from "@web/librarys/context";
 import { modifyBlockStatusAtom } from "@web/librarys/layout.ts";
 import classNames from "classnames";
@@ -40,6 +41,28 @@ const Container = styled.iframe<{ $zoom: number }>`
   ${(props) => resizeMixin(props.$zoom)}
 `;
 
+function getIframeBaseUrl(channel: BlockChannel, type: string): string {
+  if (channel === null) {
+    return "about:blank";
+  }
+
+  if (channel.platform === "chzzk") {
+    if (type === "stream") {
+      return `https://chzzk.naver.com/live/${channel.channelId}/`;
+    } else {
+      return `https://chzzk.naver.com/live/${channel.channelId}/chat`;
+    }
+  } else if (channel.platform === "youtube") {
+    if (type === "stream") {
+      return `https://www.youtube.com/embed/${channel.liveId}`;
+    } else {
+      return `https://www.youtube.com/live_chat?v=${channel.liveId}`;
+    }
+  }
+
+  return "about:blank";
+}
+
 function ViewBlock({}: ViewBlockProps) {
   const layoutMode = useAtomValue(layoutModeAtom);
   const { id, type, status, channel, options } = useContext(BlockContext);
@@ -67,13 +90,20 @@ function ViewBlock({}: ViewBlockProps) {
       return "about:blank";
     }
 
-    const href =
-      type === "chat"
-        ? `https://chzzk.naver.com/live/${channel.channelId}/chat`
-        : `https://chzzk.naver.com/live/${channel.channelId}/`;
-    const url = new URL(href);
+    const baseUrl = getIframeBaseUrl(channel, type);
+    const url = new URL(baseUrl);
 
-    url.searchParams.set("embed", "true");
+    if (channel.platform === "chzzk") {
+      url.searchParams.set("embed", "true");
+    }
+
+    if (channel.platform === "youtube" && type === "stream") {
+      url.searchParams.set("autoplay", "1");
+    }
+
+    if (channel.platform === "youtube" && type === "chat") {
+      url.searchParams.set("embed_domain", location.host);
+    }
 
     if (messageClient !== null) {
       url.searchParams.set("_csp", messageClient.id.id);

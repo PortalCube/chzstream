@@ -13,12 +13,33 @@ import {
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { BlockChannel } from "@web/librarys/block.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
+import { SearchItemType } from "@web/librarys/search.ts";
 import axios from "axios";
 import { atom } from "jotai";
 
 const workerClient = axios.create({
   baseURL: import.meta.env.VITE_CLOUDFLARE_WORKER_URL,
 });
+
+export function createStreamGetChannelOptions(
+  value: SearchItemType
+): StreamGetChannelOptions | null {
+  if (value.platform === "chzzk") {
+    return {
+      platform: "chzzk",
+      id: value.channelId,
+    };
+  } else if (value.platform === "youtube") {
+    if (value.liveId) {
+      return {
+        platform: "youtube",
+        type: "video",
+        value: value.liveId,
+      };
+    }
+  }
+  return null;
+}
 
 export const fetchStreamChannelAtom = atom(
   null,

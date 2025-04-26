@@ -117,11 +117,22 @@ const swapDragBlockAtom = atom(
 const copyDragBlockAtom = atom(
   null,
   async (_get, set, block: Block, dragItem: DragItem) => {
-    const channel = await set(fetchBlockChannelAtom, {
-      platform: "chzzk",
-      id: dragItem.channelId,
-    });
-    set(setBlockChannelAtom, block.id, channel);
+    if (dragItem.platform === "chzzk") {
+      const channel = await set(fetchBlockChannelAtom, {
+        platform: "chzzk",
+        id: dragItem.channelId,
+      });
+      set(setBlockChannelAtom, block.id, channel);
+    } else if (dragItem.platform === "youtube") {
+      if (dragItem.liveId !== null) {
+        const channel = await set(fetchBlockChannelAtom, {
+          platform: dragItem.platform,
+          type: "video",
+          value: dragItem.liveId,
+        });
+        set(setBlockChannelAtom, block.id, channel);
+      }
+    }
   }
 );
 

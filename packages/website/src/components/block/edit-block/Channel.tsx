@@ -1,5 +1,8 @@
 import { StreamGetChannelOptions } from "@api/index.ts";
-import { fetchBlockChannelAtom } from "@web/librarys/api-client";
+import {
+  createStreamGetChannelOptions,
+  fetchBlockChannelAtom,
+} from "@web/librarys/api-client";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContext } from "@web/librarys/context";
 import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
@@ -187,28 +190,9 @@ function Channel({}: ChannelProps) {
       async (channels) => {
         const channel = channels[0];
 
-        let options: StreamGetChannelOptions;
+        const options = createStreamGetChannelOptions(channel);
 
-        if (channel.platform === "chzzk") {
-          options = {
-            platform: "chzzk",
-            id: channel.channelId,
-          };
-        } else if (channel.platform === "youtube") {
-          if (channel.liveId !== null) {
-            options = {
-              platform: "youtube",
-              type: "video",
-              value: channel.liveId,
-            };
-          } else {
-            options = {
-              platform: "youtube",
-              type: "id",
-              value: channel.channelId,
-            };
-          }
-        } else {
+        if (options === null) {
           return;
         }
 

@@ -1,5 +1,8 @@
 import { StreamGetChannelOptions } from "@api/index.ts";
-import { fetchBlockChannelAtom } from "@web/librarys/api-client";
+import {
+  createStreamGetChannelOptions,
+  fetchBlockChannelAtom,
+} from "@web/librarys/api-client";
 import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
@@ -112,29 +115,9 @@ function Channel() {
     openSearchModal(
       async (channels) => {
         const channel = channels[0];
+        const options = createStreamGetChannelOptions(channel);
 
-        let options: StreamGetChannelOptions;
-
-        if (channel.platform === "chzzk") {
-          options = {
-            platform: "chzzk",
-            id: channel.channelId,
-          };
-        } else if (channel.platform === "youtube") {
-          if (channel.liveId !== null) {
-            options = {
-              platform: "youtube",
-              type: "video",
-              value: channel.liveId,
-            };
-          } else {
-            options = {
-              platform: "youtube",
-              type: "id",
-              value: channel.channelId,
-            };
-          }
-        } else {
+        if (options === null) {
           return;
         }
 

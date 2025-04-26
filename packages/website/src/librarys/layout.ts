@@ -1,5 +1,8 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import { fetchBlockChannelAtom } from "@web/librarys/api-client";
+import {
+  createStreamGetChannelOptions,
+  fetchBlockChannelAtom,
+} from "@web/librarys/api-client";
 import {
   blockListAtom,
   layoutModeAtom,
@@ -173,7 +176,8 @@ export const activateBlockAtom = atom(null, (get, set) => {
       item.status = {
         ...item.status,
         enabled: true,
-        loading: isRestrictedMode === false,
+        loading:
+          isRestrictedMode === false && item.channel?.platform !== "youtube",
         error: null,
       };
     });
@@ -208,7 +212,10 @@ export const setBlockChannelAtom = atom(
     set(updateBlockAtom, id, (block) => {
       block.channel = channel;
 
-      const loading = block.channel !== null && isRestrictedMode === false;
+      const loading =
+        block.channel !== null &&
+        isRestrictedMode === false &&
+        channel?.platform !== "youtube";
       const enabled = layoutMode === "view";
 
       block.status = {
@@ -282,12 +289,11 @@ export const quickBlockAddAtom = atom(null, (_get, set) => {
     const channels: BlockChannel[] = [];
 
     for (const item of _channels) {
-      channels.push(
-        await set(fetchBlockChannelAtom, {
-          platform: "chzzk",
-          id: item.channelId,
-        })
-      );
+      const options = createStreamGetChannelOptions(item);
+
+      if (options) {
+        channels.push(await set(fetchBlockChannelAtom, options));
+      }
     }
 
     set(pushChannelWithDefaultPresetAtom, channels);
