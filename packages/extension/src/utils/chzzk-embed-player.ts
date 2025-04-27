@@ -19,9 +19,9 @@ type EmbedEvent = {
   change: (data: RequestPayload<"video-status">) => void;
 };
 
-export const embedEvent = createNanoEvents<EmbedEvent>();
+export const chzzkEmbedEvent = createNanoEvents<EmbedEvent>();
 
-export function isEmbedPlayer() {
+export function isChzzkEmbedPlayer() {
   const url = new URL(window.location.href);
   const hasEmbedParam = url.searchParams.has("embed", "true");
   const isLivePage = /^\/live\/([^/]+)\/?$/g.test(url.pathname);
@@ -45,7 +45,7 @@ function setChatAreaStatus(value: boolean) {
   }
 }
 
-export function makeEmbedPlayer() {
+export function makeChzzkEmbedPlayer() {
   window.addEventListener("keydown", (event) => {
     // ESC로 넓은 화면을 종료하는 것을 방지하기 위해 ESC키 이벤트 중지
     if (event.key === "Escape") {
@@ -179,7 +179,7 @@ function registerVideoLoadedEvent() {
   }
 
   const emit = () => {
-    embedEvent.emit("load");
+    chzzkEmbedEvent.emit("load");
     loaded = true;
   };
 
@@ -243,7 +243,7 @@ function onPlayerChange() {
   if (muted !== null) data.muted = muted;
   if (quality !== null) data.quality = quality;
 
-  embedEvent.emit("change", data);
+  chzzkEmbedEvent.emit("change", data);
 }
 
 function onResize() {
@@ -393,6 +393,6 @@ function extractQualityValue(element: HTMLLIElement) {
   return quality;
 }
 
-export function removeEmbedPlayer() {
+export function removeChzzkEmbedPlayer() {
   document.body.classList.remove(EMBED_CLASS_NAME);
 }
