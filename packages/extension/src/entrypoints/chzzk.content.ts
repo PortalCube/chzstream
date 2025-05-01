@@ -9,6 +9,7 @@ import {
 } from "@extension/utils/chzzk-embed-player.ts";
 import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
 import {
+  contentClient,
   initializeClientMessage,
   send,
 } from "@extension/utils/message/content-client.ts";
@@ -24,6 +25,12 @@ export default defineContentScript({
 
     await initializeInterceptor();
     await initializeClientMessage();
+
+    // contentClient event register
+    contentClient.on("video-status", (message) =>
+      setPlayerControl(message.data)
+    );
+
     initializeIframeEventCapture();
 
     if (isChzzkEmbedPlayer()) {
