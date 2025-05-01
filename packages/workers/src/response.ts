@@ -28,8 +28,26 @@ export function createNotFoundResponse(request: Request<unknown, unknown>) {
 
 export function createBadRequestResponse(
   request: Request<unknown, unknown>,
-  target: string
+  target: string,
+  type?: string[] | object
 ) {
+  if (Array.isArray(type)) {
+    return createJSONResponse(request, {
+      status: 400,
+      message: `Bad request. "${target}" must be one of [${type.join(", ")}].`,
+      body: null,
+    });
+  }
+
+  if (typeof type === "object") {
+    const typeName = "name" in type ? type["name"] : "unknown";
+    return createJSONResponse(request, {
+      status: 400,
+      message: `Bad request. "${target}" must be of type "${typeName}".`,
+      body: null,
+    });
+  }
+
   return createJSONResponse(request, {
     status: 400,
     message: `Bad request. "${target}" is not valid.`,

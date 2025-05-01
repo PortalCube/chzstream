@@ -14,7 +14,7 @@ const routers: Route[] = [
   // CORS preflight request
   {
     method: "OPTIONS",
-    path: "*path",
+    path: "*path", // "*"
     handler: (request) => createResponse(request, null, 200),
     ttl: 60,
   },

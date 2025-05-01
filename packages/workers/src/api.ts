@@ -42,15 +42,17 @@ export const getYoutubeChannelRoute: Endpoint = async (
   });
 
   if (typeof type !== "string") {
-    return createBadRequestResponse(request, "type");
+    return createBadRequestResponse(request, "type", String);
   }
 
-  if (["id", "handle", "video"].includes(type) === false) {
-    return createBadRequestResponse(request, "type");
+  const getChannelType = ["id", "handle", "video"];
+
+  if (getChannelType.includes(type) === false) {
+    return createBadRequestResponse(request, "type", getChannelType);
   }
 
   if (typeof value !== "string") {
-    return createBadRequestResponse(request, "value");
+    return createBadRequestResponse(request, "value", String);
   }
 
   const response = await client.getChannel({
@@ -82,7 +84,7 @@ export const getChannelRoute: Endpoint = async (
   const client = new StreamClient();
 
   if (typeof channelId !== "string") {
-    return createBadRequestResponse(request, "channelId");
+    return createBadRequestResponse(request, "channelId", String);
   }
 
   const response = await client.getChannel({
