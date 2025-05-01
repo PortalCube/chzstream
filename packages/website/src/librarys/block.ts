@@ -63,11 +63,6 @@ export type BlockStatus = {
 
 export type BlockOptions = {
   zoom: number;
-  objectFit: "contain" | "cover" | "fill";
-  objectPosition: {
-    horizontal: "left" | "center" | "right";
-    vertical: "top" | "center" | "bottom";
-  };
 };
 
 export type Block = {

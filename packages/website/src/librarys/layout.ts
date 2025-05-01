@@ -57,11 +57,6 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
     },
     options: {
       zoom: 1.0,
-      objectFit: "contain",
-      objectPosition: {
-        horizontal: "center",
-        vertical: "center",
-      },
     },
   };
 
@@ -299,31 +294,3 @@ export const quickBlockAddAtom = atom(null, (_get, set) => {
     set(pushChannelWithDefaultPresetAtom, channels);
   });
 });
-
-export const sendBlockOptionsAtom = atom(
-  null,
-  async (get, _set, id: number) => {
-    const messageClient = get(messageClientAtom);
-    if (messageClient === null) return;
-
-    const blockList = get(blockListAtom);
-    const block = blockList.find((item) => item.id === id);
-
-    if (block === undefined) return;
-
-    const websiteId = messageClient.id.id;
-
-    messageClient.send(
-      "video-style",
-      {
-        objectFit: block.options.objectFit,
-        objectPosition: block.options.objectPosition,
-      },
-      {
-        type: "content",
-        websiteId: websiteId,
-        blockId: id,
-      }
-    );
-  }
-);

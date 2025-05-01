@@ -368,14 +368,6 @@ export function setPlayerControl(data: RequestPayload<"video-status">) {
   }
 }
 
-export function setVideoStyle(data: RequestPayload<"video-style">) {
-  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
-  if (videoElement === null) return;
-
-  videoElement.style.objectFit = data.objectFit;
-  videoElement.style.objectPosition = `${data.objectPosition.horizontal} ${data.objectPosition.vertical}`;
-}
-
 function extractQualityValue(element: HTMLLIElement) {
   const qualityTextElement = element.querySelector<HTMLSpanElement>(
     ".pzp-ui-setting-quality-item__prefix"
