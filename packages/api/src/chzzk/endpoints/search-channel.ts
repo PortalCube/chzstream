@@ -1,21 +1,28 @@
 import { createPaginationSchema } from "@api/chzzk/schema.ts";
 import { ChzzkClient } from "@api/chzzk/client.ts";
 import { z } from "zod";
+import { def } from "@api/error.ts";
 
-const nextSchema = z.object({
-  offset: z.number(),
-});
+const nextSchema = z
+  .object({
+    offset: z.number(),
+  })
+  .catch(
+    def({
+      offset: 0,
+    })
+  );
 
 const schema = createPaginationSchema(
   z.object({
     channel: z.object({
-      channelId: z.string(),
-      channelName: z.string(),
-      channelImageUrl: z.string().nullable(),
-      verifiedMark: z.boolean(),
-      channelDescription: z.string(),
-      followerCount: z.number(),
-      openLive: z.boolean(),
+      channelId: z.string().catch(def("")),
+      channelName: z.string().catch(def("알 수 없음")),
+      channelImageUrl: z.string().nullable().catch(def(null)),
+      verifiedMark: z.boolean().catch(def(false)),
+      channelDescription: z.string().catch(def("")),
+      followerCount: z.number().catch(def(0)),
+      openLive: z.boolean().catch(def(false)),
       personalData: z
         .object({
           following: z.object({
@@ -25,7 +32,8 @@ const schema = createPaginationSchema(
           }),
           privateUserBlock: z.boolean(),
         })
-        .optional(),
+        .optional()
+        .catch(def(undefined)),
     }),
   }),
   nextSchema

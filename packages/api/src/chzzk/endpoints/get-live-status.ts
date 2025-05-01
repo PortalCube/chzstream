@@ -1,41 +1,50 @@
 import { createResponseSchema } from "@api/chzzk/schema.ts";
 import { ChzzkClient } from "@api/chzzk/client.ts";
 import { z } from "zod";
+import { def } from "@api/error.ts";
 
 const schema = createResponseSchema(
   z
     .object({
-      liveTitle: z.string(),
-      status: z.enum(["OPEN", "CLOSE"]),
-      concurrentUserCount: z.number(),
-      accumulateCount: z.number(),
-      paidPromotion: z.boolean(),
-      adult: z.boolean(),
-      krOnlyViewing: z.boolean(),
-      openDate: z.string(),
-      closeDate: z.string().nullable(),
-      clipActive: z.boolean(),
-      chatChannelId: z.string().nullable(),
-      tags: z.string().array(),
-      categoryType: z.string().nullable(),
-      liveCategory: z.string().nullable(),
-      liveCategoryValue: z.string(),
-      livePollingStatusJson: z.string(),
+      liveTitle: z.string().catch(def("알 수 없음")),
+      status: z.enum(["OPEN", "CLOSE"]).catch(def("CLOSE" as const)),
+      concurrentUserCount: z.number().catch(def(0)),
+      accumulateCount: z.number().catch(def(0)),
+      paidPromotion: z.boolean().catch(def(false)),
+      adult: z.boolean().catch(def(false)),
+      krOnlyViewing: z.boolean().catch(def(false)),
+      openDate: z.string().catch(def("")),
+      closeDate: z.string().nullable().catch(def(null)),
+      clipActive: z.boolean().catch(def(false)),
+      chatChannelId: z.string().nullable().catch(def(null)),
+      tags: z.string().array().catch(def([])),
+      categoryType: z.string().nullable().catch(def(null)),
+      liveCategory: z.string().nullable().catch(def(null)),
+      liveCategoryValue: z.string().catch(def("")),
+      livePollingStatusJson: z.string().catch(def("")),
       faultStatus: z.unknown(),
       userAdultStatus: z
         .enum(["ADULT", "NOT_LOGIN_USER", "NOT_REAL_NAME_AUTH"])
-        .nullable(),
+        .nullable()
+        .catch(def(null)),
       blindType: z.unknown(),
-      playerRecommendContent: z.object({
-        categoryLives: z.array(z.unknown()),
-        channelLatestVideos: z.array(z.unknown()),
-      }),
-      chatActive: z.boolean(),
-      chatAvailableGroup: z.string(),
-      chatAvailableCondition: z.string(),
-      minFollowerMinute: z.number(),
-      allowSubscriberInFollowerMode: z.boolean(),
-      chatDonationRankingExposure: z.boolean(),
+      playerRecommendContent: z
+        .object({
+          categoryLives: z.array(z.unknown()),
+          channelLatestVideos: z.array(z.unknown()),
+        })
+        .catch(
+          def({
+            categoryLives: [],
+            channelLatestVideos: [],
+          })
+        ),
+      chatActive: z.boolean().catch(def(false)),
+      chatAvailableGroup: z.string().catch(def("")),
+      chatAvailableCondition: z.string().catch(def("")),
+      minFollowerMinute: z.number().catch(def(0)),
+      allowSubscriberInFollowerMode: z.boolean().catch(def(false)),
+      chatDonationRankingExposure: z.boolean().catch(def(false)),
       dropsCampaignNo: z.unknown(),
       liveTokenList: z.unknown(),
       watchPartyNo: z.unknown(),

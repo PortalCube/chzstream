@@ -1,45 +1,53 @@
 import { ChzzkClient } from "@api/chzzk/client.ts";
 import { createPaginationSchema } from "@api/chzzk/schema.ts";
+import { def } from "@api/error.ts";
 import { z } from "zod";
 
-const nextSchema = z.object({
-  offset: z.number(),
-});
+const nextSchema = z
+  .object({
+    offset: z.number(),
+  })
+  .catch(
+    def({
+      offset: 0,
+    })
+  );
 
 const schema = createPaginationSchema(
   z.object({
     live: z.object({
-      liveTitle: z.string(),
-      liveImageUrl: z.string().nullable(),
-      defaultThumbnailImageUrl: z.string().nullable(),
-      concurrentUserCount: z.number(),
-      accumulateCount: z.number(),
-      openDate: z.string(),
-      liveId: z.number(),
-      adult: z.boolean(),
-      tags: z.string().array(),
-      chatChannelId: z.string().nullable(),
-      categoryType: z.string().nullable(),
-      liveCategory: z.string().nullable(),
-      liveCategoryValue: z.string(),
+      liveTitle: z.string().catch(def("알 수 없음")),
+      liveImageUrl: z.string().nullable().catch(def(null)),
+      defaultThumbnailImageUrl: z.string().nullable().catch(def(null)),
+      concurrentUserCount: z.number().catch(def(0)),
+      accumulateCount: z.number().catch(def(0)),
+      openDate: z.string().catch(def("")),
+      liveId: z.number().catch(def(0)),
+      adult: z.boolean().catch(def(false)),
+      tags: z.string().array().catch(def([])),
+      chatChannelId: z.string().nullable().catch(def(null)),
+      categoryType: z.string().nullable().catch(def(null)),
+      liveCategory: z.string().nullable().catch(def(null)),
+      liveCategoryValue: z.string().catch(def("")),
       dropsCampaignNo: z.unknown(),
       watchPartyNo: z.unknown(),
       watchPartyTag: z.unknown(),
-      channelId: z.string(),
-      livePlaybackJson: z.string().nullable(),
+      channelId: z.string().catch(def("")),
+      livePlaybackJson: z.string().nullable().catch(def(null)),
       blindType: z.unknown(),
     }),
     channel: z.object({
-      channelId: z.string(),
-      channelName: z.string(),
-      channelImageUrl: z.string().nullable(),
-      verifiedMark: z.boolean(),
-      activatedChannelBadgeIds: z.string().array().optional(),
+      channelId: z.string().catch(def("")),
+      channelName: z.string().catch(def("알 수 없음")),
+      channelImageUrl: z.string().nullable().catch(def(null)),
+      verifiedMark: z.boolean().catch(def(false)),
+      activatedChannelBadgeIds: z.string().array().optional().catch(def([])),
       personalData: z
         .object({
           privateUserBlock: z.boolean(),
         })
-        .optional(),
+        .optional()
+        .catch(def(undefined)),
     }),
   }),
   nextSchema
