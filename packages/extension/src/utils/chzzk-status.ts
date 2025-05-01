@@ -11,7 +11,7 @@ export async function initializePlayerStatus() {
       send("player-status", {
         type: "end",
       });
-      removeEmbedPlayer();
+      removeChzzkEmbedPlayer();
       return;
     }
 
@@ -24,7 +24,7 @@ export async function initializePlayerStatus() {
       send("player-status", {
         type: "end",
       });
-      removeEmbedPlayer();
+      removeChzzkEmbedPlayer();
       return;
     }
 
@@ -43,7 +43,7 @@ export async function initializePlayerStatus() {
       send("player-status", {
         type: "end",
       });
-      removeEmbedPlayer();
+      removeChzzkEmbedPlayer();
       return;
     }
 
@@ -56,7 +56,7 @@ export async function initializePlayerStatus() {
       send("player-status", {
         type: "end",
       });
-      removeEmbedPlayer();
+      removeChzzkEmbedPlayer();
       return;
     }
 
