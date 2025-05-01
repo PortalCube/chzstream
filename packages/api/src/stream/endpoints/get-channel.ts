@@ -1,4 +1,10 @@
 import { Platform, StreamClient } from "@api/stream/client.ts";
+import {
+  YoutubeGetChannelResponse,
+  YoutubeGetPlaylistItemsResponse,
+  YoutubeGetVideosResponse,
+} from "@api/youtube";
+import { isAxiosError } from "axios";
 
 export type StreamGetChannelResponse = {
   platform: Platform;
@@ -76,30 +82,27 @@ async function getChannelChzzk(
   return response;
 }
 
-async function getChannelYoutube(
+type YoutubeGetVideoItem = YoutubeGetVideosResponse["items"][number];
+
+async function getYoutubeStream(
   this: StreamClient,
-  options: Extract<StreamGetChannelOptions, { platform: "youtube" }>
-): Promise<StreamGetChannelResponse> {
-  if (options.type === "video") {
-    return getChannelYoutubeWithVideo.call(this, options);
+  playlistId: string
+): Promise<YoutubeGetVideoItem | null> {
+  let playlistResponse: YoutubeGetPlaylistItemsResponse | null = null;
+
+  try {
+    playlistResponse = await this.youtubeClient.getPlaylistItems({
+      id: playlistId,
+      size: 50,
+    });
+  } catch (err) {
+    if (isAxiosError(err) === false) throw err;
+    if (err.status !== 404) throw err;
   }
 
-  const channelResponse = await this.youtubeClient.getChannel({
-    type: options.type,
-    value: options.value,
-  });
-
-  if (channelResponse.pageInfo.totalResults === 0) {
+  if (playlistResponse === null) {
     return null;
   }
-
-  const channel = channelResponse.items![0];
-  const uploadPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
-
-  const playlistResponse = await this.youtubeClient.getPlaylistItems({
-    id: uploadPlaylistId,
-    size: 50,
-  });
 
   const videoIds = playlistResponse.items.map(
     (item) => item.contentDetails.videoId
@@ -107,27 +110,19 @@ async function getChannelYoutube(
 
   const videoResponse = await this.youtubeClient.getVideos(videoIds);
 
-  let stream: (typeof videoResponse.items)[number] | null = null;
+  const dateSort = (a: YoutubeGetVideoItem, b: YoutubeGetVideoItem) =>
+    new Date(a.liveStreamingDetails!.scheduledStartTime!).valueOf() -
+    new Date(b.liveStreamingDetails!.scheduledStartTime!).valueOf();
 
   // 진행 중인 라이브 스트림
   const liveStreams = videoResponse.items
     .filter((item) => item.snippet.liveBroadcastContent === "live")
-    .sort(
-      (a, b) =>
-        // 가장 나중에 시작한 라이브를 가져오기
-        new Date(b.liveStreamingDetails!.actualStartTime!).valueOf() -
-        new Date(a.liveStreamingDetails!.actualStartTime!).valueOf()
-    );
+    .sort(dateSort);
 
   // 예정된 라이브 스트림
   const upcomingStreams = videoResponse.items
     .filter((item) => item.snippet.liveBroadcastContent === "upcoming")
-    .sort(
-      (a, b) =>
-        // 가장 먼저 시작할 라이브를 가져오기
-        new Date(a.liveStreamingDetails!.scheduledStartTime!).valueOf() -
-        new Date(b.liveStreamingDetails!.scheduledStartTime!).valueOf()
-    );
+    .sort(dateSort);
 
   // 종료된 라이브 스트림
   const endedStreams = videoResponse.items
@@ -136,21 +131,53 @@ async function getChannelYoutube(
         item.snippet.liveBroadcastContent === "none" &&
         item.liveStreamingDetails !== undefined
     )
-    .sort(
-      (a, b) =>
-        // 가장 나중에 시작한 라이브를 가져오기
-        new Date(b.liveStreamingDetails!.actualStartTime!).valueOf() -
-        new Date(a.liveStreamingDetails!.actualStartTime!).valueOf()
-    );
+    .sort(dateSort);
 
   if (liveStreams.length > 0) {
-    stream = liveStreams[0];
+    return liveStreams.pop()!;
   } else if (upcomingStreams.length > 0) {
-    stream = upcomingStreams[0];
+    return upcomingStreams.shift()!;
   } else if (endedStreams.length > 0) {
-    stream = endedStreams[0];
+    return endedStreams.pop()!;
   }
 
+  return null;
+}
+
+async function getChannelYoutube(
+  this: StreamClient,
+  options: Extract<StreamGetChannelOptions, { platform: "youtube" }>
+): Promise<StreamGetChannelResponse> {
+  if (options.type === "video") {
+    return getChannelYoutubeWithVideo.call(this, options);
+  }
+
+  const { type, value } = options;
+
+  let channelResponse: YoutubeGetChannelResponse | null = null;
+
+  try {
+    channelResponse = await this.youtubeClient.getChannel({
+      type,
+      value,
+    });
+  } catch (err) {
+    if (isAxiosError(err) === false) throw err;
+    if (err.status !== 404) throw err;
+  }
+
+  if (channelResponse === null) {
+    return null;
+  }
+
+  if (channelResponse.pageInfo.totalResults === 0) {
+    return null;
+  }
+
+  const channel = channelResponse.items![0];
+  const uploadPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
+
+  const stream = await getYoutubeStream.call(this, uploadPlaylistId);
   const viewer = stream?.liveStreamingDetails?.concurrentViewers ?? 0; // TODO
 
   return {
