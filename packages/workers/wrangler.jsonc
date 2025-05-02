@@ -15,4 +15,7 @@
       "database_id": "2ea5abef-c49a-4251-b23d-ab7a8395d5b3",
     },
   ],
+  "limits": {
+    "cpu_ms": 150,
+  },
 }
