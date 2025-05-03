@@ -6,7 +6,11 @@ import {
   searchLiveRoute,
   searchTagRoute,
 } from "@workers/api.ts";
-import { createNotFoundResponse, createResponse } from "@workers/response.ts";
+import {
+  createInternalErrorResponse,
+  createNotFoundResponse,
+  createResponse,
+} from "@workers/response.ts";
 import { createShareLayout, viewShareLayout } from "@workers/share.ts";
 import { match } from "path-to-regexp";
 
@@ -92,14 +96,19 @@ export default {
       }
 
       // Create new response and write to cache
-      const response = await route.handler(request, env, ctx, matched.params);
+      try {
+        const response = await route.handler(request, env, ctx, matched.params);
 
-      if (response.status === 200) {
-        response.headers.append("Cache-Control", "s-maxage=" + route.ttl);
-        ctx.waitUntil(caches.default.put(cacheKey, response.clone()));
+        if (response.status === 200) {
+          response.headers.append("Cache-Control", "s-maxage=" + route.ttl);
+          ctx.waitUntil(caches.default.put(cacheKey, response.clone()));
+        }
+
+        return response;
+      } catch (error) {
+        console.error("Error:", request.url, error);
+        return createInternalErrorResponse(request);
       }
-
-      return response;
     }
 
     return createNotFoundResponse(request);

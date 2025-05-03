@@ -18,6 +18,16 @@ export function createResponse(
   return new Response(response, { status, headers: cors(request) });
 }
 
+export function createInternalErrorResponse(
+  request: Request<unknown, unknown>
+) {
+  return createJSONResponse(request, {
+    status: 500,
+    message: "Internal Server Error",
+    body: null,
+  });
+}
+
 export function createNotFoundResponse(request: Request<unknown, unknown>) {
   return createJSONResponse(request, {
     status: 404,
