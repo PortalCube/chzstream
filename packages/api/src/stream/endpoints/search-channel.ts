@@ -1,5 +1,9 @@
-import { ChzzkSearchChannelOptions } from "@api/chzzk/index.ts";
+import {
+  ChzzkSearchChannelOptions,
+  ChzzkSearchChannelResponse,
+} from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
+import { isAxiosError } from "axios";
 
 export type StreamSearchChannelResponse = (
   | {
@@ -57,7 +61,22 @@ async function searchChannelChzzk(
   this: StreamClient,
   options: Extract<StreamSearchChannelOptions, { platform: "chzzk" }>
 ): Promise<StreamSearchChannelResponse> {
-  const data = await this.chzzkClient.searchChannel(options);
+  let data: ChzzkSearchChannelResponse | null = null;
+
+  try {
+    data = await this.chzzkClient.searchChannel(options);
+  } catch (err) {
+    if (isAxiosError(err) === false) throw err;
+    if (err.status !== 400) throw err;
+  }
+
+  if (data === null) {
+    return {
+      platform: "chzzk",
+      next: null,
+      result: [],
+    };
+  }
 
   return {
     platform: "chzzk",

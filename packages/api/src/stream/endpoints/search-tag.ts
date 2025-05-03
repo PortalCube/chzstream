@@ -1,5 +1,9 @@
-import { ChzzkSearchTagOptions } from "@api/chzzk/index.ts";
+import {
+  ChzzkSearchTagOptions,
+  ChzzkSearchTagResponse,
+} from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
+import { isAxiosError } from "axios";
 
 export type StreamSearchTagResponse = (
   | {
@@ -53,7 +57,22 @@ async function searchTagChzzk(
   this: StreamClient,
   options: Extract<StreamSearchTagOptions, { platform: "chzzk" }>
 ): Promise<StreamSearchTagResponse> {
-  const data = await this.chzzkClient.searchTag(options);
+  let data: ChzzkSearchTagResponse | null = null;
+
+  try {
+    data = await this.chzzkClient.searchTag(options);
+  } catch (err) {
+    if (isAxiosError(err) === false) throw err;
+    if (err.status !== 400) throw err;
+  }
+
+  if (data === null) {
+    return {
+      platform: "chzzk",
+      next: null,
+      result: [],
+    };
+  }
 
   return {
     platform: "chzzk",

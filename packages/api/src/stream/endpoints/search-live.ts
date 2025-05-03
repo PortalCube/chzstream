@@ -1,5 +1,9 @@
-import { ChzzkSearchLiveOptions } from "@api/chzzk/index.ts";
+import {
+  ChzzkSearchLiveOptions,
+  ChzzkSearchLiveResponse,
+} from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
+import { isAxiosError } from "axios";
 
 export type StreamSearchLiveResponse = (
   | {
@@ -55,7 +59,22 @@ async function searchLiveChzzk(
   this: StreamClient,
   options: Extract<StreamSearchLiveOptions, { platform: "chzzk" }>
 ): Promise<StreamSearchLiveResponse> {
-  const data = await this.chzzkClient.searchLive(options);
+  let data: ChzzkSearchLiveResponse | null = null;
+
+  try {
+    data = await this.chzzkClient.searchLive(options);
+  } catch (err) {
+    if (isAxiosError(err) === false) throw err;
+    if (err.status !== 400) throw err;
+  }
+
+  if (data === null) {
+    return {
+      platform: "chzzk",
+      next: null,
+      result: [],
+    };
+  }
 
   return {
     platform: "chzzk",
