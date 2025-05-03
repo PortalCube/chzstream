@@ -222,7 +222,7 @@ function Topbar() {
       {
         key: "mixer",
         Icon: MdVolumeUp,
-        text: "스트림 믹서",
+        text: "오디오 믹서",
         onClick: openMixerModal,
         filter: ["modify", "view"],
       },

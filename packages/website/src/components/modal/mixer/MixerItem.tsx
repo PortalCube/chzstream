@@ -1,6 +1,5 @@
-import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
-import React, { useMemo } from "react";
+import MixerVolume from "@web/components/modal/mixer/MixerVolume.tsx";
+import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { MixerContext } from "@web/librarys/context.ts";
 import {
   type MixerItem,
@@ -9,9 +8,10 @@ import {
   soloBlockIdAtom,
   updateMuteAtom,
 } from "@web/librarys/mixer.ts";
+import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
+import React, { useMemo } from "react";
 import styled from "styled-components";
-import MixerQuality from "@web/components/modal/mixer/MixerQuality.tsx";
-import MixerVolume from "@web/components/modal/mixer/MixerVolume.tsx";
 
 const Container = styled.div`
   padding: 8px;
@@ -44,19 +44,10 @@ const Block = styled.div`
   gap: 8px;
 `;
 
-const BlockIcon = styled.div`
+const BlockIcon = styled.img`
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 4px;
-  background-color: rgba(40, 255, 119, 1);
-  color: rgba(0, 0, 0, 1);
-
-  font-weight: 600;
-  font-size: 16px;
+  border-radius: 50%;
 
   &.hidden {
     display: none;
@@ -127,7 +118,7 @@ function MixerItem({ item }: MixerItemProps) {
 
   const updateMute = useSetAtom(updateMuteAtom);
 
-  const { id, name, mixer } = item;
+  const { id, icon, name, mixer } = item;
   const { lock } = mixer;
   const soloBlockId = useAtomValue(soloBlockIdAtom);
   const solo = useMemo(() => soloBlockId === id, [soloBlockId, id]);
@@ -165,10 +156,12 @@ function MixerItem({ item }: MixerItemProps) {
     <MixerContext.Provider value={item}>
       <Container className={className}>
         <Block>
-          <BlockIcon className={blockIconClassName}>{id}</BlockIcon>
+          <BlockIcon
+            src={icon ?? getProfileImageUrl()}
+            className={blockIconClassName}
+          />
           <BlockText>{name}</BlockText>
         </Block>
-        <MixerQuality />
         <MixerVolume />
         <LockButton className={lockButtonClassName} onClick={onLockClick}>
           LOCK

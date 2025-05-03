@@ -2,7 +2,6 @@ import { RequestMessage } from "@message/index.ts";
 import ButtonMenu from "@web/components/block-context-menu/ButtonMenu.tsx";
 import Channel from "@web/components/block-context-menu/Channel.tsx";
 import MixerItem from "@web/components/block-context-menu/MixerItem.tsx";
-import MixerQuality from "@web/components/block-context-menu/MixerQuality.tsx";
 import MixerVolume from "@web/components/block-context-menu/MixerVolume.tsx";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import { blockListAtom } from "@web/librarys/app.ts";
@@ -177,7 +176,6 @@ function BlockContextMenu() {
 
     return (
       <>
-        <MixerQuality />
         <MixerVolume />
         <MixerItem />
         <Divider />

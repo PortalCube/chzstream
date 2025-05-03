@@ -6,8 +6,6 @@ const EMBED_CLASS_NAME = "chzzk-embed-player";
 
 const MINIFIED_PLAYER_WIDTH = 360;
 
-const QUALITY_ARRAY = [360, 480, 720, 1080];
-
 let lockPlayerEventDate: number | null = null;
 
 let loaded = false;
@@ -90,26 +88,6 @@ export function makeChzzkEmbedPlayer() {
       onLargeModeActivated();
     };
 
-    const isQualityChanged = (item: Node) => {
-      if (item instanceof HTMLLIElement === false) return;
-      if (
-        item.classList.contains("pzp-ui-setting-pane-item--checked") === false
-      )
-        return;
-      if (item.classList.contains("pzp-ui-setting-quality-item") === false)
-        return;
-
-      if (loaded === false) {
-        return;
-      }
-
-      if (isPlayerEventLocked()) {
-        return;
-      }
-
-      debouncedPlayerChange();
-    };
-
     const isSmallMode = (layout: Node) => {
       if (isEmbedPlayerLoaded() === false) return;
       if (layout instanceof HTMLDivElement === false) return;
@@ -120,12 +98,7 @@ export function makeChzzkEmbedPlayer() {
       clickElement("button.pzp-viewmode-button");
     };
 
-    const functions = [
-      isPlayerLoaded,
-      isLargeMode,
-      isSmallMode,
-      isQualityChanged,
-    ];
+    const functions = [isPlayerLoaded, isLargeMode, isSmallMode];
 
     mutations.forEach((mutation) => {
       functions.forEach((fn) => fn(mutation.target));
@@ -205,6 +178,7 @@ function registerVolumeChangeEvent() {
     if (isPlayerEventLocked()) {
       return;
     }
+
     debouncedPlayerChange();
   });
 }
@@ -233,7 +207,6 @@ function debounce(func: () => void, delay: number) {
 function onPlayerChange() {
   if (loaded === false) return;
 
-  const quality = getQuality();
   const volume = getVolume();
   const muted = getMuted();
 
@@ -241,7 +214,6 @@ function onPlayerChange() {
 
   if (volume !== null) data.volume = volume;
   if (muted !== null) data.muted = muted;
-  if (quality !== null) data.quality = quality;
 
   chzzkEmbedEvent.emit("change", data);
 }
@@ -284,67 +256,6 @@ function setMuted(value: boolean) {
   videoElement.muted = value;
 }
 
-function getQuality() {
-  const qualityElement = document.querySelector<HTMLLIElement>(
-    ".pzp-ui-setting-quality-item.pzp-ui-setting-pane-item--checked"
-  );
-  if (qualityElement === null) return null;
-
-  return extractQualityValue(qualityElement);
-}
-
-function setQuality(value: number) {
-  const quality = QUALITY_ARRAY[value];
-  if (quality === undefined) {
-    throw new Error(`Invalid quality: ${value}`);
-  }
-
-  // quality보다 작은 해상도 중 가장 높은 해상도를 선택
-  const qualityElements = Array.from(
-    document.querySelectorAll<HTMLLIElement>(".pzp-ui-setting-quality-item")
-  );
-
-  let selectedQuality: number | null = null;
-  let selectedElement: HTMLLIElement | null = null;
-
-  for (const element of qualityElements) {
-    const quality = extractQualityValue(element);
-    if (quality === null) continue;
-
-    if (quality > value) continue;
-
-    if (selectedQuality === null || selectedQuality < quality) {
-      selectedQuality = quality;
-      selectedElement = element;
-    }
-  }
-
-  if (selectedElement === null) return;
-  selectedElement.dispatchEvent(new Event("focus"));
-  selectedElement.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export function waitForPlayerControl(
-  videoElement: HTMLVideoElement
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const time = setTimeout(() => {
-      reject(new Error("Failed to wait for player control"));
-    }, 5000);
-
-    videoElement.addEventListener("loadeddata", async () => {
-      // 화질이 너무 빨리 변경되면 플레이어가 일시 정지되는 문제가 있음
-      await sleep(100);
-      resolve();
-      clearTimeout(time);
-    });
-  });
-}
-
 export function setPlayerControl(data: RequestPayload<"video-status">) {
   const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
   if (videoElement === null) return;
@@ -355,10 +266,6 @@ export function setPlayerControl(data: RequestPayload<"video-status">) {
 
   lockPlayerEventDate = Date.now();
 
-  if (data.quality !== undefined) {
-    setQuality(data.quality);
-  }
-
   if (data.volume !== undefined) {
     setVolume(data.volume);
   }
@@ -366,23 +273,6 @@ export function setPlayerControl(data: RequestPayload<"video-status">) {
   if (data.muted !== undefined) {
     setMuted(data.muted);
   }
-}
-
-function extractQualityValue(element: HTMLLIElement) {
-  const qualityTextElement = element.querySelector<HTMLSpanElement>(
-    ".pzp-ui-setting-quality-item__prefix"
-  );
-  if (qualityTextElement === null) return null;
-
-  const qualityText = qualityTextElement.textContent;
-  if (qualityText === null) return null;
-
-  const qualityValue = Number(qualityText.trim().replaceAll(/\D/g, ""));
-
-  const quality = QUALITY_ARRAY.findIndex((value) => value === qualityValue);
-  if (quality === -1) return null;
-
-  return quality;
 }
 
 export function removeChzzkEmbedPlayer() {

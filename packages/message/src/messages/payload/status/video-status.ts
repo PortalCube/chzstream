@@ -2,7 +2,6 @@ import { PayloadSchema } from "../payload.ts";
 
 interface VideoStatusMessage extends PayloadSchema {
   request: {
-    quality?: number;
     volume?: number;
     muted?: boolean;
   };

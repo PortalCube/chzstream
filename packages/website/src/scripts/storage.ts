@@ -125,23 +125,3 @@ export async function getStoragePlayerMuted(): Promise<boolean> {
 export async function setStoragePlayerMuted(value: boolean) {
   await set(PLAYER_MUTED_KEY, value);
 }
-
-// player_default_quality
-const PLAYER_QUALITY_KEY = "player_quality";
-
-export const PLAYER_QUALITY_INITIAL_DATA = 0;
-
-export async function getStoragePlayerQuality(): Promise<number> {
-  const response = await get<number>(PLAYER_QUALITY_KEY);
-
-  if (response === undefined) {
-    await setStoragePlayerQuality(PLAYER_QUALITY_INITIAL_DATA);
-    return PLAYER_QUALITY_INITIAL_DATA;
-  }
-
-  return response;
-}
-
-export async function setStoragePlayerQuality(value: number) {
-  await set(PLAYER_QUALITY_KEY, value);
-}

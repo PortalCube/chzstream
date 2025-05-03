@@ -46,13 +46,11 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
     channel: null,
     mixer: {
       volume: defaultMixerItem.mixer.volume,
-      quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
       lock: false,
     },
     player: {
       volume: defaultMixerItem.mixer.volume,
-      quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
     },
     options: {
@@ -76,7 +74,6 @@ export const addBlockAtom = atom(null, (get, set, block: Block) => {
 
   block.mixer = {
     volume: defaultMixerItem.mixer.volume,
-    quality: defaultMixerItem.mixer.quality,
     muted: defaultMixerItem.mixer.muted,
     lock: false,
   };

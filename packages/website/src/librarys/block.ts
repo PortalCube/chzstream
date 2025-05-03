@@ -33,14 +33,12 @@ export type BlockChannel = {
 
 export type BlockMixer = {
   volume: number;
-  quality: number;
   lock: boolean;
   muted: boolean;
 };
 
 export type BlockPlayer = {
   volume: number;
-  quality: number;
   muted: boolean;
 };
 

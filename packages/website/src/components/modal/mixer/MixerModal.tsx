@@ -1,20 +1,18 @@
-import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
+import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
 import {
-  bandwidthAtom,
   batchMixerItemAtom,
   defaultMixerItemAtom,
   mixerItemsAtom,
   setupMixerAtom,
-  updateBatchQualityAtom,
 } from "@web/librarys/mixer.ts";
 import {
   closeModalAtom,
   modalAtom,
   useModalListener,
 } from "@web/librarys/modal.ts";
+import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
 import styled from "styled-components";
-import MixerItem from "@web/components/modal/mixer/MixerItem.tsx";
 
 const Container = styled.div`
   padding: 24px;
@@ -72,11 +70,6 @@ const Footer = styled.div`
   justify-content: space-between;
 `;
 
-const BandwidthText = styled.p`
-  font-weight: 600;
-  font-size: 16px;
-`;
-
 const ApplyButton = styled.button`
   padding: 8px 24px;
   border: none;
@@ -107,8 +100,6 @@ function MixerModal({}: MixerModalProps) {
   const mixerItems = useAtomValue(mixerItemsAtom);
   const defaultMixerItem = useAtomValue(defaultMixerItemAtom);
   const batchMixerItem = useAtomValue(batchMixerItemAtom);
-  const bandwidth = useAtomValue(bandwidthAtom);
-  const updateAllQuality = useSetAtom(updateBatchQualityAtom);
   const setupMixer = useSetAtom(setupMixerAtom);
 
   const onApplyClick: React.MouseEventHandler = () => closeModal();
@@ -122,12 +113,6 @@ function MixerModal({}: MixerModalProps) {
   ));
 
   useModalListener((_get, _set, newVal, prevVal) => {
-    if (prevVal.type !== "mixer") return;
-    if (newVal.type !== "none") return;
-    updateAllQuality();
-  });
-
-  useModalListener((_get, _set, newVal, prevVal) => {
     if (prevVal.type === newVal.type) return;
     if (newVal.type !== "mixer") return;
     setupMixer();
@@ -135,7 +120,7 @@ function MixerModal({}: MixerModalProps) {
 
   return (
     <Container className={className}>
-      <Title>스트림 믹서</Title>
+      <Title>오디오 믹서</Title>
       <List>
         <MixerItem item={defaultMixerItem} />
         <MixerItem item={batchMixerItem} />
@@ -143,7 +128,6 @@ function MixerModal({}: MixerModalProps) {
       <Divider />
       <List>{items}</List>
       <Footer>
-        <BandwidthText>예상 네트워크 사용량: {bandwidth}</BandwidthText>
         <ApplyButton onClick={onApplyClick}>확인</ApplyButton>
       </Footer>
     </Container>
