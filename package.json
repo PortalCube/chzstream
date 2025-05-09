@@ -1,7 +1,7 @@
 {
   "name": "chzstream",
   "description": "치지직 스트리밍을 하나의 화면으로 편하게 시청하세요.",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "type": "module",
   "author": "PortalCube",
   "license": "MIT",
