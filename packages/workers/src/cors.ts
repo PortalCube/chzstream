@@ -21,6 +21,9 @@ export function cors(request: Request<unknown, unknown>): HeadersInit {
   if (origin !== null && isAllowedOrigin(origin)) {
     return {
       "Access-Control-Allow-Origin": origin,
+
+      // 기존 Response가 캐시되어 로컬에서 CORS 에러가 발생하는 것을 방지
+      Vary: "Origin",
     };
   }
 
