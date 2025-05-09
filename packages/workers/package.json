@@ -1,0 +1,32 @@
+{
+  "name": "@chzstream/workers",
+  "version": "0.25.0",
+  "type": "module",
+  "author": "PortalCube",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "pnpm build && vite preview",
+    "deploy": "pnpm build && wrangler deploy",
+    "test": "vitest",
+    "wrangler": "wrangler",
+    "execute": "wrangler d1 execute chzstream-d1",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.0.5",
+    "@cloudflare/vitest-pool-workers": "^0.7.5",
+    "typescript": "^5.8.3",
+    "vite": "^6.2.1",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "~3.0.7",
+    "wrangler": "^4.10.0"
+  },
+  "dependencies": {
+    "@chzstream/api": "workspace:^",
+    "@chzstream/url": "workspace:^",
+    "nanoid": "^5.1.5",
+    "path-to-regexp": "^8.2.0"
+  }
+}

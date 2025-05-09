@@ -1,5 +1,9 @@
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
 import {
+  createStreamGetChannelOptions,
+  fetchBlockChannelAtom,
+} from "@web/librarys/api-client";
+import {
   blockListAtom,
   layoutModeAtom,
   nextBlockIdAtom,
@@ -11,7 +15,6 @@ import {
   BlockPosition,
   BlockStatus,
 } from "@web/librarys/block.ts";
-import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import {
   defaultMixerItemAtom,
   setSoloAtom,
@@ -43,22 +46,15 @@ export const pushBlockAtom = atom(null, (get, set, position: BlockPosition) => {
     channel: null,
     mixer: {
       volume: defaultMixerItem.mixer.volume,
-      quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
       lock: false,
     },
     player: {
       volume: defaultMixerItem.mixer.volume,
-      quality: defaultMixerItem.mixer.quality,
       muted: defaultMixerItem.mixer.muted,
     },
     options: {
       zoom: 1.0,
-      objectFit: "contain",
-      objectPosition: {
-        horizontal: "center",
-        vertical: "center",
-      },
     },
   };
 
@@ -78,7 +74,6 @@ export const addBlockAtom = atom(null, (get, set, block: Block) => {
 
   block.mixer = {
     volume: defaultMixerItem.mixer.volume,
-    quality: defaultMixerItem.mixer.quality,
     muted: defaultMixerItem.mixer.muted,
     lock: false,
   };
@@ -173,7 +168,8 @@ export const activateBlockAtom = atom(null, (get, set) => {
       item.status = {
         ...item.status,
         enabled: true,
-        loading: isRestrictedMode === false,
+        loading:
+          isRestrictedMode === false && item.channel?.platform !== "youtube",
         error: null,
       };
     });
@@ -208,7 +204,10 @@ export const setBlockChannelAtom = atom(
     set(updateBlockAtom, id, (block) => {
       block.channel = channel;
 
-      const loading = block.channel !== null && isRestrictedMode === false;
+      const loading =
+        block.channel !== null &&
+        isRestrictedMode === false &&
+        channel?.platform !== "youtube";
       const enabled = layoutMode === "view";
 
       block.status = {
@@ -245,67 +244,15 @@ export const refreshChannelAtom = atom(null, async (get, set) => {
   });
 
   for (const block of expiredBlockList) {
-    const channel = await set(fetchChzzkChannelAtom, block.channel!.uuid);
+    const channel = await set(fetchBlockChannelAtom, {
+      platform: "chzzk",
+      id: block.channel!.channelId,
+    });
 
     // DONT USE "setBlockChannel" HERE
     set(modifyBlockAtom, { id: block.id, channel });
   }
 });
-
-export const fetchChzzkChannelAtom = atom(
-  null,
-  async (get, _set, uuid: string) => {
-    const messageClient = get(messageClientAtom);
-    const isRestrictedMode = messageClient === null;
-
-    const channel: BlockChannel = {
-      uuid: uuid,
-      name: "알 수 없음",
-      title: "현재 오프라인 상태입니다",
-      thumbnailUrl: "",
-      iconUrl: getProfileImageUrl(),
-      lastUpdate: null,
-      liveStatus: false,
-    };
-
-    // 제한 모드 처리
-    if (isRestrictedMode) {
-      channel.title = "제한 모드에서는 채널 정보를 불러올 수 없습니다";
-      return channel;
-    }
-
-    // 채널 데이터 가져오기
-    const response = await messageClient.request("stream-get-channel", {
-      platform: "chzzk",
-      id: uuid,
-    });
-
-    const data = response.data;
-    if (data === null) {
-      throw new Error(`Channel not found: ${uuid}`);
-    }
-
-    // 가져온 데이터로 채널 정보 업데이트
-    channel.name = data.channelName;
-    channel.iconUrl = getProfileImageUrl(data.channelImageUrl);
-    channel.liveStatus = data.liveStatus;
-    channel.lastUpdate = Date.now();
-
-    // 방송이 켜진 경우, 제목도 업데이트
-    if (data.liveStatus === true) {
-      channel.title = data.liveTitle ?? "";
-    }
-
-    // TODO: CHZZK 전용 코드 --> 추후 수정
-    // 썸네일 이미지가 있는 경우, 이미지 URL 업데이트
-    if (data.liveThumbnailUrl !== null) {
-      const imageUrl = data.liveThumbnailUrl.replace("{type}", "1080");
-      channel.thumbnailUrl = imageUrl + `?t=${channel.lastUpdate}`;
-    }
-
-    return channel;
-  }
-);
 
 export const activateViewModeAtom = atom(null, (_get, set) => {
   set(layoutModeAtom, "view");
@@ -334,37 +281,13 @@ export const quickBlockAddAtom = atom(null, (_get, set) => {
     const channels: BlockChannel[] = [];
 
     for (const item of _channels) {
-      channels.push(await set(fetchChzzkChannelAtom, item.uuid));
+      const options = createStreamGetChannelOptions(item);
+
+      if (options) {
+        channels.push(await set(fetchBlockChannelAtom, options));
+      }
     }
 
     set(pushChannelWithDefaultPresetAtom, channels);
   });
 });
-
-export const sendBlockOptionsAtom = atom(
-  null,
-  async (get, _set, id: number) => {
-    const messageClient = get(messageClientAtom);
-    if (messageClient === null) return;
-
-    const blockList = get(blockListAtom);
-    const block = blockList.find((item) => item.id === id);
-
-    if (block === undefined) return;
-
-    const websiteId = messageClient.id.id;
-
-    messageClient.send(
-      "video-style",
-      {
-        objectFit: block.options.objectFit,
-        objectPosition: block.options.objectPosition,
-      },
-      {
-        type: "content",
-        websiteId: websiteId,
-        blockId: id,
-      }
-    );
-  }
-);

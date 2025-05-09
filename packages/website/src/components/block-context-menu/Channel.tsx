@@ -1,11 +1,13 @@
+import { StreamGetChannelOptions } from "@api/index.ts";
+import {
+  createStreamGetChannelOptions,
+  fetchBlockChannelAtom,
+} from "@web/librarys/api-client";
 import { clearBlockContextMenuAtom } from "@web/librarys/block-context-menu.ts";
 import { getProfileImageUrl } from "@web/librarys/chzzk-util.ts";
 import { BlockContextMenuContext } from "@web/librarys/context.ts";
 import { useBlockDrag } from "@web/librarys/drag-and-drop.ts";
-import {
-  fetchChzzkChannelAtom,
-  setBlockChannelAtom,
-} from "@web/librarys/layout.ts";
+import { setBlockChannelAtom } from "@web/librarys/layout.ts";
 import { openSearchModalAtom } from "@web/librarys/modal.ts";
 import { useSetAtom } from "jotai";
 import { useContext, useMemo } from "react";
@@ -75,7 +77,7 @@ const Description = styled.div`
 function Channel() {
   const block = useContext(BlockContextMenuContext);
   const openSearchModal = useSetAtom(openSearchModalAtom);
-  const fetchChzzkChannel = useSetAtom(fetchChzzkChannelAtom);
+  const fetchBlockChannel = useSetAtom(fetchBlockChannelAtom);
   const setBlockChannel = useSetAtom(setBlockChannelAtom);
   const clearBlockContextMenu = useSetAtom(clearBlockContextMenuAtom);
 
@@ -100,8 +102,8 @@ function Channel() {
       return result;
     }
 
-    result.iconUrl = block.channel.iconUrl;
-    result.name = block.channel.name;
+    result.iconUrl = block.channel.channelImageUrl;
+    result.name = block.channel.channelName;
     result.description = "클릭하거나 드래그";
     result.hasChannel = true;
 
@@ -112,9 +114,15 @@ function Channel() {
     clearBlockContextMenu();
     openSearchModal(
       async (channels) => {
-        const uuid = channels[0].uuid;
-        const channel = await fetchChzzkChannel(uuid);
-        setBlockChannel(id, channel);
+        const channel = channels[0];
+        const options = createStreamGetChannelOptions(channel);
+
+        if (options === null) {
+          return;
+        }
+
+        const blockChannel = await fetchBlockChannel(options);
+        setBlockChannel(id, blockChannel);
       },
       { allowMultiSelect: false }
     );

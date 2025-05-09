@@ -1,17 +1,34 @@
+import { StreamGetChannelOptions } from "@api/index.ts";
 import { messageClientAtom } from "@web/hooks/useMessageClient.ts";
-import { getChzzkUuid } from "@web/librarys/chzzk-util.ts";
+import {
+  fetchStreamChannelAtom,
+  fetchStreamLiveListAtom,
+  searchStreamChannelAtom,
+  searchStreamLiveAtom,
+  searchStreamTagAtom,
+} from "@web/librarys/api-client.ts";
+import { BlockPlatform } from "@web/librarys/block.ts";
+import { getChzzkChannelId } from "@web/librarys/chzzk-util.ts";
 import { closeModalAtom, modalAtom } from "@web/librarys/modal.ts";
+import { getYoutubeChannelId } from "@web/librarys/youtube-util.ts";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 
-export type SearchCategory = "summary" | "channel" | "live" | "recommend";
+export type SearchCategory =
+  | "summary"
+  | "channel"
+  | "live"
+  | "recommend"
+  | "youtube-notice";
 
 export type SearchItemType = {
-  uuid: string;
+  platform: BlockPlatform;
+  channelId: string;
+  liveId: string | null;
   title: string;
   description: string;
-  channelImage: string | null;
-  thumbnailImage: string | null;
+  channelImageUrl: string | null;
+  liveThumbnailUrl: string | null;
   countPrefix: string;
   count: number;
   liveStatus: boolean;
@@ -22,6 +39,9 @@ export type SearchItemResult = SearchItemType & {
   type: "channel" | "live";
   selected: boolean;
 };
+
+// 검색 플랫폼
+export const searchPlatformAtom = atom<BlockPlatform>("chzzk");
 
 // 검색 query
 export const searchQueryAtom = atom<string>("");
@@ -55,7 +75,7 @@ export const liveResultAtom = atom<SearchItemResult[]>((get) => {
     .filter((item) => item.type === "live")
     .map((item) => ({
       ...item,
-      selected: selectedItems.some((i) => i.uuid === item.uuid),
+      selected: selectedItems.some((i) => i.channelId === item.channelId),
     }));
 });
 
@@ -66,7 +86,7 @@ export const channelResultAtom = atom<SearchItemResult[]>((get) => {
     .filter((item) => item.type === "channel")
     .map((item) => ({
       ...item,
-      selected: selectedItems.some((i) => i.uuid === item.uuid),
+      selected: selectedItems.some((i) => i.channelId === item.channelId),
     }));
 });
 
@@ -84,55 +104,102 @@ export const setMultiSelectAtom = atom(
 
 // 입력한 query와 category로 검색을 진행합니다다.
 export const submitSearchAtom = atom(null, async (get, set) => {
-  set(searchLoadingAtom, true);
+  if (get(searchLoadingAtom) === true) return;
+
+  set(searchResultAtom, []); // 검색 결과 초기화
 
   const query = get(searchQueryAtom);
-  const uuid = getChzzkUuid(query);
+  const platform = get(searchPlatformAtom);
 
-  if (query === "") {
-    // 인기 라이브 목록 가져오기
-    set(searchCategoryAtom, "recommend");
-    await set(searchRecommendLiveAtom);
+  const result: SearchItemResult[] = [];
+
+  if (platform === "youtube") {
+    set(searchLoadingAtom, true);
+    if (query === "") {
+      // 안내 메세지 표시
+      set(searchCategoryAtom, "youtube-notice");
+    } else {
+      // 채널 조회
+      set(searchCategoryAtom, "summary");
+    }
   } else {
-    // 전체 검색
-    set(searchCategoryAtom, "summary");
-    await set(searchItemAtom);
+    if (query === "") {
+      // 인기 라이브 목록 가져오기
+      set(searchCategoryAtom, "recommend");
+      set(searchLoadingAtom, true);
+
+      const recommendResult = await set(searchRecommendLiveAtom);
+      result.push(...recommendResult);
+    } else {
+      // 전체 검색
+      set(searchCategoryAtom, "summary");
+      set(searchLoadingAtom, true);
+
+      const totalResult = await set(searchItemAtom);
+      result.push(...totalResult);
+    }
   }
 
   // uuid 검색
-  if (uuid !== null) {
-    await set(searchUuidAtom, uuid);
+  if (platform === "chzzk") {
+    const chzzkChannelId = getChzzkChannelId(query);
+
+    if (chzzkChannelId !== null) {
+      const item = await set(searchChannelIdAtom, {
+        platform: "chzzk",
+        id: chzzkChannelId,
+      });
+
+      if (item !== null) {
+        result.unshift(item);
+      }
+    }
+  } else if (platform === "youtube") {
+    const youtubeChannelId = getYoutubeChannelId(query);
+
+    if (youtubeChannelId !== null) {
+      const item = await set(searchChannelIdAtom, {
+        ...youtubeChannelId,
+        platform: "youtube",
+      });
+
+      if (item !== null) {
+        result.unshift(item);
+      }
+    }
   }
 
+  set(searchResultAtom, result);
   set(searchLoadingAtom, false);
 });
 
 // 라이브 목록을 시청자 내림차순으로 가져와 searchResultAtom에 저장합니다.
 export const searchRecommendLiveAtom = atom(null, async (get, set) => {
-  const messageClient = get(messageClientAtom);
+  const platform = get(searchPlatformAtom);
 
-  if (messageClient === null) {
-    set(searchResultAtom, []);
-    return;
+  // Youtube 일부 기능 미지원
+  if (platform === "youtube") {
+    return [];
   }
 
-  const response = await messageClient.request("stream-get-live-list", {
-    platform: "chzzk",
+  const response = await set(fetchStreamLiveListAtom, {
+    platform,
     size: 50,
   });
 
-  const data = response.data.result;
+  const data = response.result;
   if (data === null) {
-    set(searchResultAtom, []);
-    return;
+    return [];
   }
 
   const items = data.map<SearchItemResult>((item) => ({
-    uuid: item.channelId,
+    platform: item.platform,
+    channelId: item.channelId,
+    liveId: null,
     title: item.channelName,
     description: item.liveTitle ?? "",
-    channelImage: item.channelImageUrl,
-    thumbnailImage: item.liveThumbnailUrl,
+    channelImageUrl: item.channelImageUrl,
+    liveThumbnailUrl: item.liveThumbnailUrl,
     countPrefix: "시청자",
     count: item.liveViewer,
     liveStatus: true,
@@ -141,33 +208,34 @@ export const searchRecommendLiveAtom = atom(null, async (get, set) => {
     selected: false,
   }));
 
-  set(searchResultAtom, items);
+  return items;
 });
 
 // 주어진 query로 채널, 라이브, 태그 검색 결과를 가져와 searchResultAtom에 저장합니다.
 export const searchItemAtom = atom(null, async (get, set) => {
-  const messageClient = get(messageClientAtom);
+  const platform = get(searchPlatformAtom);
   const query = get(searchQueryAtom);
 
-  if (messageClient === null) {
-    set(searchResultAtom, []);
-    return;
+  // Youtube 일부 기능 미지원
+  if (platform === "youtube") {
+    return [];
   }
 
-  // 채널 검색
-  const channelResponse = await messageClient.request("stream-search-channel", {
-    platform: "chzzk",
+  const channelResponse = await set(searchStreamChannelAtom, {
+    platform,
     query,
     size: 50,
   });
 
-  const channelResults = channelResponse.data.result.map<SearchItemResult>(
+  const channelResults = channelResponse.result.map<SearchItemResult>(
     (item) => ({
-      uuid: item.channelId,
+      platform: item.platform,
+      channelId: item.channelId,
+      liveId: null,
       title: item.channelName,
       description: item.channelDescription,
-      channelImage: item.channelImageUrl,
-      thumbnailImage: null,
+      channelImageUrl: item.channelImageUrl,
+      liveThumbnailUrl: null,
       countPrefix: "팔로우",
       count: item.channelFollower,
       liveStatus: item.liveStatus,
@@ -177,19 +245,19 @@ export const searchItemAtom = atom(null, async (get, set) => {
     })
   );
 
-  const liveResponse = await messageClient.request("stream-search-live", {
+  const liveResponse = await set(searchStreamLiveAtom, {
+    platform,
+    query,
+    size: 50,
+  });
+
+  const tagResponse = await set(searchStreamTagAtom, {
     platform: "chzzk",
     query,
     size: 50,
   });
 
-  const tagResponse = await messageClient.request("stream-search-tag", {
-    platform: "chzzk",
-    query,
-    size: 50,
-  });
-
-  const liveResults = [...liveResponse.data.result, ...tagResponse.data.result]
+  const liveResults = [...liveResponse.result, ...tagResponse.result]
     .filter(
       (item, index, array) =>
         array.findIndex((el) => el.channelId === item.channelId) === index &&
@@ -197,11 +265,13 @@ export const searchItemAtom = atom(null, async (get, set) => {
     )
     .sort((a, b) => b.liveViewer - a.liveViewer)
     .map<SearchItemResult>((item) => ({
-      uuid: item.channelId,
+      platform: item.platform,
+      channelId: item.channelId,
+      liveId: null,
       title: item.channelName,
       description: item.liveTitle ?? "",
-      channelImage: item.channelImageUrl,
-      thumbnailImage: item.liveThumbnailUrl,
+      channelImageUrl: item.channelImageUrl,
+      liveThumbnailUrl: item.liveThumbnailUrl,
       countPrefix: "시청자",
       count: item.liveViewer,
       liveStatus: true,
@@ -210,70 +280,57 @@ export const searchItemAtom = atom(null, async (get, set) => {
       selected: false,
     }));
 
-  set(searchResultAtom, [...channelResults, ...liveResults]);
+  return [...channelResults, ...liveResults];
 });
 
-// 주어진 uuid를 가진 채널을 검색하여 searchResultAtom에 추가합니다.
-export const searchUuidAtom = atom(null, async (get, set, uuid: string) => {
-  const messageClient = get(messageClientAtom);
+// 주어진 id를 가진 채널을 검색하여 searchResultAtom에 추가합니다.
+export const searchChannelIdAtom = atom(
+  null,
+  async (_get, set, options: StreamGetChannelOptions) => {
+    const response = await set(fetchStreamChannelAtom, options);
 
-  if (messageClient === null) {
-    const unknownItem: SearchItemResult = {
-      uuid,
-      title: `치지직 UUID ${uuid}`,
-      description: `제한 모드에서는 채널의 정보를 가져올 수 없습니다.`,
-      channelImage: null,
-      thumbnailImage: null,
+    // 해당 채널이 존재하지 않음
+    if (response === null) {
+      return null;
+    }
+
+    const item: SearchItemResult = {
+      platform: response.platform,
+      channelId: response.channelId,
+      liveId: response.liveId,
+      title: response.channelName,
+      description: response.channelDescription,
+      channelImageUrl: response.channelImageUrl,
+      liveThumbnailUrl: response.liveThumbnailUrl,
       countPrefix: "팔로우",
-      count: 0,
-      liveStatus: false,
-      verified: false,
+      count: response.channelFollower,
+      liveStatus: response.liveStatus,
+      verified: response.channelVerified,
       type: "channel",
       selected: false,
     };
-    set(searchResultAtom, (prev) => {
-      prev.unshift(unknownItem);
-    });
-    return;
+
+    if (options.platform === "youtube") {
+      if (options.type === "video") {
+        item.type = "live";
+        item.description = response.liveTitle ?? "";
+        item.count = response.liveViewer;
+        item.countPrefix = "시청자";
+      } else {
+        item.countPrefix = "구독자";
+      }
+    }
+
+    return item;
   }
-
-  const response = await messageClient.request("stream-get-channel", {
-    platform: "chzzk",
-    id: uuid,
-  });
-
-  // 해당 uuid가 존재하지 않음
-  if (response.data === null) {
-    return;
-  }
-
-  const data = response.data;
-
-  const item: SearchItemResult = {
-    uuid: data.channelId,
-    title: data.channelName,
-    description: data.channelDescription,
-    channelImage: data.channelImageUrl,
-    thumbnailImage: null,
-    countPrefix: "팔로우",
-    count: data.channelFollower,
-    liveStatus: data.liveStatus,
-    verified: data.channelVerified,
-    type: "channel",
-    selected: false,
-  };
-
-  set(searchResultAtom, (prev) => {
-    prev.unshift(item);
-  });
-});
+);
 
 // 사용자가 선택한 채널을 선택된 채널 목록에 추가합니다. 다중 선택이 비활성화 되어있는 경우 그대로 modal을 종료합니다.
 export const selectItemAtom = atom(null, (get, set, item: SearchItemType) => {
   const isMultiSelect = get(isMultiSelectAtom);
 
   set(selectedItemsAtom, (draft) => {
-    const index = draft.findIndex((i) => i.uuid === item.uuid);
+    const index = draft.findIndex((i) => i.channelId === item.channelId);
     if (index === -1) {
       draft.push(item);
     } else {
@@ -299,7 +356,7 @@ export const removeSelectedItemAtom = atom(
   null,
   (_get, set, item: SearchItemType) => {
     set(selectedItemsAtom, (draft) => {
-      const index = draft.findIndex((i) => i.uuid === item.uuid);
+      const index = draft.findIndex((i) => i.channelId === item.channelId);
       if (index !== -1) {
         draft.splice(index, 1);
       }

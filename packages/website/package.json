@@ -1,6 +1,6 @@
 {
   "name": "@chzstream/website",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "type": "module",
   "author": "PortalCube",
   "license": "MIT",
@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chzstream/api": "workspace:^",
     "@chzstream/message": "workspace:^",
     "@chzstream/url": "workspace:^",
     "axios": "^1.8.2",
@@ -32,6 +33,7 @@
     "@types/lodash": "^4.17.16",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/youtube": "^0.1.0",
     "@vitejs/plugin-react": "^4.3.4",
     "sass-embedded": "^1.85.1",
     "typescript": "^5.8.2",

@@ -11,6 +11,7 @@ chzstream은 pnpm workspace를 이용한 모노레포를 사용합니다.
 - `message` 메시징 라이브러리
 - `url` url 라이브러리
 - `api` 치지직 API 라이브러리
+- `workers` Cloudflare Workers
 
 ## Local development
 
@@ -28,7 +29,7 @@ pnpm i
 pnpm web dev
 ```
 
-##### Website (React) 빌드
+#### Website (React) 빌드
 
 ```
 pnpm web build

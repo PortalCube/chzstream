@@ -147,7 +147,7 @@ function SearchChannelItem({ item }: SearchItemProps) {
   });
 
   const profileImage = useMemo(
-    () => getProfileImageUrl(item.channelImage),
+    () => getProfileImageUrl(item.channelImageUrl),
     [item]
   );
 

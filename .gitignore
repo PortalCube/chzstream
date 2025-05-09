@@ -129,16 +129,16 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Mac
-.DS_Store
-
 # @chzstream
 .vscode
 .vercel
+.DS_Store
 
 # @chzstream/extension
 .output
-stats.html
-stats-*.json
 .wxt
-web-ext.config.ts
+
+# @chzstream/workers
+worker-configuration.d.ts
+.dev.vars
+.wrangler/

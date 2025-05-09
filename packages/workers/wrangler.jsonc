@@ -1,0 +1,25 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chzstream-workers",
+  "main": "src/index.ts",
+  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2025-04-09",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chzstream-d1",
+      "database_id": "2ea5abef-c49a-4251-b23d-ab7a8395d5b3",
+    },
+  ],
+  "limits": {
+    "cpu_ms": 150,
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+}

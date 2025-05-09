@@ -14,9 +14,14 @@ const manifest: UserManifestFn = ({ mode }) => ({
   permissions: ["cookies"],
   host_permissions: makeUrls(
     [
+      // 네이버 로그인
       "https://naver.com/",
+
+      // 네이버 치지직
       "https://chzzk.naver.com/*",
       "https://api.chzzk.naver.com/*",
+
+      // 치즈스트림
       "https://chzstream.app/*",
       "https://preview.chzstream.app/*",
       "https://*.chzstream.pages.dev/*",

@@ -41,7 +41,7 @@ const itemCount = 5;
 const itemDelay = 200;
 const startDelay = -itemDelay * itemCount;
 
-function Spinner() {
+function BarSpinner() {
   const [randomDelay] = useState(randomRange(-500, 0));
 
   const elements = Array.from({ length: itemCount }, (_, i) => i).map((i) => (
@@ -51,4 +51,4 @@ function Spinner() {
   return <Container>{elements}</Container>;
 }
 
-export default Spinner;
+export default BarSpinner;

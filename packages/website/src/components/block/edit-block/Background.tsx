@@ -130,9 +130,9 @@ function Background({}: BackgroundProps) {
 
   const [error, setError] = useState(false);
 
-  const thumbnailUrl = channel?.thumbnailUrl ?? "";
-  const iconUrl = channel?.iconUrl ?? "";
-  const name = channel?.name ?? "알 수 없는 채널";
+  const thumbnailUrl = channel?.liveThumbnailUrl ?? "";
+  const iconUrl = channel?.channelImageUrl ?? "";
+  const name = channel?.channelName ?? "알 수 없는 채널";
 
   useEffect(() => {
     setError(false);

@@ -1,14 +1,15 @@
 import {
-  isEmbedChat,
-  makeEmbedChat,
+  isChzzkEmbedChat,
+  makeChzzkEmbedChat,
 } from "@extension/utils/chzzk-embed-chat.ts";
 import {
-  embedEvent,
-  isEmbedPlayer,
-  makeEmbedPlayer,
+  chzzkEmbedEvent,
+  isChzzkEmbedPlayer,
+  makeChzzkEmbedPlayer,
 } from "@extension/utils/chzzk-embed-player.ts";
 import { initializeIframeEventCapture } from "@extension/utils/iframe-event.ts";
 import {
+  contentClient,
   initializeClientMessage,
   send,
 } from "@extension/utils/message/content-client.ts";
@@ -24,12 +25,18 @@ export default defineContentScript({
 
     await initializeInterceptor();
     await initializeClientMessage();
+
+    // contentClient event register
+    contentClient.on("video-status", (message) =>
+      setPlayerControl(message.data)
+    );
+
     initializeIframeEventCapture();
 
-    if (isEmbedPlayer()) {
+    if (isChzzkEmbedPlayer()) {
       initializePlayerStatus();
       await initializeEmbedPlayer();
-    } else if (isEmbedChat()) {
+    } else if (isChzzkEmbedChat()) {
       await initializeEmbedChat();
     }
   },
@@ -41,13 +48,13 @@ function isEmbed() {
 }
 
 async function initializeEmbedPlayer() {
-  makeEmbedPlayer();
+  makeChzzkEmbedPlayer();
 
-  embedEvent.on("change", async (data) => {
+  chzzkEmbedEvent.on("change", async (data) => {
     send("video-status", data);
   });
 
-  embedEvent.on("load", async () => {
+  chzzkEmbedEvent.on("load", async () => {
     send("player-status", {
       type: "ready",
     });
@@ -55,7 +62,7 @@ async function initializeEmbedPlayer() {
 }
 
 async function initializeEmbedChat() {
-  makeEmbedChat();
+  makeChzzkEmbedChat();
 
   send("player-status", {
     type: "ready",

@@ -58,6 +58,10 @@ const MoreButton = styled.button`
   &:hover {
     color: rgba(180, 180, 180, 1);
   }
+
+  &.hidden {
+    display: none;
+  }
 `;
 
 const Spliter = styled.div`
@@ -77,11 +81,22 @@ function SearchSummary({}: SearchSummaryProps) {
     hidden: category !== "summary",
   });
 
+  const channelMoreClassName = classNames({
+    hidden: channelResult.length <= 3,
+  });
+
+  const liveMoreClassName = classNames({
+    hidden: liveResult.length <= 6,
+  });
+
   return (
     <Container className={className}>
       <Section>
         <Category name="채널" interactable={false} />
-        <MoreButton onClick={() => setCategory("channel")}>
+        <MoreButton
+          className={channelMoreClassName}
+          onClick={() => setCategory("channel")}
+        >
           모두 보기
           <MdNavigateNext size={24} />
         </MoreButton>
@@ -90,7 +105,10 @@ function SearchSummary({}: SearchSummaryProps) {
       <Spliter />
       <Section>
         <Category name="라이브" interactable={false} />
-        <MoreButton onClick={() => setCategory("live")}>
+        <MoreButton
+          className={liveMoreClassName}
+          onClick={() => setCategory("live")}
+        >
           모두 보기
           <MdNavigateNext size={24} />
         </MoreButton>

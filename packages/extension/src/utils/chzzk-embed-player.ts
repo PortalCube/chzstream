@@ -6,8 +6,6 @@ const EMBED_CLASS_NAME = "chzzk-embed-player";
 
 const MINIFIED_PLAYER_WIDTH = 360;
 
-const QUALITY_ARRAY = [360, 480, 720, 1080];
-
 let lockPlayerEventDate: number | null = null;
 
 let loaded = false;
@@ -19,9 +17,9 @@ type EmbedEvent = {
   change: (data: RequestPayload<"video-status">) => void;
 };
 
-export const embedEvent = createNanoEvents<EmbedEvent>();
+export const chzzkEmbedEvent = createNanoEvents<EmbedEvent>();
 
-export function isEmbedPlayer() {
+export function isChzzkEmbedPlayer() {
   const url = new URL(window.location.href);
   const hasEmbedParam = url.searchParams.has("embed", "true");
   const isLivePage = /^\/live\/([^/]+)\/?$/g.test(url.pathname);
@@ -45,7 +43,7 @@ function setChatAreaStatus(value: boolean) {
   }
 }
 
-export function makeEmbedPlayer() {
+export function makeChzzkEmbedPlayer() {
   window.addEventListener("keydown", (event) => {
     // ESC로 넓은 화면을 종료하는 것을 방지하기 위해 ESC키 이벤트 중지
     if (event.key === "Escape") {
@@ -90,26 +88,6 @@ export function makeEmbedPlayer() {
       onLargeModeActivated();
     };
 
-    const isQualityChanged = (item: Node) => {
-      if (item instanceof HTMLLIElement === false) return;
-      if (
-        item.classList.contains("pzp-ui-setting-pane-item--checked") === false
-      )
-        return;
-      if (item.classList.contains("pzp-ui-setting-quality-item") === false)
-        return;
-
-      if (loaded === false) {
-        return;
-      }
-
-      if (isPlayerEventLocked()) {
-        return;
-      }
-
-      debouncedPlayerChange();
-    };
-
     const isSmallMode = (layout: Node) => {
       if (isEmbedPlayerLoaded() === false) return;
       if (layout instanceof HTMLDivElement === false) return;
@@ -120,12 +98,7 @@ export function makeEmbedPlayer() {
       clickElement("button.pzp-viewmode-button");
     };
 
-    const functions = [
-      isPlayerLoaded,
-      isLargeMode,
-      isSmallMode,
-      isQualityChanged,
-    ];
+    const functions = [isPlayerLoaded, isLargeMode, isSmallMode];
 
     mutations.forEach((mutation) => {
       functions.forEach((fn) => fn(mutation.target));
@@ -179,7 +152,7 @@ function registerVideoLoadedEvent() {
   }
 
   const emit = () => {
-    embedEvent.emit("load");
+    chzzkEmbedEvent.emit("load");
     loaded = true;
   };
 
@@ -205,6 +178,7 @@ function registerVolumeChangeEvent() {
     if (isPlayerEventLocked()) {
       return;
     }
+
     debouncedPlayerChange();
   });
 }
@@ -233,7 +207,6 @@ function debounce(func: () => void, delay: number) {
 function onPlayerChange() {
   if (loaded === false) return;
 
-  const quality = getQuality();
   const volume = getVolume();
   const muted = getMuted();
 
@@ -241,9 +214,8 @@ function onPlayerChange() {
 
   if (volume !== null) data.volume = volume;
   if (muted !== null) data.muted = muted;
-  if (quality !== null) data.quality = quality;
 
-  embedEvent.emit("change", data);
+  chzzkEmbedEvent.emit("change", data);
 }
 
 function onResize() {
@@ -284,67 +256,6 @@ function setMuted(value: boolean) {
   videoElement.muted = value;
 }
 
-function getQuality() {
-  const qualityElement = document.querySelector<HTMLLIElement>(
-    ".pzp-ui-setting-quality-item.pzp-ui-setting-pane-item--checked"
-  );
-  if (qualityElement === null) return null;
-
-  return extractQualityValue(qualityElement);
-}
-
-function setQuality(value: number) {
-  const quality = QUALITY_ARRAY[value];
-  if (quality === undefined) {
-    throw new Error(`Invalid quality: ${value}`);
-  }
-
-  // quality보다 작은 해상도 중 가장 높은 해상도를 선택
-  const qualityElements = Array.from(
-    document.querySelectorAll<HTMLLIElement>(".pzp-ui-setting-quality-item")
-  );
-
-  let selectedQuality: number | null = null;
-  let selectedElement: HTMLLIElement | null = null;
-
-  for (const element of qualityElements) {
-    const quality = extractQualityValue(element);
-    if (quality === null) continue;
-
-    if (quality > value) continue;
-
-    if (selectedQuality === null || selectedQuality < quality) {
-      selectedQuality = quality;
-      selectedElement = element;
-    }
-  }
-
-  if (selectedElement === null) return;
-  selectedElement.dispatchEvent(new Event("focus"));
-  selectedElement.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export function waitForPlayerControl(
-  videoElement: HTMLVideoElement
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const time = setTimeout(() => {
-      reject(new Error("Failed to wait for player control"));
-    }, 5000);
-
-    videoElement.addEventListener("loadeddata", async () => {
-      // 화질이 너무 빨리 변경되면 플레이어가 일시 정지되는 문제가 있음
-      await sleep(100);
-      resolve();
-      clearTimeout(time);
-    });
-  });
-}
-
 export function setPlayerControl(data: RequestPayload<"video-status">) {
   const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
   if (videoElement === null) return;
@@ -355,10 +266,6 @@ export function setPlayerControl(data: RequestPayload<"video-status">) {
 
   lockPlayerEventDate = Date.now();
 
-  if (data.quality !== undefined) {
-    setQuality(data.quality);
-  }
-
   if (data.volume !== undefined) {
     setVolume(data.volume);
   }
@@ -368,31 +275,6 @@ export function setPlayerControl(data: RequestPayload<"video-status">) {
   }
 }
 
-export function setVideoStyle(data: RequestPayload<"video-style">) {
-  const videoElement = document.querySelector<HTMLVideoElement>(".pzp video");
-  if (videoElement === null) return;
-
-  videoElement.style.objectFit = data.objectFit;
-  videoElement.style.objectPosition = `${data.objectPosition.horizontal} ${data.objectPosition.vertical}`;
-}
-
-function extractQualityValue(element: HTMLLIElement) {
-  const qualityTextElement = element.querySelector<HTMLSpanElement>(
-    ".pzp-ui-setting-quality-item__prefix"
-  );
-  if (qualityTextElement === null) return null;
-
-  const qualityText = qualityTextElement.textContent;
-  if (qualityText === null) return null;
-
-  const qualityValue = Number(qualityText.trim().replaceAll(/\D/g, ""));
-
-  const quality = QUALITY_ARRAY.findIndex((value) => value === qualityValue);
-  if (quality === -1) return null;
-
-  return quality;
-}
-
-export function removeEmbedPlayer() {
+export function removeChzzkEmbedPlayer() {
   document.body.classList.remove(EMBED_CLASS_NAME);
 }

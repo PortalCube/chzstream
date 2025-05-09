@@ -6,14 +6,14 @@ const MINIFIED_CHAT_WIDTH = 280;
 const MINIFIED_CHAT_HEIGHT = 360;
 const MINIFIED_CHAT_NO_PINNED_HEIGHT = 480;
 
-export function isEmbedChat() {
+export function isChzzkEmbedChat() {
   const url = new URL(window.location.href);
   const hasEmbedParam = url.searchParams.has("embed", "true");
   const isChatPage = /^\/live\/([^/]+)\/chat\/?$/g.test(url.pathname);
   return hasEmbedParam && isChatPage;
 }
 
-export function makeEmbedChat() {
+export function makeChzzkEmbedChat() {
   // 컨테이너 최소 크기 제거
   document
     .querySelector<HTMLDivElement>("div[class^='chat_container']")

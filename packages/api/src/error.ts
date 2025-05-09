@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 
-export function replace<T>(defaultValue: T) {
+export function def<T>(defaultValue: T) {
   return (ctx: { error: ZodError; input: unknown }): T => {
     const { error, input } = ctx;
     reportSchemaError(error);
@@ -10,5 +10,5 @@ export function replace<T>(defaultValue: T) {
 
 export async function reportSchemaError(error: ZodError) {
   // send error somewhere...
-  console.error(error);
+  // console.error(error);
 }

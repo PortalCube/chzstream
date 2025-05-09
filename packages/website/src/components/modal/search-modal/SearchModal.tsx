@@ -2,9 +2,13 @@ import MultiSelect from "@web/components/modal/search-modal/MultiSelect.tsx";
 import MultiSelectCheckBox from "@web/components/modal/search-modal/MultiSelectCheckBox.tsx";
 import SearchBar from "@web/components/modal/search-modal/SearchBar.tsx";
 import SearchDetail from "@web/components/modal/search-modal/SearchDetail.tsx";
+import SearchLoading from "@web/components/modal/search-modal/SearchLoading.tsx";
+import SearchPlatformDropdown from "@web/components/modal/search-modal/SearchPlatformDropdown.tsx";
 import SearchSummary from "@web/components/modal/search-modal/SearchSummary.tsx";
+import SearchYoutubeNotice from "@web/components/modal/search-modal/SearchYoutubeNotice.tsx";
 import { modalAtom, useModalListener } from "@web/librarys/modal.ts";
 import {
+  searchPlatformAtom,
   searchQueryAtom,
   setMultiSelectAtom,
   submitSearchAtom,
@@ -53,6 +57,7 @@ function SearchModal({}: SearchModalProps) {
   const modal = useAtomValue(modalAtom);
 
   const setQuery = useSetAtom(searchQueryAtom);
+  const setPlatform = useSetAtom(searchPlatformAtom);
   const submitSearch = useSetAtom(submitSearchAtom);
   const setMultiSelect = useSetAtom(setMultiSelectAtom);
 
@@ -66,6 +71,7 @@ function SearchModal({}: SearchModalProps) {
 
     // 쿼리 초기화
     setQuery("");
+    setPlatform("chzzk");
     submitSearch();
   });
 
@@ -77,10 +83,12 @@ function SearchModal({}: SearchModalProps) {
     <Container className={className}>
       <Header>
         <SearchBar />
+        <SearchPlatformDropdown />
         <MultiSelectCheckBox />
       </Header>
       <SearchSummary />
       <SearchDetail />
+      <SearchYoutubeNotice />
       <MultiSelect />
     </Container>
   );

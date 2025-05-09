@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { sleep, streamClient, TEST_DELAY } from "../util.ts";
+import { StreamSearchLiveResponse } from "@api/stream/endpoints/search-live.ts";
 
 describe("StreamClient", () => {
   describe("searchLive", () => {
@@ -10,12 +11,13 @@ describe("StreamClient", () => {
 
     ["talk", "리그 오브 레전드"].forEach((query, index) => {
       it(`common query ${index + 1}`, async () => {
-        const res = await streamClient.searchLive({
+        const res = (await streamClient.searchLive({
           platform: "chzzk",
           query,
           size: 5,
-        });
+        })) as Extract<StreamSearchLiveResponse, { platform: "chzzk" }>;
 
+        expect(res.platform).toBe("chzzk");
         expect(res.next).not.toBeNull();
         expect(res.result.length).not.toBe(0);
       });
@@ -28,11 +30,12 @@ describe("StreamClient", () => {
     });
 
     it("pagination", async () => {
-      const res1 = await streamClient.searchLive({
+      const res1 = (await streamClient.searchLive({
         platform: "chzzk",
         query: "talk",
         size: 5,
-      });
+      })) as Extract<StreamSearchLiveResponse, { platform: "chzzk" }>;
+      expect(res1.platform).toBe("chzzk");
       expect(res1.next).not.toBeNull();
       expect(res1.result.length).not.toBe(0);
 
@@ -40,12 +43,13 @@ describe("StreamClient", () => {
 
       const next = res1.next;
 
-      const res2 = await streamClient.searchLive({
+      const res2 = (await streamClient.searchLive({
         platform: "chzzk",
         query: "talk",
         size: 5,
         next,
-      });
+      })) as Extract<StreamSearchLiveResponse, { platform: "chzzk" }>;
+      expect(res2.platform).toBe("chzzk");
       expect(res2.next).not.toBeNull();
       expect(res2.result.length).not.toBe(0);
     });

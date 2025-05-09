@@ -1,40 +1,53 @@
 import { ChzzkClient } from "@api/chzzk/client.ts";
 import { createPaginationSchema } from "@api/chzzk/schema.ts";
+import { def } from "@api/error.ts";
 import { z } from "zod";
 
-const nextSchema = z.object({
-  concurrentUserCount: z.number(),
-  liveId: z.number(),
-});
+const nextSchema = z
+  .object({
+    concurrentUserCount: z.number(),
+    liveId: z.number(),
+  })
+  .catch(
+    def({
+      concurrentUserCount: 0,
+      liveId: 0,
+    })
+  );
 
 const schema = createPaginationSchema(
   z.object({
-    liveId: z.number(),
-    liveTitle: z.string(),
-    liveImageUrl: z.string().nullable(),
-    defaultThumbnailImageUrl: z.string().nullable(),
-    concurrentUserCount: z.number(),
-    accumulateCount: z.number(),
-    openDate: z.string().nullable(),
-    adult: z.boolean(),
-    tags: z.string().array(),
-    categoryType: z.string().nullable(),
-    liveCategory: z.string().nullable(),
-    liveCategoryValue: z.string(),
+    liveId: z.number().catch(def(0)),
+    liveTitle: z.string().catch(def("알 수 없음")),
+    liveImageUrl: z.string().nullable().catch(def(null)),
+    defaultThumbnailImageUrl: z.string().nullable().catch(def(null)),
+    concurrentUserCount: z.number().catch(def(0)),
+    accumulateCount: z.number().catch(def(0)),
+    openDate: z.string().nullable().catch(def(null)),
+    adult: z.boolean().catch(def(false)),
+    tags: z.string().array().catch(def([])),
+    categoryType: z.string().nullable().catch(def(null)),
+    liveCategory: z.string().nullable().catch(def(null)),
+    liveCategoryValue: z.string().catch(def("")),
     dropsCampaignNo: z.unknown(),
     watchPartyNo: z.unknown(),
     watchPartyTag: z.unknown(),
     channel: z.object({
-      channelId: z.string(),
-      channelName: z.string(),
-      channelImageUrl: z.string().nullable(),
-      verifiedMark: z.boolean(),
-      activatedChannelBadgeIds: z.string().array().optional(),
+      channelId: z.string().catch(def("")),
+      channelName: z.string().catch(def("알 수 없음")),
+      channelImageUrl: z.string().nullable().catch(def(null)),
+      verifiedMark: z.boolean().catch(def(false)),
+      activatedChannelBadgeIds: z
+        .string()
+        .array()
+        .optional()
+        .catch(def(undefined)),
       personalData: z
         .object({
           privateUserBlock: z.boolean(),
         })
-        .optional(),
+        .optional()
+        .catch(def(undefined)),
     }),
     blindType: z.unknown(),
   }),

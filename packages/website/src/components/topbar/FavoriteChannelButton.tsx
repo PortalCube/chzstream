@@ -36,7 +36,11 @@ const Container = styled.div<{ $gap: number }>`
   }
 `;
 
-function ChannelButton({ icon, onClick, gap }: ChannelButtonProps) {
+function FavoriteChannelButton({
+  icon,
+  onClick,
+  gap,
+}: FavoriteChannelButtonProps) {
   const Icon = icon;
   return (
     <Container onClick={onClick} $gap={gap}>
@@ -45,10 +49,10 @@ function ChannelButton({ icon, onClick, gap }: ChannelButtonProps) {
   );
 }
 
-type ChannelButtonProps = {
+type FavoriteChannelButtonProps = {
   icon: IconType;
   onClick: React.MouseEventHandler;
   gap: number;
 };
 
-export default ChannelButton;
+export default FavoriteChannelButton;

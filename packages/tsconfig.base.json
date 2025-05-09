@@ -20,6 +20,7 @@
       "@message/*": ["../message/src/*"],
       "@url/*": ["../url/src/*"],
       "@api/*": ["../api/src/*"],
+      "@workers/*": ["../workers/src/*"],
 
       "@chzstream/api": ["../api/src/index.ts"],
       "@chzstream/message": ["../message/src/index.ts"],

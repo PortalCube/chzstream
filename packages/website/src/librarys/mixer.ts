@@ -4,10 +4,8 @@ import { blockListAtom } from "@web/librarys/app.ts";
 import { BlockMixer } from "@web/librarys/block.ts";
 import {
   getStoragePlayerMuted,
-  getStoragePlayerQuality,
   getStoragePlayerVolume,
   setStoragePlayerMuted,
-  setStoragePlayerQuality,
   setStoragePlayerVolume,
 } from "@web/scripts/storage.ts";
 import { atom } from "jotai";
@@ -15,15 +13,16 @@ import { atomWithImmer } from "jotai-immer";
 
 export type MixerItem = {
   id: number | null;
+  icon: string | null;
   name: string;
   mixer: BlockMixer;
 };
 
 export const defaultMixerItemAtom = atomWithImmer<MixerItem>({
   id: null,
+  icon: null,
   name: "기본값",
   mixer: {
-    quality: 0,
     volume: 0,
     lock: false,
     muted: false,
@@ -32,9 +31,9 @@ export const defaultMixerItemAtom = atomWithImmer<MixerItem>({
 
 export const batchMixerItemAtom = atomWithImmer<MixerItem>({
   id: 0,
+  icon: null,
   name: "모든 블록에 적용",
   mixer: {
-    quality: 1,
     volume: 50,
     lock: false,
     muted: false,
@@ -49,36 +48,18 @@ export const mixerItemsAtom = atom<MixerItem[]>((get) => {
     .filter((block) => block.type === "stream")
     .map((block) => ({
       id: block.id,
-      name: block.channel?.name ?? "채널 없음",
+      icon: block.channel?.channelImageUrl ?? null,
+      name: block.channel?.channelName ?? "채널 없음",
       mixer: block.mixer,
     }));
 });
 
-const BANDWIDTHS = [100, 250, 500, 1200];
-export const bandwidthAtom = atom((get) => {
-  const mixerItems = get(mixerItemsAtom);
-
-  const size = mixerItems.reduce(
-    (acc, item) => acc + BANDWIDTHS[item.mixer.quality],
-    0
-  );
-
-  if (size > 2000) {
-    const value = Math.round((size / 1024) * 10) / 10;
-    return `${value}MB/s`;
-  } else {
-    return `${size}KB/s`;
-  }
-});
-
 export const loadDefaultMixerAtom = atom(null, async (_get, set) => {
-  const quality = await getStoragePlayerQuality();
   const volume = await getStoragePlayerVolume();
   const muted = await getStoragePlayerMuted();
 
   set(defaultMixerItemAtom, (draft) => {
     draft.mixer = {
-      quality,
       volume,
       lock: false,
       muted,
@@ -93,7 +74,6 @@ export const setupMixerAtom = atom(null, (_get, set) => {
       if (item.status.enabled === false) return;
 
       item.mixer.volume = item.player.volume;
-      item.mixer.quality = item.player.quality;
       item.mixer.muted = item.player.muted;
     });
   });
@@ -114,23 +94,6 @@ export const setVolumeAtom = atom(
       newValue = set(setDefaultVolumeAtom, volume);
     } else {
       newValue = set(setSingleVolumeAtom, id, volume);
-    }
-
-    return newValue;
-  }
-);
-
-export const setQualityAtom = atom(
-  null,
-  (_get, set, id: number | null, quality: number) => {
-    let newValue: number | null = null;
-
-    if (id === 0) {
-      newValue = set(setBatchQualityAtom, quality);
-    } else if (id === null) {
-      newValue = set(setDefaultQualityAtom, quality);
-    } else {
-      newValue = set(setSingleQualityAtom, id, quality);
     }
 
     return newValue;
@@ -210,26 +173,6 @@ export const setSingleVolumeAtom = atom(
     });
 
     return volume;
-  }
-);
-
-export const setSingleQualityAtom = atom(
-  null,
-  (get, set, id: number, quality: number): number | null => {
-    const blockList = get(blockListAtom);
-
-    const index = blockList.findIndex((item) => item.id === id);
-    if (index === -1) return null;
-
-    const block = blockList[index];
-    if (block.mixer.quality === quality) return null;
-
-    set(blockListAtom, (draft) => {
-      const item = draft[index];
-      item.mixer.quality = quality;
-    });
-
-    return quality;
   }
 );
 
@@ -319,22 +262,6 @@ export const setDefaultVolumeAtom = atom(
   }
 );
 
-export const setDefaultQualityAtom = atom(
-  null,
-  (get, set, quality: number): number | null => {
-    const defaultMixerItem = get(defaultMixerItemAtom);
-    if (defaultMixerItem.mixer.quality === quality) return null;
-
-    set(defaultMixerItemAtom, (draft) => {
-      draft.mixer.quality = quality;
-    });
-
-    setStoragePlayerQuality(quality);
-
-    return quality;
-  }
-);
-
 export const setDefaultMuteAtom = atom(
   null,
   (get, set, mute: boolean | null): boolean | null => {
@@ -371,23 +298,6 @@ export const setBatchVolumeAtom = atom(
     });
 
     return volume;
-  }
-);
-
-export const setBatchQualityAtom = atom(
-  null,
-  (get, set, quality: number): number | null => {
-    set(batchMixerItemAtom, (draft) => {
-      draft.mixer.quality = quality;
-    });
-
-    const mixerItems = get(mixerItemsAtom);
-    mixerItems.forEach((item) => {
-      if (item.mixer.lock) return;
-      set(setQualityAtom, item.id, quality);
-    });
-
-    return quality;
   }
 );
 
@@ -452,42 +362,6 @@ export const updateBatchVolumeAtom = atom(null, (_get, set) => {
   });
 });
 
-export const updateQualityAtom = atom(null, (_get, set, id: number) => {
-  if (id === 0) {
-    set(updateBatchQualityAtom);
-  } else {
-    set(updateSingleQualityAtom, id);
-  }
-});
-
-export const updateSingleQualityAtom = atom(null, (get, set, id: number) => {
-  const blockList = get(blockListAtom);
-  const index = blockList.findIndex((item) => item.id === id);
-
-  if (index === -1) return;
-
-  set(blockListAtom, (draft) => {
-    const item = draft[index];
-    item.player.quality = item.mixer.quality;
-
-    set(sendPlayerControlAtom, id, {
-      quality: item.player.quality,
-    });
-  });
-});
-
-export const updateBatchQualityAtom = atom(null, (_get, set) => {
-  set(blockListAtom, (draft) => {
-    draft.forEach((item) => {
-      item.player.quality = item.mixer.quality;
-
-      set(sendPlayerControlAtom, item.id, {
-        quality: item.player.quality,
-      });
-    });
-  });
-});
-
 export const updateMuteAtom = atom(null, (_get, set, id: number) => {
   if (id === 0) {
     set(updateBatchMuteAtom);
@@ -546,13 +420,12 @@ export const applyPlayerControlAtom = atom(
 
     const soloBlockId = get(soloBlockIdAtom);
 
-    const { volume, quality, muted } = block.player;
+    const { volume, muted } = block.player;
 
     const forceMute = soloBlockId !== null && soloBlockId !== id;
 
     set(sendPlayerControlAtom, id, {
       volume,
-      quality,
       muted: forceMute ? true : muted,
     });
   }
@@ -584,11 +457,6 @@ export const updatePlayerControlAtom = atom(
 
     set(blockListAtom, (draft) => {
       const item = draft[index];
-
-      if (data.quality !== undefined && item.mixer.quality !== data.quality) {
-        item.mixer.quality = data.quality;
-        item.player.quality = data.quality;
-      }
 
       if (data.volume !== undefined && item.mixer.volume !== data.volume) {
         item.mixer.volume = data.volume;

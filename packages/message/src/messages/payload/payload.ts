@@ -10,7 +10,6 @@ import { StreamSearchChannelMessage } from "./stream/search-channel.ts";
 import { StreamSearchLiveMessage } from "./stream/search-live.ts";
 import { StreamSearchTagMessage } from "./stream/search-tag.ts";
 import { VideoStatusMessage } from "./status/video-status.ts";
-import { VideoStyleMessage } from "./status/video-style.ts";
 
 export const PAYLOAD_MAP = {
   /* Heartbeat */
@@ -19,7 +18,6 @@ export const PAYLOAD_MAP = {
   /* Status */
   "player-status": PlayerStatusMessage,
   "video-status": VideoStatusMessage,
-  "video-style": VideoStyleMessage,
 
   /* Iframe Event */
   "iframe-pointer-move": IframePointerMoveMessage,

@@ -1,10 +1,11 @@
 import Category from "@web/components/modal/search-modal/Category.tsx";
 import SearchList from "@web/components/modal/search-modal/SearchList.tsx";
 import {
-  searchCategoryAtom,
   channelResultAtom,
   liveResultAtom,
+  searchCategoryAtom,
   SearchItemResult,
+  searchPlatformAtom,
 } from "@web/librarys/search.ts";
 import classNames from "classnames";
 import { useAtom, useAtomValue } from "jotai";
@@ -42,7 +43,7 @@ function SearchDetail({}: SearchDetailProps) {
   const channelResult = useAtomValue(channelResultAtom);
 
   const className = classNames({
-    hidden: category === "summary",
+    hidden: category === "summary" || category === "youtube-notice",
   });
 
   const { items, type } = useMemo<{

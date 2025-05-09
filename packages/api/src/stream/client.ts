@@ -6,16 +6,20 @@ import { getLiveList } from "@api/stream/endpoints/get-live-list.ts";
 import { searchChannel } from "@api/stream/endpoints/search-channel.ts";
 import { searchLive } from "@api/stream/endpoints/search-live.ts";
 import { searchTag } from "@api/stream/endpoints/search-tag.ts";
+import { YoutubeClient } from "@api/youtube/client.ts";
 
 export type StreamClientOptions = Partial<{
   headers: AxiosRequestConfig["headers"];
+  googleApiKey: string;
 }> | null;
 
 export class StreamClient {
   readonly chzzkClient: ChzzkClient;
+  readonly youtubeClient: YoutubeClient;
 
   constructor(options?: StreamClientOptions) {
     this.chzzkClient = new ChzzkClient(options);
+    this.youtubeClient = new YoutubeClient(options);
   }
 
   getChannel = getChannel;
@@ -25,4 +29,4 @@ export class StreamClient {
   searchTag = searchTag;
 }
 
-export type Platform = "chzzk"; // | "soop" | "youtube" | "twitch";
+export type Platform = "chzzk" | "youtube"; // | "soop" | "twitch";

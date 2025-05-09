@@ -14,7 +14,9 @@ export function useMessageClient() {
 
   useEffect(() => {
     if (checkWebsiteClient() === false) {
-      alert("확장프로그램을 인식하지 못했습니다. 제한 모드로 진행합니다.");
+      console.warn(
+        "확장프로그램을 인식하지 못했습니다. 제한 모드로 진행합니다."
+      );
       return;
     }
 

@@ -1,51 +1,55 @@
 import { createResponseSchema } from "@api/chzzk/schema.ts";
 import { ChzzkClient } from "@api/chzzk/client.ts";
 import { z } from "zod";
+import { def } from "@api/error.ts";
 
 const schema = createResponseSchema(
   z
     .object({
-      liveId: z.number(),
-      liveTitle: z.string(),
-      status: z.enum(["OPEN", "CLOSE"]),
-      liveImageUrl: z.string().nullable(),
-      defaultThumbnailImageUrl: z.string().nullable(),
-      concurrentUserCount: z.number(),
-      accumulateCount: z.number(),
-      openDate: z.string(),
-      closeDate: z.string().nullable(),
-      adult: z.boolean(),
-      krOnlyViewing: z.boolean(),
-      clipActive: z.boolean(),
-      tags: z.string().array(),
-      chatChannelId: z.string().nullable(),
-      categoryType: z.string().nullable(), // enum
-      liveCategory: z.string().nullable(),
-      liveCategoryValue: z.string(),
-      chatActive: z.boolean(),
-      chatAvailableGroup: z.string(), // enum
-      paidPromotion: z.boolean(),
-      chatAvailableCondition: z.string(), // enum
-      minFollowerMinute: z.number(),
-      allowSubscriberInFollowerMode: z.boolean(),
-      livePlaybackJson: z.string().nullable(),
-      p2pQuality: z.string().array().nullable(),
+      liveId: z.number().catch(def(0)),
+      liveTitle: z.string().catch(def("알 수 없음")),
+      status: z.enum(["OPEN", "CLOSE"]).catch(def("CLOSE" as const)),
+      liveImageUrl: z.string().nullable().catch(def(null)),
+      defaultThumbnailImageUrl: z.string().nullable().catch(def(null)),
+      concurrentUserCount: z.number().catch(def(0)),
+      accumulateCount: z.number().catch(def(0)),
+      openDate: z.string().catch(def("")),
+      closeDate: z.string().nullable().catch(def(null)),
+      adult: z.boolean().catch(def(false)),
+      krOnlyViewing: z.boolean().catch(def(false)),
+      clipActive: z.boolean().catch(def(false)),
+      tags: z.string().array().catch(def([])),
+      chatChannelId: z.string().nullable().catch(def(null)),
+      categoryType: z.string().nullable().catch(def(null)),
+      liveCategory: z.string().nullable().catch(def(null)),
+      liveCategoryValue: z.string().catch(def("")),
+      chatActive: z.boolean().catch(def(false)),
+      chatAvailableGroup: z.string().catch(def("")),
+      paidPromotion: z.boolean().catch(def(false)),
+      chatAvailableCondition: z.string().catch(def("")),
+      minFollowerMinute: z.number().catch(def(0)),
+      allowSubscriberInFollowerMode: z.boolean().catch(def(false)),
+      livePlaybackJson: z.string().nullable().catch(def(null)),
+      p2pQuality: z.string().array().nullable().catch(def(null)),
       channel: z.object({
-        channelId: z.string(),
-        channelName: z.string(),
-        channelImageUrl: z.string().nullable(),
-        verifiedMark: z.boolean(),
-        activatedChannelBadgeIds: z.string().array().optional(),
+        channelId: z.string().catch(def("")),
+        channelName: z.string().catch(def("알 수 없음")),
+        channelImageUrl: z.string().nullable().catch(def(null)),
+        verifiedMark: z.boolean().catch(def(false)),
+        activatedChannelBadgeIds: z.string().array().optional().catch(def([])),
       }),
-      livePollingStatusJson: z.string(),
+      livePollingStatusJson: z.string().catch(def("")),
       userAdultStatus: z
         .enum(["ADULT", "NOT_LOGIN_USER", "NOT_REAL_NAME_AUTH"])
-        .nullable(), // enum (need more info)
+        .nullable()
+        .catch(def(null)),
       blindType: z.unknown(),
-      chatDonationRankingExposure: z.boolean(),
-      adParameter: z.object({
-        tag: z.string(), // enum?
-      }),
+      chatDonationRankingExposure: z.boolean().catch(def(false)),
+      adParameter: z
+        .object({
+          tag: z.string(),
+        })
+        .catch(def({ tag: "" })),
       dropsCampaignNo: z.unknown(),
       watchPartyNo: z.unknown(),
       watchPartyTag: z.unknown(),

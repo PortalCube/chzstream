@@ -1,13 +1,16 @@
-import { createStore } from "jotai";
 import {
   BLOCK_TYPE_CHAT_NAME,
   BLOCK_TYPE_STREAM_NAME,
 } from "@web/scripts/constants.ts";
+import { createStore } from "jotai";
 import { MdForum, MdSmartDisplay } from "react-icons/md";
 
 export type Store = ReturnType<typeof createStore>;
 
 export type BlockType = "stream" | "chat";
+
+// TODO: 언젠가는 @api의 Platform으로 통합시키기
+export type BlockPlatform = "chzzk" | "youtube";
 
 export type BlockPosition = {
   top: number;
@@ -17,25 +20,25 @@ export type BlockPosition = {
 };
 
 export type BlockChannel = {
-  uuid: string;
-  name: string;
-  title: string;
-  thumbnailUrl: string;
-  iconUrl: string;
-  lastUpdate: number | null;
+  platform: BlockPlatform;
+  channelId: string;
+  channelName: string;
+  channelImageUrl: string;
+  liveId: string | null;
   liveStatus: boolean;
+  liveTitle: string;
+  liveThumbnailUrl: string;
+  lastUpdate: number | null;
 };
 
 export type BlockMixer = {
   volume: number;
-  quality: number;
   lock: boolean;
   muted: boolean;
 };
 
 export type BlockPlayer = {
   volume: number;
-  quality: number;
   muted: boolean;
 };
 
@@ -58,11 +61,6 @@ export type BlockStatus = {
 
 export type BlockOptions = {
   zoom: number;
-  objectFit: "contain" | "cover" | "fill";
-  objectPosition: {
-    horizontal: "left" | "center" | "right";
-    vertical: "top" | "center" | "bottom";
-  };
 };
 
 export type Block = {

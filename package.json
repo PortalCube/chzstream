@@ -1,7 +1,7 @@
 {
   "name": "chzstream",
   "description": "치지직 스트리밍을 하나의 화면으로 편하게 시청하세요.",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "type": "module",
   "author": "PortalCube",
   "license": "MIT",
@@ -11,6 +11,7 @@
     "api": "pnpm -F @chzstream/api",
     "url": "pnpm -F @chzstream/url",
     "msg": "pnpm -F @chzstream/message",
+    "wks": "pnpm -F @chzstream/workers",
     "dev": "pnpm -r dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
@@ -29,7 +30,8 @@
     "prettier": "^3.5.3",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1",
-    "vitest": "^3.0.8"
+    "vitest": "^3.0.8",
+    "wrangler": "^4.10.0"
   },
-  "packageManager": "pnpm@10.7.1"
+  "packageManager": "pnpm@10.10.0"
 }

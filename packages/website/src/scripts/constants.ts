@@ -14,3 +14,13 @@ export const WEB_EXTENSION_ID = "lmgoeocifeehhcopjbimlcpgapjfbclg";
 
 export const CHZZK_EMPTY_PROFILE_IMAGE =
   "https://ssl.pstatic.net/cmstatic/nng/img/img_anonymous_square_gray_opacity2x.png";
+
+/*************************
+ * Assets
+ *************************/
+
+import CHZZK_ICON_URL from "@web/assets/platform/chzzk.png";
+import SOOP_ICON_URL from "@web/assets/platform/soop.png";
+import YOUTUBE_ICON_URL from "@web/assets/platform/youtube.png";
+
+export { YOUTUBE_ICON_URL, SOOP_ICON_URL, CHZZK_ICON_URL };

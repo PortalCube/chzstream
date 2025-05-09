@@ -1,10 +1,17 @@
-import { ChzzkSearchLiveOptions } from "@api/chzzk/index.ts";
+import {
+  ChzzkSearchLiveOptions,
+  ChzzkSearchLiveResponse,
+} from "@api/chzzk/index.ts";
 import { Platform, StreamClient } from "@api/stream/client.ts";
+import { isAxiosError } from "axios";
 
-export type StreamSearchLiveResponse = {
-  platform: "chzzk";
-  next: Exclude<ChzzkSearchLiveOptions["next"], undefined>;
-} & {
+export type StreamSearchLiveResponse = (
+  | {
+      platform: "chzzk";
+      next: Exclude<ChzzkSearchLiveOptions["next"], undefined>;
+    }
+  | { platform: "youtube" }
+) & {
   result: {
     platform: Platform;
     channelId: string;
@@ -17,10 +24,15 @@ export type StreamSearchLiveResponse = {
   }[];
 };
 
-export type StreamSearchLiveOptions = {
-  platform: "chzzk";
-  next?: ChzzkSearchLiveOptions["next"];
-} & {
+export type StreamSearchLiveOptions = (
+  | {
+      platform: "chzzk";
+      next?: ChzzkSearchLiveOptions["next"];
+    }
+  | {
+      platform: "youtube";
+    }
+) & {
   query: string;
   size?: number;
 };
@@ -36,16 +48,33 @@ export async function searchLive(
 
   if (options.platform === "chzzk") {
     return searchLiveChzzk.call(this, options);
+  } else if (options.platform === "youtube") {
+    return searchLiveYoutube.call(this, options);
   }
 
-  throw new Error(`Unsupported platform: ${options.platform}`);
+  throw new Error("Unsupported platform");
 }
 
 async function searchLiveChzzk(
   this: StreamClient,
-  options: StreamSearchLiveOptions
+  options: Extract<StreamSearchLiveOptions, { platform: "chzzk" }>
 ): Promise<StreamSearchLiveResponse> {
-  const data = await this.chzzkClient.searchLive(options);
+  let data: ChzzkSearchLiveResponse | null = null;
+
+  try {
+    data = await this.chzzkClient.searchLive(options);
+  } catch (err) {
+    if (isAxiosError(err) === false) throw err;
+    if (err.status !== 400) throw err;
+  }
+
+  if (data === null) {
+    return {
+      platform: "chzzk",
+      next: null,
+      result: [],
+    };
+  }
 
   return {
     platform: "chzzk",
@@ -61,4 +90,11 @@ async function searchLiveChzzk(
       liveViewer: item.live.concurrentUserCount,
     })),
   };
+}
+
+async function searchLiveYoutube(
+  this: StreamClient,
+  options: Extract<StreamSearchLiveOptions, { platform: "youtube" }>
+): Promise<StreamSearchLiveResponse> {
+  throw new Error("Not implemented");
 }

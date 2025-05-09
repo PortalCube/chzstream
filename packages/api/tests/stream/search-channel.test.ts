@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { sleep, streamClient, TEST_CHANNELS, TEST_DELAY } from "../util.ts";
+import { StreamSearchChannelResponse } from "@api/stream/endpoints/search-channel.ts";
 
 describe("StreamClient", () => {
   describe("searchChannel", () => {
@@ -10,12 +11,13 @@ describe("StreamClient", () => {
 
     TEST_CHANNELS.forEach(({ id, name }, index) => {
       it(`chzzk common query ${index + 1}`, async () => {
-        const res = await streamClient.searchChannel({
+        const res = (await streamClient.searchChannel({
           platform: "chzzk",
           query: name,
           size: 5,
-        });
+        })) as Extract<StreamSearchChannelResponse, { platform: "chzzk" }>;
 
+        expect(res.platform).toBe("chzzk");
         expect(res.next).not.toBeNull();
         expect(res.result.length).not.toBe(0);
         expect(res.result[0].channelId).toBe(id);
@@ -29,11 +31,13 @@ describe("StreamClient", () => {
     });
 
     it("chzzk pagination", async () => {
-      const res1 = await streamClient.searchChannel({
+      const res1 = (await streamClient.searchChannel({
         platform: "chzzk",
         query: "치지직",
         size: 5,
-      });
+      })) as Extract<StreamSearchChannelResponse, { platform: "chzzk" }>;
+
+      expect(res1.platform).toBe("chzzk");
       expect(res1.next).not.toBeNull();
       expect(res1.result.length).not.toBe(0);
 
@@ -41,12 +45,14 @@ describe("StreamClient", () => {
 
       const next = res1.next;
 
-      const res2 = await streamClient.searchChannel({
+      const res2 = (await streamClient.searchChannel({
         platform: "chzzk",
         query: "치지직",
         size: 5,
         next,
-      });
+      })) as Extract<StreamSearchChannelResponse, { platform: "chzzk" }>;
+
+      expect(res2.platform).toBe("chzzk");
       expect(res2.next).not.toBeNull();
       expect(res2.result.length).not.toBe(0);
     });
