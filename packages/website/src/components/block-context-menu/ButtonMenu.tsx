@@ -43,6 +43,14 @@ const Tip = styled.p`
   }
 `;
 
+const KeyCode = styled.span`
+  margin-right: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background-color: rgb(49, 49, 49);
+  color: rgb(253, 110, 14);
+`;
+
 function ButtonMenu() {
   const block = useContext(BlockContextMenuContext);
 
@@ -147,7 +155,9 @@ function ButtonMenu() {
     <Container>
       <ZoomLevel />
       {items}
-      <Tip className={tipClassName}>참고: Ctrl + 우클릭으로 원래 메뉴 열기</Tip>
+      <Tip className={tipClassName}>
+        <KeyCode>Ctrl + 우클릭</KeyCode>으로 기존 메뉴 열기
+      </Tip>
     </Container>
   );
 }

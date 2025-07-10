@@ -27,45 +27,61 @@ export type FavoriteChannelItem = {
 const FAVORITE_CHANNELS_KEY = "favorite_channels";
 
 export const FAVOTIRE_CHANNELS_INITIAL_DATA: FavoriteChannelItem[] = [
+  // {
+  //   platform: "chzzk",
+  //   id: "f722959d1b8e651bd56209b343932c01",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "45e71a76e949e16a34764deb962f9d9f",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "b044e3a3b9259246bc92e863e7d3f3b8",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "4515b179f86b67b4981e16190817c580",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "4325b1d5bbc321fad3042306646e2e50",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "a6c4ddb09cdb160478996007bff35296",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "64d76089fba26b180d9c9e48a32600d9",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "516937b5f85cbf2249ce31b0ad046b0f",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "4d812b586ff63f8a2946e64fa860bbf5",
+  // },
+  // {
+  //   platform: "chzzk",
+  //   id: "8fd39bb8de623317de90654718638b10",
+  // },
   {
     platform: "chzzk",
-    id: "f722959d1b8e651bd56209b343932c01",
+    id: "9381e7d6816e6d915a44a13c0195b202",
   },
   {
     platform: "chzzk",
-    id: "45e71a76e949e16a34764deb962f9d9f",
+    id: "0b33823ac81de48d5b78a38cdbc0ab94",
   },
   {
     platform: "chzzk",
-    id: "b044e3a3b9259246bc92e863e7d3f3b8",
+    id: "d7ddd7585a271e55159ae47c0ce9a9dd",
   },
   {
     platform: "chzzk",
-    id: "4515b179f86b67b4981e16190817c580",
-  },
-  {
-    platform: "chzzk",
-    id: "4325b1d5bbc321fad3042306646e2e50",
-  },
-  {
-    platform: "chzzk",
-    id: "a6c4ddb09cdb160478996007bff35296",
-  },
-  {
-    platform: "chzzk",
-    id: "64d76089fba26b180d9c9e48a32600d9",
-  },
-  {
-    platform: "chzzk",
-    id: "516937b5f85cbf2249ce31b0ad046b0f",
-  },
-  {
-    platform: "chzzk",
-    id: "4d812b586ff63f8a2946e64fa860bbf5",
-  },
-  {
-    platform: "chzzk",
-    id: "8fd39bb8de623317de90654718638b10",
+    id: "dec8d19f0bc4be90a4e8b5d57df9c071",
   },
 ];
 
